@@ -28,11 +28,16 @@ requirements: test_environment
 
 ## Make Dataset
 data: 	requirements
+	$(PYTHON_INTERPRETER) src/data/create_directories_for_data.py
 	@echo ">>> Downloading data."
 	curl -o data/raw/landcover.zip $(LANDCOVER_DATA_URL)
 	@echo ">>> Unzipping."
 	unzip data/raw/landcover.zip -d data/raw
 	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+
+## Check and create directories for data if not exist
+dirs:	
+	$(PYTHON_INTERPRETER) src/data/create_directories_for_data.py
 
 ## Delete all compiled Python files
 clean:
