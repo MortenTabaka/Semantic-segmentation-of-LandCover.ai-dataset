@@ -39,6 +39,10 @@ data: 	requirements
 dirs:	
 	$(PYTHON_INTERPRETER) src/data/create_directories_for_data.py
 
+## Preprocess already downloaded data
+preprocess:	
+	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete

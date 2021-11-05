@@ -7,9 +7,12 @@ from preprocessing import DataProcessor
 
 
 
+
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
+
+
 
 # Source:
 # https://ericbassett.tech/cookiecutter-data-science-crash-course/
@@ -17,6 +20,8 @@ def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
+    
+    
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
     preprocessor = DataProcessor()
@@ -24,8 +29,8 @@ def main(input_filepath, output_filepath):
     logger.info('splitting images into tiles')
     preprocessor.split_images(input_filepath)
 
-    # logger.info('reading data')
-    # preprocessor.read_data(input_filepath)
+    logger.info('moving data to train/val/test directories')
+    preprocessor.move_data(input_filepath, output_filepath)
 
     # logger.info('processing data')
     # preprocessor.process_data()

@@ -10,11 +10,11 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 """
 
 import pandas as pd
-import numpy as np
-import csv
+import shutil
 
 import glob
 import os
+import os.path
 import cv2
 
 
@@ -27,8 +27,8 @@ class DataProcessor:
     
     def split_images(self, raw_data_path):
         """"
-        Splits each original image and its corresponding mask into 512x512
-        tiles and shuffles them.
+        Split each original image and its corresponding mask into 512x512
+        tiles and shuffle them.
         
         Source: LandCover.ai
         """
@@ -75,17 +75,35 @@ class DataProcessor:
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
         
 
-    # def read_data(self, raw_data_path):
-    #     """Read raw data into DataProcessor."""
-    #     pass
-
-    # def process_data(self, stable=True):
-    #     """Process raw data into useful files for model."""
-    #     pass
-
-    def write_data(self, processed_data_path):
-        """Write processed data to directory."""
+    def move_data(self, raw_data_path, processed_data_path):
+        """Move data to train/val/test directories."""
         
+        dataSplit = ['train', 'val', 'test']
         
-        
-        pass
+        for whichSplit in dataSplit:
+            
+            moveFrom = raw_data_path + '/tiles'
+            moveTo = processed_data_path + '/' + whichSplit
+           
+            if not os.path.exists(moveTo):
+                
+                os.mkdir(moveTo)
+            
+            imgsNames = pd.read_csv(raw_data_path + '/' + whichSplit + '.txt',
+                                    sep='\n', names=['file_name'])
+            
+            for imgName in imgsNames['file_name']:
+                
+                image = imgName + '.jpg'
+                mask = imgName + '_m.png'
+                
+                if os.path.isfile(moveFrom + '/' + image):
+                
+                    shutil.move(moveFrom + '/' + image,
+                                moveTo + '/' + image)
+                    
+                if os.path.isfile(moveFrom + '/' + mask):
+                
+                    shutil.move(moveFrom + '/' + mask,
+                                moveTo + '/' + mask)
+                    
