@@ -5,7 +5,7 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 
 References
 ==============================
-1. @InProceedings{Boguszewski_2021_CVPR,
+1. {Boguszewski_2021_CVPR,
     author = {Boguszewski, Adrian and Batorski, Dominik and Ziemba-Jankowska, Natalia and Dziedzic, Tomasz and Zambrzycka, Anna},
     title = {LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery},
     booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
