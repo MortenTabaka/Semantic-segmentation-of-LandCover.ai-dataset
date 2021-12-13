@@ -3,6 +3,15 @@ Improving IoU for roads semantic segmentation in LandCover.ai dataset
 
 Project will focus on semantic segmentation algorithms which may improve IoU for roads specifically. Dataset authors obtaied IoU=68.74% for roads, which was lowest score among all classes. 
 
+## Jupyter Notebooks
+### Data exploration
+
+1. [Check the class convention in the mask](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/0.1-Marcin-verify_mask_convention_for_classes.ipynb).
+
+2. [Preparing images for training](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/0.2-Marcin-explore_preparing_the_data_for_training.ipynb).
+
+### Model exploration
+
 
 ## References
 <a id="1">[1]</a> 
