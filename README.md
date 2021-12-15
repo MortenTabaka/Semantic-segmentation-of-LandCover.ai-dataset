@@ -12,6 +12,8 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 
 ### Model exploration
 
+1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/0.3-Marcin-GAN_MUNet_model.ipynb) in progress.
+
 
 ## References
 <a id="1">[1]</a> 
