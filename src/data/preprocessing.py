@@ -95,15 +95,15 @@ class DataProcessor:
             for imgName in imgsNames['file_name']:
                 
                 image = imgName + '.jpg'
-                mask = imgName + '_m.png'
+                mask = imgName + '.png'
                 
                 if os.path.isfile(moveFrom + '/' + image):
                 
                     shutil.move(moveFrom + '/' + image,
-                                moveTo + '/' + image)
+                                moveTo + '/image/' + image)
                     
                 if os.path.isfile(moveFrom + '/' + mask):
                 
                     shutil.move(moveFrom + '/' + mask,
-                                moveTo + '/' + mask)
-                    
+                                moveTo + '/mask/' + mask)
+        
