@@ -26,8 +26,8 @@ def move_data(raw_data_path, processed_data_path):
            
             if not os.path.exists(moveTo):
                 
-                os.makedirs(moveTo + '/images')
-                os.makedirs(moveTo + '/masks')
+                os.makedirs(moveTo + '/images/img')
+                os.makedirs(moveTo + '/masks/img')
             
             imgsNames = pd.read_csv(raw_data_path + '/' + whichSplit + '.txt',
                                     sep='\n', names=['file_name'])
@@ -41,14 +41,11 @@ def move_data(raw_data_path, processed_data_path):
                 if os.path.isfile(moveFrom + '/' + image):
                 
                     shutil.move(moveFrom + '/' + image,
-                                moveTo + '/images/' + image)
+                                moveTo + '/images/img/' + image)
                     
                 if os.path.isfile(moveFrom + '/' + org_mask_name):
                 
                     shutil.move(moveFrom + '/' + org_mask_name,
-                                moveTo + '/masks/' + mask)
+                                moveTo + '/masks/img/' + mask)
 
-raw =  '/home/marcin/git_workspace/roads_semantic_segmentation_in_LandCover.ai_dataset/data/raw'
-processed = '/home/marcin/git_workspace/roads_semantic_segmentation_in_LandCover.ai_dataset/data/processed'
-
-move_data(raw, processed)
+move_data('/home/marcin/git_workspace/roads_semantic_segmentation_in_LandCover.ai_dataset/data/raw', '/home/marcin/git_workspace/roads_semantic_segmentation_in_LandCover.ai_dataset/data/processed')

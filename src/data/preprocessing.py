@@ -75,7 +75,7 @@ class DataProcessor:
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
         
 
-    def move_data(self, raw_data_path, processed_data_path):
+    def move_data(raw_data_path, processed_data_path):
         """Move data to train/val/test directories."""
         
         dataSplit = ['train', 'val', 'test']
@@ -87,7 +87,8 @@ class DataProcessor:
            
             if not os.path.exists(moveTo):
                 
-                os.mkdir(moveTo)
+                os.makedirs(moveTo + '/images/img')
+                os.makedirs(moveTo + '/masks/img')
             
             imgsNames = pd.read_csv(raw_data_path + '/' + whichSplit + '.txt',
                                     sep='\n', names=['file_name'])
@@ -95,15 +96,16 @@ class DataProcessor:
             for imgName in imgsNames['file_name']:
                 
                 image = imgName + '.jpg'
+                org_mask_name = imgName + '_m.png'
                 mask = imgName + '.png'
                 
                 if os.path.isfile(moveFrom + '/' + image):
                 
                     shutil.move(moveFrom + '/' + image,
-                                moveTo + '/image/' + image)
+                                moveTo + '/images/img/' + image)
                     
-                if os.path.isfile(moveFrom + '/' + mask):
+                if os.path.isfile(moveFrom + '/' + org_mask_name):
                 
-                    shutil.move(moveFrom + '/' + mask,
-                                moveTo + '/mask/' + mask)
+                    shutil.move(moveFrom + '/' + org_mask_name,
+                                moveTo + '/masks/img/' + mask)
         
