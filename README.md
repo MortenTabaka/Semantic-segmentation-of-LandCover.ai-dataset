@@ -3,6 +3,26 @@ Improving IoU for roads semantic segmentation in LandCover.ai dataset
 
 Project will focus on semantic segmentation algorithms which may improve IoU for roads specifically. Dataset authors obtaied IoU=68.74% for roads, which was lowest score among all classes. 
 
+## Create Anaconda Environment
+
+1. To install Anaconda follow [Anaconda documentation](https://docs.anaconda.com/anaconda/install/index.html)
+
+2.  Open terminal in project directory and run  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```  or  ```conda create --name CHOSEN_ENV_NAME --file pkgs.txt```
+
+3. Run environment by ```conda activate CHOSEN_ENV_NAME```
+
+## Prepare dataset. 
+
+1. Open terminal in chosen directory. 
+
+2. Clone repository `git clone https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset.git`
+
+3. Change directory to repository with command `cd Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/`
+
+4. Download and preapare data by using `make data` command in repository dir. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
+
+5. Run Jupyter by `jupyter-notebook`.
+
 ## Jupyter Notebooks
 ### Data exploration
 
