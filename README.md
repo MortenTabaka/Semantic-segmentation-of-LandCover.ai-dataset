@@ -33,6 +33,7 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 ### Model exploration
 
 1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/Marcin_GAN_model_v2.ipynb) (it is possible to train the model, but it needs further development; not completed)
+2. [DeepLabv3+ model](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.0-Marcin-DeepLabv3%2B_model.ipynb) was used by dataset authors with good result and in consequence is treated as baseline model. (in progress; on branch "DeepLabv3+)
 
 
 ## References
