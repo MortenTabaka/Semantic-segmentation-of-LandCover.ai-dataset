@@ -26,14 +26,14 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 ## Jupyter Notebooks
 ### Data exploration
 
-1. [Check the class convention in the mask](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/0.1-Marcin-verify_mask_convention_for_classes.ipynb).
+1. [Check the class convention in the mask](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
 
-2. [Preparing images for training](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/0.2-Marcin-explore_preparing_the_data_for_training.ipynb).
+2. [Preparing images for training](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/2.0-Marcin-prepare_data_for_training.ipynb).
 
 ### Model exploration
 
-1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/Marcin_GAN_model_v2.ipynb) (it is possible to train the model, but it needs further development; not completed)
-2. [DeepLabv3+ model](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.0-Marcin-DeepLabv3%2B_model.ipynb) was used by dataset authors with good result and in consequence is treated as baseline model. (in progress; on branch "DeepLabv3+)
+1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/GAN_with_MUnet_generator/notebooks/exploratory/4.0-Marcin-GAN_model_v2.ipynb). It is possible to run training the model, but it gives completely wrong results (needs further development; not completed).
+2. [DeepLabv3+ model](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.0-Marcin-DeepLabv3%2B_model.ipynb) was used by dataset authors with good result and in consequence is treated as baseline model. (ready to run; needs data augmentation for overfitting)
 
 
 ## References
