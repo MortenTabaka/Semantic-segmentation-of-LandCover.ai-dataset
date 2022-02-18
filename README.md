@@ -33,8 +33,9 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 ### Model exploration
 
 1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/GAN_with_MUnet_generator/notebooks/exploratory/4.0-Marcin-GAN_model_v2.ipynb). It is possible to run training the model, but it gives completely wrong results (needs further development; not completed).
-2. [DeepLabv3+ model](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.0-Marcin-DeepLabv3%2B_model.ipynb) was used by dataset authors with good result and in consequence is treated as baseline model. (ready to run; needs data augmentation for overfitting)
-
+2. [DeepLabv3+ with ResNet50 as a backbone](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.0-Marcin-DeepLabv3%2B_model.ipynb) was used by dataset authors with good result and in consequence is treated as baseline model. (ready to run)
+3. **Best results so far for [DeepLabv3+ with Xception as a backbone](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.1-Marcin-DeepLabv3%2B_model.ipynb)**. Xception with frozen weights. 
+4. [DeepLabv3+ with Xception as a backbone and data augmentation](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.2-Marcin-DeepLabv3%2B_model.ipynb). Xception with frozen weights.
 
 ## References
 <a id="1">[1]</a> 
