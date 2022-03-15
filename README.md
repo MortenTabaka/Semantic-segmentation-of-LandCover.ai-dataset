@@ -37,6 +37,19 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 3. **Best results so far for [DeepLabv3+ with Xception as a backbone](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.1-Marcin-DeepLabv3%2B_model.ipynb)**. Xception with frozen weights. 
 4. [DeepLabv3+ with Xception as a backbone and data augmentation](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.2-Marcin-DeepLabv3%2B_model.ipynb). Xception with frozen weights.
 
+| Ver. | Architecture | Backbone | Weights | Frozen convolution base | Loss function | Data augmentation | Train dataset size | Loss weights | mIoU on test dataset |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 5.1 | DeepLabv3+ | Tensorflow Xception | Imagenet | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.587 | 
+|5.2 | DeepLabv3+ | Tensorflow Xception | Imagenet | Yes | Sparse Categorical Crossentropy | Yes | 14940 | No | 0.423 |
+| 5.3 | DeepLabv3+ | Tensorflow Xception | Imagenet | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.542 |
+| 5.4 | DeepLabv3+ | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.549 |
+| 5.4 | DeepLabv3+ | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.562 |
+| 5.5 | DeepLabv3+ | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.567 |
+| 5.6 | DeepLabv3+ | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.536 |
+| 5.7 | DeepLabv3+ | Modified Xception | Cityscapes | No | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.359 |
+| 5.8 | DeepLabv3+ | Modified Xception | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
+
+
 ## References
 <a id="1">[1]</a> 
 Boguszewski, Adrian and Batorski, Dominik and Ziemba-Jankowska, Natalia and Dziedzic, Tomasz and Zambrzycka, Anna (2021). ["LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery"](https://arxiv.org/abs/2005.02264v2)
