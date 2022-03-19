@@ -49,7 +49,7 @@ All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segme
 | [5.6](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.6-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.536 |
 | [5.7](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.7-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | No | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.359 |
 | [5.8](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.8-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
-
+| [**5.9**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.9-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Pascal VOC | Partially | Soft Dice Loss | No | 7470 | No | **0.607** |
 
 
 ## References
