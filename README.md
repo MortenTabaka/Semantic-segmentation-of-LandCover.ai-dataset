@@ -1,7 +1,7 @@
-Improving IoU for roads semantic segmentation in LandCover.ai dataset
+Semantic segmentation for LandCover.ai dataset
 ==============================
 
-Project will focus on semantic segmentation algorithms which may improve IoU for roads specifically. Dataset authors obtaied IoU=68.74% for roads, which was lowest score among all classes. 
+The project focuses on reproducing the results of the authors of the dataset and will make further efforts to improve the accuracy of the model.
 
 ## Create Anaconda Environment
 
