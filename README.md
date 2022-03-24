@@ -55,6 +55,13 @@ All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segme
 | [5.11](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.11-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
 | [5.12](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.12-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
 
+## Currently best IoU score
+
+![alt text](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/reports/figures/Currently_best_classes_iou.png)
+
+meanIoU = 0.718
+
+Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
 
 ## References
 <a id="1">[1]</a> 
