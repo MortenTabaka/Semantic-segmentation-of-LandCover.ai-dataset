@@ -7,23 +7,26 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 
 1. To install Anaconda follow [Anaconda documentation](https://docs.anaconda.com/anaconda/install/index.html)
 
-2.  Open terminal in project directory and run  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```  or  ```conda create --name CHOSEN_ENV_NAME --file pkgs.txt```
+2.  Open terminal in project directory and run command:  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```  or  ```conda create --name CHOSEN_ENV_NAME --file pkgs.txt```
 
-3. Run environment by ```conda activate CHOSEN_ENV_NAME```
+3. Run environment with command: ```conda activate CHOSEN_ENV_NAME```
 
 ## Prepare dataset. 
 
 1. Open terminal in chosen directory. 
 
-2. Clone repository `git clone https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset.git`
+2. Clone repository: `git clone https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset.git`
 
-3. Change directory to repository with command `cd Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/`
+3. Change current directory to repository's one with command: `cd Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/`
 
-4. Download and preapare data by using `make data` command in repository dir. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
+4. Download and preapare data by using **`make data`** command in repository dir. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
 
-5. Run Jupyter by `jupyter-notebook`.
+5. Run Jupyter with `jupyter-notebook`.
 
 ## Jupyter Notebooks
+
+All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/tree/main/notebooks/exploratory).
+
 ### Data exploration
 
 1. [Check the class convention in the mask](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
@@ -31,8 +34,6 @@ Project will focus on semantic segmentation algorithms which may improve IoU for
 2. [Preparing images for training](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/2.0-Marcin-prepare_data_for_training.ipynb).
 
 ### Model exploration
-
-All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/tree/main/notebooks/exploratory).
 
 1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/GAN_with_MUnet_generator/notebooks/exploratory/4.0-Marcin-GAN_model_v2.ipynb). It is possible to run training the model, but it gives completely wrong results (needs further development; not completed).
 
@@ -51,6 +52,9 @@ All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segme
 | [5.8](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.8-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
 | [5.9](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.9-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Pascal VOC | Partially | Soft Dice Loss | No | 7470 | No | 0.607 |
 | [**5.10**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | No | 7470 | No | **0.718** |
+| [5.11](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.11-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
+| [5.12](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.12-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
+
 
 ## References
 <a id="1">[1]</a> 
