@@ -71,10 +71,10 @@ Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmen
 - [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook)
     * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
 - [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook)
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+    * [ ] If successful, create Python modules and add the ability to run the model from the terminal.
 - [ ] Classicial Unet model.
     * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
-
+- [ ] Check meticulously if annotations in provided masks are correctly assgined.
 
 ## References
 <a id="1">[1]</a> 
