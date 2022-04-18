@@ -63,6 +63,19 @@ meanIoU = 0.718
 
 Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
 
+## TODO
+
+- [x] [Add functionality to download and preprocess dataset with `make data` command.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/tree/main/src/data)
+- [x] [Check annotations on masks and how pixel class information is communicated](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
+- [x] Create a pipeline for the data to be feed into the model
+- [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook)
+    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+- [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook)
+    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+- [ ] Classicial Unet model.
+    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+
+
 ## References
 <a id="1">[1]</a> 
 Boguszewski, Adrian and Batorski, Dominik and Ziemba-Jankowska, Natalia and Dziedzic, Tomasz and Zambrzycka, Anna (2021). ["LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery"](https://arxiv.org/abs/2005.02264v2)
