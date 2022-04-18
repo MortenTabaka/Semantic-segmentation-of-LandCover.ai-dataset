@@ -1,7 +1,7 @@
-Semantic segmentation for LandCover.ai dataset
+Semantic segmentation of LandCover.ai dataset
 ==============================
 
-The project focuses on reproducing the results of the authors of the dataset and will make further efforts to improve the accuracy of the model.
+The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
 ## Create Anaconda Environment
 
@@ -15,11 +15,11 @@ The project focuses on reproducing the results of the authors of the dataset and
 
 1. Open terminal in chosen directory. 
 
-2. Clone repository: `git clone https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset.git`
+2. Clone repository: `git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git`
 
-3. Change current directory to repository's one with command: `cd Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/`
+3. Change current directory to repository's one with command: `cd Semantic-segmentation-of-LandCover.ai-dataset/`
 
-4. Download and preapare data by using **`make data`** command in repository dir. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
+4. Download and preapare data by using **`make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
 
 5. Run Jupyter with `jupyter-notebook`.
 
