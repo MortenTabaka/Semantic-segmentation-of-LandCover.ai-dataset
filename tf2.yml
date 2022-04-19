@@ -1,4 +1,4 @@
-name: tensorflow_ml_assignment
+name: tensorflow
 channels:
   - conda-forge
   - defaults
@@ -21,10 +21,11 @@ dependencies:
   - binaryornot=0.4.4=pyhd3eb1b0_1
   - blas=1.0=mkl
   - bleach=3.3.1=pyhd3eb1b0_0
+  - bottleneck=1.3.2=py38heb32a55_1
   - brotli=1.0.9=he6710b0_2
   - brotlipy=0.7.0=py38h27cfd23_1003
   - c-ares=1.18.1=h7f8727e_0
-  - ca-certificates=2021.10.8=ha878542_0
+  - ca-certificates=2021.10.26=h06a4308_2
   - cffi=1.14.6=py38h400218f_0
   - chardet=4.0.0=py38h06a4308_1003
   - click=8.0.1=pyhd3eb1b0_0
@@ -33,6 +34,8 @@ dependencies:
   - cryptography=3.4.7=py38hd23ed53_0
   - cudatoolkit=11.3.1=h2bc3f7f_2
   - cudnn=8.2.1=cuda11.3_0
+  - cytoolz=0.11.0=py38h7b6447c_0
+  - dask-core=2021.10.0=pyhd3eb1b0_0
   - dataclasses=0.8=pyhc8e2a94_3
   - dbus=1.13.18=hb2f20db_0
   - decorator=5.0.9=pyhd3eb1b0_0
@@ -43,6 +46,7 @@ dependencies:
   - fontconfig=2.13.1=h6c09931_0
   - fonttools=4.25.0=pyhd3eb1b0_0
   - freetype=2.10.4=h5ab3b9f_0
+  - fsspec=2022.1.0=pyhd3eb1b0_0
   - future=0.18.2=py38_1
   - giflib=5.2.1=h7b6447c_0
   - glib=2.69.0=h5202010_0
@@ -102,10 +106,12 @@ dependencies:
   - libxcb=1.14=h7b6447c_0
   - libxml2=2.9.12=h03d6c58_0
   - libxslt=1.1.34=hc22bd24_0
+  - locket=0.2.1=py38h06a4308_1
   - lxml=4.6.3=py38h9120a33_0
   - lz4-c=1.9.3=h295c915_1
   - markdown=3.3.4=py38h06a4308_0
   - markupsafe=1.1.1=py38h7b6447c_0
+  - matplotlib-base=3.4.3=py38hbbc1b5f_0
   - mccabe=0.6.1=py38_1
   - mistune=0.8.4=py38h7b6447c_1000
   - mkl=2021.3.0=h06a4308_520
@@ -120,7 +126,10 @@ dependencies:
   - nbformat=5.1.3=pyhd3eb1b0_0
   - ncurses=6.2=he6710b0_1
   - nest-asyncio=1.5.1=pyhd3eb1b0_0
+  - networkx=2.6.3=pyhd3eb1b0_0
   - notebook=6.4.3=pyha770c72_0
+  - numexpr=2.7.3=py38h22e1b3c_1
+  - numpy-base=1.20.3=py38h74d4b33_0
   - numpydoc=1.1.0=pyhd3eb1b0_1
   - olefile=0.46=pyhd3eb1b0_0
   - openssl=1.1.1m=h7f8727e_0
@@ -128,6 +137,7 @@ dependencies:
   - pandoc=2.12=h06a4308_0
   - pandocfilters=1.4.3=py38h06a4308_1
   - parso=0.7.0=py_0
+  - partd=1.2.0=pyhd3eb1b0_0
   - pcre=8.45=h295c915_0
   - pexpect=4.8.0=pyhd3eb1b0_3
   - pickleshare=0.7.5=pyhd3eb1b0_1003
@@ -155,6 +165,7 @@ dependencies:
   - python-slugify=5.0.2=pyhd3eb1b0_0
   - python_abi=3.8=1_cp38
   - pytz=2021.1=pyhd3eb1b0_0
+  - pywavelets=1.1.1=py38h7b6447c_2
   - pyxdg=0.27=pyhd3eb1b0_0
   - pyyaml=5.4.1=py38h27cfd23_1
   - pyzmq=20.0.0=py38h2531618_1
@@ -170,6 +181,7 @@ dependencies:
   - requests-unixsocket=0.2.0=py_0
   - rope=0.19.0=pyhd3eb1b0_0
   - rtree=0.9.7=py38h06a4308_1
+  - scikit-image=0.18.3=py38h51133e4_0
   - scikit-learn=0.24.2=py38ha9443f7_0
   - scipy=1.6.2=py38had2a1c9_1
   - seaborn=0.11.2=pyhd3eb1b0_0
@@ -196,9 +208,11 @@ dependencies:
   - textdistance=4.2.1=pyhd3eb1b0_0
   - threadpoolctl=2.2.0=pyhb85f177_0
   - three-merge=0.1.1=pyhd3eb1b0_0
+  - tifffile=2020.10.1=py38hdd07704_2
   - tinycss=0.4=pyhd3eb1b0_1002
   - tk=8.6.10=hbc83047_0
   - toml=0.10.2=pyhd3eb1b0_0
+  - toolz=0.11.2=pyhd3eb1b0_0
   - tornado=6.1=py38h27cfd23_0
   - traitlets=5.0.5=pyhd3eb1b0_0
   - typed-ast=1.4.3=py38h7f8727e_1
@@ -226,6 +240,7 @@ dependencies:
     - astunparse==1.6.3
     - avro-python3==1.9.2.1
     - awscli==1.21.8
+    - beautifulsoup4==4.11.1
     - black==21.12b0
     - botocore==1.22.8
     - cachetools==4.2.2
@@ -247,6 +262,7 @@ dependencies:
     - flake8==3.9.2
     - flatbuffers==1.12
     - gast==0.4.0
+    - gdown==4.4.0
     - gin-config==0.4.0
     - google-api-core==1.30.0
     - google-api-python-client==2.8.0
@@ -265,6 +281,7 @@ dependencies:
     - httplib2==0.19.1
     - identify==2.4.2
     - importlib-resources==5.1.4
+    - ipynb==0.5.1
     - jmespath==0.10.0
     - jupyter-http-over-ws==0.0.8
     - jupyter-tensorboard==0.2.0
@@ -285,7 +302,7 @@ dependencies:
     - pandas==1.2.4
     - pathspec==0.9.0
     - pillow==8.2.0
-    - pip==21.3.1
+    - pip==22.0.4
     - platformdirs==2.4.1
     - portalocker==2.0.0
     - pre-commit==2.16.0
@@ -313,8 +330,9 @@ dependencies:
     - sacrebleu==1.5.1
     - sentencepiece==0.1.95
     - seqeval==1.2.2
-    - setuptools==58.5.3
+    - setuptools==62.1.0
     - sklearn==0.0
+    - soupsieve==2.3.2.post1
     - split-folders==0.4.3
     - tensorboard==2.5.0
     - tensorboard-data-server==0.6.1
@@ -335,5 +353,5 @@ dependencies:
     - uritemplate==3.0.1
     - urllib3==1.26.5
     - virtualenv==20.13.0
-    - wheel==0.36.2
+    - wheel==0.37.1
 prefix: /home/marcin/anaconda3/envs/tensorflow

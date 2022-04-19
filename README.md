@@ -7,7 +7,7 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 
 1. To install Anaconda follow [Anaconda documentation](https://docs.anaconda.com/anaconda/install/index.html)
 
-2.  Open terminal in project directory and run command:  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```  or  ```conda create --name CHOSEN_ENV_NAME --file pkgs.txt```
+2.  Open terminal in project directory and run command:  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```
 
 3. Run environment with command: ```conda activate CHOSEN_ENV_NAME```
 
@@ -19,7 +19,7 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 
 3. Change current directory to repository's one with command: `cd Semantic-segmentation-of-LandCover.ai-dataset/`
 
-4. Download and preapare data by using **`make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
+4. Download and preapare data by using **`pip install gdown && make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
 
 5. Run Jupyter with `jupyter-notebook`.
 
