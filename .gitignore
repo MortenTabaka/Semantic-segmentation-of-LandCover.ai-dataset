@@ -89,3 +89,4 @@ target/
 # Mypy cache
 .mypy_cache/
 notebooks/exploratory/results/
+models/saved_weights
