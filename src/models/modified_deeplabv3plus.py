@@ -415,15 +415,15 @@ def Deeplabv3(weights='pascal_voc', input_tensor=None, input_shape=(512, 512, 3)
         x = tf.keras.layers.experimental.preprocessing.Resizing(
                 *skip_size_0[1:3], interpolation="bilinear"
             )(x)
-        dec_skip0 = Conv2D(16, (1, 1), padding='same',
+        dec_skip0 = Conv2D(8, (1, 1), padding='same',
                            use_bias=False, name='feature_projection1')(skip0)
         dec_skip0 = BatchNormalization(
             name='feature_projection1_BN', epsilon=1e-5)(dec_skip0)
         dec_skip0 = Activation(tf.nn.relu)(dec_skip0)
         x = Concatenate()([x, dec_skip0])
-        x = SepConv_BN(x, 128, 'decoder_conv2',
+        x = SepConv_BN(x, 64, 'decoder_conv2',
                        depth_activation=True, epsilon=1e-5)
-        x = SepConv_BN(x, 128, 'decoder_conv3',
+        x = SepConv_BN(x, 64, 'decoder_conv3',
                        depth_activation=True, epsilon=1e-5)
 
     # you can use it with arbitary number of classes
