@@ -66,15 +66,14 @@ Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmen
 ## TODO
 
 - [x] [Add functionality to download and preprocess dataset with `make data` command.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/tree/main/src/data)
-- [x] [Check annotations on masks and how pixel class information is communicated](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
-- [x] Create a pipeline for the data to be feed into the model
-- [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook)
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
-- [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook)
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal.
-- [ ] Classicial Unet model.
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+- [x] [Check annotations on masks and how pixel class information is communicated.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
+- [x] Create a pipeline for the data to be feed into the model.
+- [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook).
+- [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook).
+    * [ ] Modify architecture by increasing split connections and adding more layers to decoder.  
 - [ ] Check meticulously if annotations in provided masks are correctly assgined.
+   * [x] [Create notebook for finding predicted mask with low IoU, to help determine which ground truth masks should be removed due to low quality.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/6.1-Marcin-check_quality_of_provided_masks.ipynb)
+   * [ ] Exclude low quality masks from train and validation sets and retrain model from start (downloaded weights trained on Cityscapes).
 
 ## References
 <a id="1">[1]</a> 
