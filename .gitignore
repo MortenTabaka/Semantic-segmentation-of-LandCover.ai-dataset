@@ -78,6 +78,7 @@ target/
 # exclude data from source control by default
 /data/
 /notebooks/exploratory/results
+/models/saved_weights
 
 # Mac OS-specific storage files
 .DS_Store
