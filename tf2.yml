@@ -1,4 +1,4 @@
-name: tensorflow
+name: tensorflow_MortenTabaka
 channels:
   - conda-forge
   - defaults
@@ -234,6 +234,7 @@ dependencies:
   - zipp=3.5.0=pyhd3eb1b0_0
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.4.9=haebb681_0
+  - pip
   - pip:
     - absl-py==0.12.0
     - apache-beam==2.30.0
