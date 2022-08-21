@@ -134,6 +134,32 @@ Project Organization
 
 --------
 
+## Citation
+If you use this software, please cite it using these metadata.
+```
+@software{Tabaka_Semantic_segmentation_of_2021,
+author = {Tabaka, Marcin Jarosław},
+license = {Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)},
+month = {11},
+title = {{Semantic segmentation of LandCover.ai dataset}},
+url = {https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset},
+year = {2021}
+}
+```
+
+Cite dataset authors:
+```
+@InProceedings{Boguszewski_2021_CVPR,
+    author = {Boguszewski, Adrian and Batorski, Dominik and Ziemba-Jankowska, Natalia and Dziedzic, Tomasz and Zambrzycka, Anna},
+    title = {LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+    month = {June},
+    year = {2021},
+    pages = {1102-1110}
+    url = {https://landcover.ai.linuxpolska.com/}
+}
+```
+
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
