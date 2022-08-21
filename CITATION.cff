@@ -1,14 +1,10 @@
 cff-version: 1.2.0
-message: If you use this software, please cite it using these metadata.
-title: Semantic segmentation of LandCover.ai dataset
-abstract: The LandCover dataset consists of aerial images of urban and rural areas of Poland. 
-The project focuses on the application of various neural networks for semantic segmentation, 
-including the reconstruction of the neural network implemented by the authors of the dataset.
+message: "If you use this software, please cite it using these metadata."
 authors:
-  - family-names: Tabaka
-    given-names: Marcin Jarosław
-  - name: "Semantic segmentation of LandCover.ai dataset"
-version: 1.0.0
-license: Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+- family-names: "Tabaka"
+  given-names: "Marcin Jarosław"
+- name: "Semantic segmentation of LandCover.ai dataset"
+title: "Semantic segmentation of LandCover.ai dataset"
+license: "Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)"
 date-released: 2021-11-04 
-repository-code: "https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset"
+url: "https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset"
