@@ -3,15 +3,23 @@ Semantic segmentation of LandCover.ai dataset
 
 The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
-## Create Anaconda Environment
+## Create a project environment
 
-1. To install Anaconda follow [Anaconda documentation](https://docs.anaconda.com/anaconda/install/index.html)
+To get Tensorflow and required drivers (if not installed), please visit [tutorial](https://www.youtube.com/watch?v=PnK1jO2kXOQ) and its [instruction](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/install/tensorflow-install-jul-2020.ipynb).
 
-2.  Open terminal in project directory and run command:  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```
+Project was created using:
+* Python 3.8
+* Tensorflow 2.5
 
-3. Run environment with command: ```conda activate CHOSEN_ENV_NAME```
+### Possible errors
 
-## Prepare dataset. 
+I. `Could not load dynamic library 'libcudnn.so.8'`
+
+Solution:
+
+Visit [discussion](https://github.com/tensorflow/tensorflow/issues/45200#issue-7514283790) or `conda install -c nvidia cudnn`
+
+## Prepare dataset
 
 1. Open terminal in chosen directory. 
 
@@ -21,7 +29,7 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 
 4. Download and preapare data by using **`pip install gdown && make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
 
-5. Run Jupyter with `jupyter-notebook`.
+5. Run Jupyter `jupyter notebook`
 
 ## Jupyter Notebooks
 
@@ -144,19 +152,6 @@ month = {11},
 title = {{Semantic segmentation of LandCover.ai dataset}},
 url = {https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset},
 year = {2021}
-}
-```
-
-Cite dataset authors:
-```
-@InProceedings{Boguszewski_2021_CVPR,
-    author = {Boguszewski, Adrian and Batorski, Dominik and Ziemba-Jankowska, Natalia and Dziedzic, Tomasz and Zambrzycka, Anna},
-    title = {LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery},
-    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
-    month = {June},
-    year = {2021},
-    pages = {1102-1110}
-    url = {https://landcover.ai.linuxpolska.com/}
 }
 ```
 
