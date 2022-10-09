@@ -63,13 +63,67 @@ All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segme
 | [5.11](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.11-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
 | [5.12](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.12-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
 
-## Currently best IoU score
+## Currently best mIoU score
 
 ![alt text](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/reports/figures/Currently_best_classes_iou.png)
 
 meanIoU = 0.718
 
 Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
+
+Weights generating best mIOU on test set are [**available to download from Gdrive.**](https://drive.google.com/drive/folders/1MyJ0_lQxBW7ekOzuVaBG4BRIpbaA-7xj?usp=sharing).
+
+Run below script in the project folder to create a model and load the weights.
+
+```
+#get local path to the project
+ABS_PATH = %pwd
+slash_idx = [idx for idx,ch in enumerate(ABS_PATH) if ch=='/']
+ABS_PATH = ABS_PATH[:slash_idx[-2]]
+
+#add folder with models to sys.path to be able to make imports in Jupyter
+module_path = ABS_PATH + '/src/models'
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+from deeplabv3plus import Deeplabv3
+
+
+IMG_SIZE = 512
+NUM_CLASSES = 5
+
+
+def get_deeplab_model(weights=None, activation=None):
+    
+    """Returns Deeplabv3+ model.
+    
+    Args:
+    weights: one of 'pascal_voc' (pre-trained on pascal voc),
+            'cityscapes' (pre-trained on cityscape) or None (random initialization)
+    freeze_conv_base: True if convolution base should be freezed or 
+            False if it to be otherwise
+    activation: optional activation to add to the top of the network.
+            One of 'softmax', 'sigmoid' or None
+    """
+    
+    model = Deeplabv3(
+        weights=weights,
+        classes=NUM_CLASSES,
+        backbone='xception',
+        OS=16,
+        input_shape=(IMG_SIZE, IMG_SIZE, 3),
+        activation=activation)
+        
+    return model
+    
+
+# path to downloaded folder with weights when put in the project's data folder 
+PATH_TO_DOWNLOADED_CHECKPOINT = ABS_PATH + '/data/0.718mIOU/checkpoint'
+
+model = get_deeplab_model()
+model.load_weights(PATH_TO_DOWNLOADED_CHECKPOINT)
+
+```
 
 ## TODO
 
