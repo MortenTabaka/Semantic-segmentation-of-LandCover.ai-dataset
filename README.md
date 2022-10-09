@@ -71,7 +71,7 @@ meanIoU = 0.718
 
 Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
 
-Weights generating best mIOU on test set are [**available to download from Gdrive.**](https://drive.google.com/drive/folders/1MyJ0_lQxBW7ekOzuVaBG4BRIpbaA-7xj?usp=sharing).
+Weights generating best mIOU on test set are [**available to download from Gdrive.**](https://drive.google.com/drive/folders/1MyJ0_lQxBW7ekOzuVaBG4BRIpbaA-7xj?usp=sharing)
 
 Run below script in the project folder to create a model and load the weights.
 
@@ -95,13 +95,11 @@ NUM_CLASSES = 5
 
 def get_deeplab_model(weights=None, activation=None):
     
-    """Returns Deeplabv3+ model.
+    """Returns pre-configured Deeplabv3+ used in the project.
     
     Args:
     weights: one of 'pascal_voc' (pre-trained on pascal voc),
             'cityscapes' (pre-trained on cityscape) or None (random initialization)
-    freeze_conv_base: True if convolution base should be freezed or 
-            False if it to be otherwise
     activation: optional activation to add to the top of the network.
             One of 'softmax', 'sigmoid' or None
     """
@@ -120,7 +118,11 @@ def get_deeplab_model(weights=None, activation=None):
 # path to downloaded folder with weights when put in the project's data folder 
 PATH_TO_DOWNLOADED_CHECKPOINT = ABS_PATH + '/data/0.718mIOU/checkpoint'
 
+#since we are loading weights
+#there is no need to load pre-trained Cityscapes or Pascal weights
 model = get_deeplab_model()
+
+#load downloaded weights
 model.load_weights(PATH_TO_DOWNLOADED_CHECKPOINT)
 
 ```
