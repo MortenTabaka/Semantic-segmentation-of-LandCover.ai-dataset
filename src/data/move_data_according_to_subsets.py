@@ -34,7 +34,6 @@ def move_data(raw_data_path, processed_data_path):
                                names=['file_name'], lineterminator="\n")
 
         for imgName in imgNames['file_name']:
-            print(imgName)
             image = imgName + '.jpg'
             org_mask_name = imgName + '_m.png'
             mask = imgName + '.png'
