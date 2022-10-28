@@ -10,13 +10,18 @@ import os
 
 
 def create_dir(path_list):
-    
+
     for path in path_list:
         if not os.path.exists(path):
             os.makedirs(path)
 
 
-paths = ['./data', './data/raw', './data/processed', './data/external', 
-         './data/interim']
+paths = [
+    "./data",
+    "./data/raw",
+    "./data/processed",
+    "./data/external",
+    "./data/interim",
+]
 
 create_dir(paths)

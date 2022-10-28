@@ -1,13 +1,13 @@
 # https://github.com/wkentaro/gdown
 import os
+
 import gdown
 
+abs_path = os.path.abspath("")
 
-abs_path = os.path.abspath('')
+DATA_DIR = abs_path + "/data/raw/"
 
-DATA_DIR = abs_path + '/data/raw/'
-
-output = DATA_DIR + 'landcover.zip'
+output = DATA_DIR + "landcover.zip"
 
 if not os.path.isfile(output):
     id = "1xILwUliGlWw5hmMt4E4GdDn5yV3ln8_G"
