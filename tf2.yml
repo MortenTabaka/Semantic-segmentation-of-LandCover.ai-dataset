@@ -355,4 +355,3 @@ dependencies:
     - urllib3==1.26.5
     - virtualenv==20.13.0
     - wheel==0.37.1
-prefix: /home/marcin/anaconda3/envs/tensorflow
