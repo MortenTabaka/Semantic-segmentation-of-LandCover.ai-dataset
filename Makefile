@@ -7,7 +7,7 @@
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 BUCKET = [OPTIONAL] your-bucket-for-syncing-data (do not include 's3://')
 PROFILE = default
-PROJECT_NAME = roads_semantic_segmentation_in_LandCover.ai_dataset
+PROJECT_NAME = Semantic-segmentation-of-LandCover.ai-dataset
 PYTHON_INTERPRETER = python3
 LANDCOVER_DATA_URL = https://drive.google.com/file/d/1xILwUliGlWw5hmMt4E4GdDn5yV3ln8_G/view?usp=sharing
 
@@ -33,7 +33,8 @@ data: 	requirements
 	$(PYTHON_INTERPRETER) src/data/download_dataset.py
 	@echo ">>> Unzipping."
 	unzip data/raw/landcover.zip -d data/raw
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw
+	$(PYTHON_INTERPRETER) src/data/move_data_according_to_subsets.py
 
 ## Check and create directories for data if not exist
 dirs:	

@@ -1,4 +1,5 @@
-name: tensorflow_MortenTabaka
+name: tensorflow2_MortenTabaka
+
 channels:
   - conda-forge
   - defaults

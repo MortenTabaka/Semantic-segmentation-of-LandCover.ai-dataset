@@ -1,42 +1,25 @@
 # -*- coding: utf-8 -*-
-import click
 import logging
 from pathlib import Path
+
+import click
 from dotenv import find_dotenv, load_dotenv
-from preprocessing import DataProcessor
-
-
+from src.data.preprocessing import DataProcessor
 
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-
-
-
 # Source:
 # https://ericbassett.tech/cookiecutter-data-science-crash-course/
-def main(input_filepath, output_filepath):
+def main(input_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
-    
-    
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
-    preprocessor = DataProcessor()
     
     logger.info('splitting images into tiles')
-    preprocessor.split_images(input_filepath)
-
-    logger.info('moving data to train/val/test directories')
-    preprocessor.move_data(input_filepath, output_filepath)
-
-    # logger.info('processing data')
-    # preprocessor.process_data()
-
-    # logger.info('saving processed data')
-    # preprocessor.write_data(output_filepath)
+    DataProcessor().split_images(input_filepath)
 
 
 if __name__ == '__main__':
