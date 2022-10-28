@@ -3,15 +3,23 @@ Semantic segmentation of LandCover.ai dataset
 
 The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
-## Create Anaconda Environment
+## Create a project environment
 
-1. To install Anaconda follow [Anaconda documentation](https://docs.anaconda.com/anaconda/install/index.html)
+To get Tensorflow and required drivers (if not installed), please visit [tutorial](https://www.youtube.com/watch?v=PnK1jO2kXOQ) and its [instruction](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/install/tensorflow-install-jul-2020.ipynb).
 
-2.  Open terminal in project directory and run command:  ```conda env create --name CHOSEN_ENV_NAME --file tf2.yml```
+Project was created using:
+* Python 3.8
+* Tensorflow 2.5
 
-3. Run environment with command: ```conda activate CHOSEN_ENV_NAME```
+### Possible errors
 
-## Prepare dataset. 
+I. `Could not load dynamic library 'libcudnn.so.8'`
+
+Solution:
+
+Visit [discussion](https://github.com/tensorflow/tensorflow/issues/45200#issue-7514283790) or `conda install -c nvidia cudnn`
+
+## Prepare dataset
 
 1. Open terminal in chosen directory. 
 
@@ -21,7 +29,7 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 
 4. Download and preapare data by using **`pip install gdown && make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
 
-5. Run Jupyter with `jupyter-notebook`.
+5. Run Jupyter `jupyter notebook`
 
 ## Jupyter Notebooks
 
@@ -55,7 +63,7 @@ All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segme
 | [5.11](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.11-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
 | [5.12](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.12-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
 
-## Currently best IoU score
+## Currently best mIoU score
 
 ![alt text](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/reports/figures/Currently_best_classes_iou.png)
 
@@ -63,18 +71,73 @@ meanIoU = 0.718
 
 Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
 
+Weights generating best mIOU on test set are [**available to download from Gdrive.**](https://drive.google.com/drive/folders/1MyJ0_lQxBW7ekOzuVaBG4BRIpbaA-7xj?usp=sharing)
+
+Run below script in the project folder to create a model and load the weights.
+
+```
+#get local path to the project
+ABS_PATH = %pwd
+slash_idx = [idx for idx,ch in enumerate(ABS_PATH) if ch=='/']
+ABS_PATH = ABS_PATH[:slash_idx[-2]]
+
+#add folder with models to sys.path to be able to make imports in Jupyter
+module_path = ABS_PATH + '/src/models'
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+from deeplabv3plus import Deeplabv3
+
+
+IMG_SIZE = 512
+NUM_CLASSES = 5
+
+
+def get_deeplab_model(weights=None, activation=None):
+    
+    """Returns pre-configured Deeplabv3+ used in the project.
+    
+    Args:
+    weights: one of 'pascal_voc' (pre-trained on pascal voc),
+            'cityscapes' (pre-trained on cityscape) or None (random initialization)
+    activation: optional activation to add to the top of the network.
+            One of 'softmax', 'sigmoid' or None
+    """
+    
+    model = Deeplabv3(
+        weights=weights,
+        classes=NUM_CLASSES,
+        backbone='xception',
+        OS=16,
+        input_shape=(IMG_SIZE, IMG_SIZE, 3),
+        activation=activation)
+        
+    return model
+    
+
+# path to downloaded folder with weights when put in the project's data folder 
+PATH_TO_DOWNLOADED_CHECKPOINT = ABS_PATH + '/data/0.718mIOU/checkpoint'
+
+#since we are loading weights
+#there is no need to load pre-trained Cityscapes or Pascal weights
+model = get_deeplab_model()
+
+#load downloaded weights
+model.load_weights(PATH_TO_DOWNLOADED_CHECKPOINT)
+
+```
+
 ## TODO
 
 - [x] [Add functionality to download and preprocess dataset with `make data` command.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/tree/main/src/data)
-- [x] [Check annotations on masks and how pixel class information is communicated](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
-- [x] Create a pipeline for the data to be feed into the model
-- [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook)
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
-- [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook)
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal.
-- [ ] Classicial Unet model.
-    * [ ] If successful, create Python modules and add the ability to run the model from the terminal. 
+- [x] [Check annotations on masks and how pixel class information is communicated.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
+- [x] Create a pipeline for the data to be feed into the model.
+- [ ] GAN model with MUnet as backbone according to research paper (Jupyter notebook).
+- [x] DeepLabv3+ model with modified Xception and pretrained weights (Jupyter notebook).
+    * [ ] Modify architecture by increasing split connections and adding more layers to decoder.  
 - [ ] Check meticulously if annotations in provided masks are correctly assgined.
+   * [x] [Create notebook for finding predicted mask with low IoU, to help determine which ground truth masks should be removed due to low quality.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/6.1-Marcin-check_quality_of_provided_masks.ipynb)
+   * [ ] Exclude low quality masks from train and validation sets and retrain model from start (downloaded weights trained on Cityscapes).
 
 ## References
 <a id="1">[1]</a> 
@@ -134,6 +197,19 @@ Project Organization
 
 
 --------
+
+## Citation
+If you use this software, please cite it using these metadata.
+```
+@software{Tabaka_Semantic_segmentation_of_2021,
+author = {Tabaka, Marcin Jarosław},
+license = {Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)},
+month = {11},
+title = {{Semantic segmentation of LandCover.ai dataset}},
+url = {https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset},
+year = {2021}
+}
+```
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 

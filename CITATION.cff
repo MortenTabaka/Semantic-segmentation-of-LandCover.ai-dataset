@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+authors:
+- family-names: "Tabaka"
+  given-names: "Marcin Jarosław"
+title: "Semantic segmentation of LandCover.ai dataset"
+license: "Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)"
+date-released: 2021-11-04 
+url: "https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset"
