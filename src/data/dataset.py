@@ -1,14 +1,15 @@
 import tensorflow as tf
 import numpy as np
-from typing import List
+from typing import List, Tuple
 import os
 from glob import glob
+from pandas import DataFrame
 
 from src.data.data_features import ImageFeatures, MaskFeatures
 from src.data.image_transformation import ImageTransformator
 
 
-class DataLoader:
+class Dataset:
     """
     Provides functionality to load processed images and masks.
     """
@@ -33,8 +34,9 @@ class DataLoader:
         self.mask_features = MaskFeatures(image_height, image_width, number_of_classes)
         self.image_transformator = ImageTransformator(image_height, image_width)
         self.batch_size = batch_size
+        self.number_of_classes = number_of_classes
 
-    def generate_dataset(self):
+    def generate_datasets(self):
         (
             train_images,
             train_masks,
@@ -43,12 +45,12 @@ class DataLoader:
             test_images,
             test_masks,
         ) = self.paths_to_images_and_masks()
-        train_dataset = self.generator(train_images, train_masks)
-        val_dataset = self.generator(val_images, val_masks)
-        test_dataset = self.generator(test_images, test_masks)
+        train_dataset = self.generate_single_dataset(train_images, train_masks)
+        val_dataset = self.generate_single_dataset(val_images, val_masks)
+        test_dataset = self.generate_single_dataset(test_images, test_masks)
         return train_dataset, val_dataset, test_dataset
 
-    def generator(
+    def generate_single_dataset(
         self,
         images_paths: List[str],
         masks_paths: List[str],
@@ -90,6 +92,24 @@ class DataLoader:
 
         return dataset
 
+    def get_class_balance(self) -> dict:
+        each_class_pixel_count = {}
+
+        for class_num in range(self.number_of_classes):
+            each_class_pixel_count[class_num] = 0.0
+
+        _, train_masks, _, val_masks, _, test_masks = self.paths_to_images_and_masks()
+        all_masks_paths = train_masks + val_masks + test_masks
+
+        for mask_path in all_masks_paths:
+            mask = self.mask_features.load_mask_from_drive(mask_path)
+            array_of_classes = mask[..., 0]
+            one_mask_count = np.unique(array_of_classes, return_counts=True)
+            for i in range(len(one_mask_count[0])):
+                each_class_pixel_count[one_mask_count[0][i]] += one_mask_count[1][i]
+
+        return each_class_pixel_count
+
     def load_single_image_and_mask(self, image_path: str, mask_path: str) -> tf.image:
         image = self.image_features.load_image_from_drive(image_path)
         mask = self.mask_features.load_mask_from_drive(mask_path)
@@ -104,7 +124,7 @@ class DataLoader:
             image, mask
         )
 
-    def paths_to_images_and_masks(self):
+    def paths_to_images_and_masks(self) -> Tuple[List[str], ...]:
         train_images = sorted(
             glob(os.path.join(self.processed_images_path, "train/images/img/*"))
         )
@@ -123,7 +143,6 @@ class DataLoader:
         test_masks = sorted(
             glob(os.path.join(self.processed_images_path, "test/masks/img/*"))
         )
-
         return train_images, train_masks, val_images, val_masks, test_images, test_masks
 
     def _get_path_to_subset_of_dataset(self, which_dataset: str) -> str:
@@ -138,3 +157,28 @@ class DataLoader:
         if self.processed_images_path[-1] == "/":
             return self.processed_images_path + which_dataset
         return self.processed_images_path + "/" + which_dataset
+
+    def get_dataframe_of_previously_calculated_class_balance_class_balance(self) -> DataFrame:
+        class_count = self.get_previously_calculated_class_balance()
+        class_names = self.get_ordered_class_names()
+
+        df = DataFrame(
+            data=class_count.items(),
+            index=class_names,
+            columns=["class_number", "pixel_count"],
+        )
+        return df
+
+    @staticmethod
+    def get_previously_calculated_class_balance() -> dict:
+        return {
+            0: 1626435631.0,
+            1: 24566909.0,
+            2: 925644528.0,
+            3: 175769115.0,
+            4: 45708873.0,
+        }
+
+    @staticmethod
+    def get_ordered_class_names() -> List[str]:
+        return ["background", "buildings", "woodland", "water", "roads"]
