@@ -3,15 +3,14 @@ import numpy as np
 
 
 class ImageTransformator:
-
     def __init__(
-            self,
-            image_height: int,
-            image_width: int,
-            probability_threshold: float = 0,
-            min_crop_coefficient: float = 0.7,
-            max_crop_coefficient: float = 1.0,
-            hue_coefficient: float = 0.2,
+        self,
+        image_height: int,
+        image_width: int,
+        probability_threshold: float = 0,
+        min_crop_coefficient: float = 0.7,
+        max_crop_coefficient: float = 1.0,
+        hue_coefficient: float = 0.2,
     ):
         """
         Creates object for images and its masks transformations.
@@ -29,9 +28,9 @@ class ImageTransformator:
         self.hue_coefficient = hue_coefficient
 
     def get_randomly_transformed_image_and_mask(
-            self,
-            input_image,
-            input_mask,
+        self,
+        input_image,
+        input_mask,
     ):
         # random crop and resize
         if tf.random.uniform(()) > self.threshold:
@@ -47,12 +46,22 @@ class ImageTransformator:
                 dtype=int,
             )
 
-            input_image = tf.image.random_crop(input_image, size=(crop_size_height, crop_size_width, 3))
-            input_image = tf.image.resize(input_image, [self.image_height, self.image_width])
+            input_image = tf.image.random_crop(
+                input_image, size=(crop_size_height, crop_size_width, 3)
+            )
+            input_image = tf.image.resize(
+                input_image, [self.image_height, self.image_width]
+            )
 
-            input_mask = tf.image.resize(input_mask, [self.image_height, self.image_width])
-            input_mask = tf.image.random_crop(input_mask, size=(crop_size_height, crop_size_width, 1))
-            input_mask = tf.image.resize(input_mask, [self.image_height, self.image_width])
+            input_mask = tf.image.resize(
+                input_mask, [self.image_height, self.image_width]
+            )
+            input_mask = tf.image.random_crop(
+                input_mask, size=(crop_size_height, crop_size_width, 1)
+            )
+            input_mask = tf.image.resize(
+                input_mask, [self.image_height, self.image_width]
+            )
 
         # random horizontal flip
         if tf.random.uniform(()) > self.threshold:
