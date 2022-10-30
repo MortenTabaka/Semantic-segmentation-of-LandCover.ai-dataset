@@ -3,23 +3,15 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
+from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import layers
-
-# from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.applications.imagenet_utils import preprocess_input
-from tensorflow.python.keras.layers import (
-    Activation,
-    Add,
-    BatchNormalization,
-    Concatenate,
-    Conv2D,
-    DepthwiseConv2D,
-    Dropout,
-    GlobalAveragePooling2D,
-    Input,
-    Reshape,
-    ZeroPadding2D,
-)
+from tensorflow.python.keras.applications.imagenet_utils import \
+    preprocess_input
+from tensorflow.python.keras.layers import (Activation, Add,
+                                            BatchNormalization, Concatenate,
+                                            Conv2D, DepthwiseConv2D, Dropout,
+                                            GlobalAveragePooling2D, Input,
+                                            Reshape, ZeroPadding2D)
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.utils.data_utils import get_file
 from tensorflow.python.keras.utils.layer_utils import get_source_inputs
@@ -332,17 +324,14 @@ def Deeplabv3(
         x = BatchNormalization(name="entry_flow_conv1_2_BN")(x)
         x = Activation(tf.nn.relu)(x)
 
-        # Add skip connection 256x256
-        x, skip0 = _xception_block(
+        x = _xception_block(
             x,
             [128, 128, 128],
             "entry_flow_block1",
             skip_connection_type="conv",
             stride=2,
             depth_activation=False,
-            return_skip=True,
         )
-
         x, skip1 = _xception_block(
             x,
             [256, 256, 256],
@@ -643,33 +632,6 @@ def Deeplabv3(
         x = SepConv_BN(x, 256, "decoder_conv0", depth_activation=True, epsilon=1e-5)
         x = SepConv_BN(x, 256, "decoder_conv1", depth_activation=True, epsilon=1e-5)
 
-    # added skip connection
-    if backbone == "xception":
-        # Feature projection
-        # x4 (x2) block
-        skip_size_0 = tf.keras.backend.int_shape(skip0)
-        x = tf.keras.layers.experimental.preprocessing.Resizing(
-            *skip_size_0[1:3], interpolation="bilinear"
-        )(x)
-        x = Conv2D(
-            56,
-            (1, 1),
-            padding="same",
-            use_bias=False,
-            name="feature_projection_decoder_1",
-        )(x)
-
-        dec_skip0 = Conv2D(
-            8, (1, 1), padding="same", use_bias=False, name="feature_projection1"
-        )(skip0)
-        dec_skip0 = BatchNormalization(name="feature_projection1_BN", epsilon=1e-5)(
-            dec_skip0
-        )
-        dec_skip0 = Activation(tf.nn.relu)(dec_skip0)
-        x = Concatenate()([x, dec_skip0])
-        x = SepConv_BN(x, 32, "decoder_conv2", depth_activation=True, epsilon=1e-5)
-        x = SepConv_BN(x, 32, "decoder_conv3", depth_activation=True, epsilon=1e-5)
-
     # you can use it with arbitary number of classes
     if (weights == "pascal_voc" and classes == 21) or (
         weights == "cityscapes" and classes == 19
@@ -693,7 +655,7 @@ def Deeplabv3(
     if activation in {"softmax", "sigmoid"}:
         x = tf.keras.layers.Activation(activation)(x)
 
-    model = Model(inputs, x, name="modified_deeplabv3plus")
+    model = Model(inputs, x, name="deeplabv3plus")
 
     # load weights
 
@@ -724,8 +686,7 @@ def Deeplabv3(
                 WEIGHTS_PATH_MOBILE_CS,
                 cache_subdir="models",
             )
-        model.load_weights(weights_path, by_name=True, skip_mismatch=True)
-
+        model.load_weights(weights_path, by_name=True)
     return model
 
 

@@ -6,8 +6,8 @@ import numpy as np
 import tensorflow as tf
 from pandas import DataFrame
 
-from src.data.data_features import ImageFeatures, MaskFeatures
-from src.data.image_transformation import ImageTransformator
+from src.features.data_features import ImageFeatures, MaskFeatures
+from src.features.image_transformation import ImageTransformator
 
 
 class Dataset:
