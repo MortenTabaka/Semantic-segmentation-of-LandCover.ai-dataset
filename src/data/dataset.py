@@ -1,8 +1,9 @@
-import tensorflow as tf
-import numpy as np
-from typing import List, Tuple
 import os
 from glob import glob
+from typing import List, Tuple
+
+import numpy as np
+import tensorflow as tf
 from pandas import DataFrame
 
 from src.data.data_features import ImageFeatures, MaskFeatures
@@ -158,7 +159,9 @@ class Dataset:
             return self.processed_images_path + which_dataset
         return self.processed_images_path + "/" + which_dataset
 
-    def get_dataframe_of_previously_calculated_class_balance_class_balance(self) -> DataFrame:
+    def get_dataframe_of_previously_calculated_class_balance_class_balance(
+        self,
+    ) -> DataFrame:
         class_count = self.get_previously_calculated_class_balance()
         class_names = self.get_ordered_class_names()
 
