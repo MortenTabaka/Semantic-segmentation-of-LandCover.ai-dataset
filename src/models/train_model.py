@@ -32,12 +32,12 @@ class Model:
 
     def get_deeplab_model(
         self,
-        architecture_version: str = None,
         weights: str = None,
         freeze_layers: bool = False,
         custom_freeze_border: int = None,
         activation: str = None,
-    ) -> tf.python.keras.models.Model:
+        architecture_version: str = None,
+    ) -> tf.keras.Model:
         """
         Creates model Deeplabv3plus or its modification.
         Original Tensorflow2 implementation: https://github.com/bonlime/keras-deeplab-v3-plus
@@ -86,7 +86,7 @@ class Model:
     @staticmethod
     def freeze_model_layers(
         model: tf.keras.models.Model, custom_freeze_border: int
-    ) -> tf.python.keras.models.Model:
+    ) -> tf.keras.Model:
         for i, layer in enumerate(model.layers):
             if i < custom_freeze_border:
                 layer.trainable = False
