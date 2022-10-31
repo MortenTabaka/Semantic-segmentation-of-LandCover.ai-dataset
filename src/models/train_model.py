@@ -19,7 +19,12 @@ class Model:
         number_of_classes: int,
     ):
         """
-        Returns Tensorflow model.
+        Class describing a single Tensorflow2 model.
+
+        Args:
+            image_height: height of a single image
+            image_width: width of a single image
+            number_of_classes: number of classes in classification
         """
         self.image_height = image_height
         self.image_width = image_width
@@ -32,17 +37,20 @@ class Model:
         freeze_layers: bool = False,
         custom_freeze_border: int = None,
         activation: str = None,
-    ):
+    ) -> tf.python.keras.models.Model:
         """
         Creates model Deeplabv3plus or its modification.
         Original Tensorflow2 implementation: https://github.com/bonlime/keras-deeplab-v3-plus
 
         Args:
-            architecture_version:
-            weights:
-            freeze_layers:
-            custom_freeze_border:
-            activation:
+            architecture_version: one of "original", "v1", "v2", "v3", "v4"
+            weights: one of 'pascal_voc' (pre-trained on pascal voc),
+                'cityscapes' (pre-trained on cityscape) or None (random initialization)
+            freeze_layers: should some layers be not trainable;
+                must set value for border by using custom_freeze_border;
+            custom_freeze_border: below that layer, all will be frozen
+            activation: optional activation to add to the top of the network.
+            One of 'softmax', 'sigmoid' or None
 
         Returns:
 
@@ -78,7 +86,7 @@ class Model:
     @staticmethod
     def freeze_model_layers(
         model: tf.keras.models.Model, custom_freeze_border: int
-    ) -> tf.keras.models.Model:
+    ) -> tf.python.keras.models.Model:
         for i, layer in enumerate(model.layers):
             if i < custom_freeze_border:
                 layer.trainable = False
