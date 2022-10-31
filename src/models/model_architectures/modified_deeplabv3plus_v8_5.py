@@ -4,14 +4,22 @@ from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
 from tensorflow.python.keras import layers
+
 # from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.applications.imagenet_utils import \
-    preprocess_input
-from tensorflow.python.keras.layers import (Activation, Add,
-                                            BatchNormalization, Concatenate,
-                                            Conv2D, DepthwiseConv2D, Dropout,
-                                            GlobalAveragePooling2D, Input,
-                                            Reshape, ZeroPadding2D)
+from tensorflow.python.keras.applications.imagenet_utils import preprocess_input
+from tensorflow.python.keras.layers import (
+    Activation,
+    Add,
+    BatchNormalization,
+    Concatenate,
+    Conv2D,
+    DepthwiseConv2D,
+    Dropout,
+    GlobalAveragePooling2D,
+    Input,
+    Reshape,
+    ZeroPadding2D,
+)
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.utils.data_utils import get_file
 from tensorflow.python.keras.utils.layer_utils import get_source_inputs
