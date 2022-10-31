@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.python.keras.applications.imagenet_utils import preprocess_input
 
 
 class ImageFeatures:
@@ -23,8 +24,12 @@ class ImageFeatures:
         image = tf.image.resize(
             images=image, size=[self.image_height, self.image_width]
         )
-        image = image / 255.0
+        image = self.normalize_image(image)
         return image
+
+    @staticmethod
+    def normalize_image(image):
+        return preprocess_input(image, mode="tf")
 
 
 class MaskFeatures:
