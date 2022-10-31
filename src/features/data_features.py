@@ -43,7 +43,7 @@ class MaskFeatures:
         self.image_width = mask_width
         self.number_of_classes = number_of_classes
 
-    def load_mask_from_drive(self, absolute_mask_path):
+    def load_mask_from_drive(self, absolute_mask_path: str) -> tf.image:
         """
         Read and decode a single mask.
         Args:
@@ -58,12 +58,8 @@ class MaskFeatures:
         single_mask = tf.image.resize(
             images=single_mask, size=[self.image_height, self.image_width]
         )
-        return single_mask
-
-    def encode_mask_to_one_hot(self, single_mask):
-        if single_mask.shape[-1] == 1:
-            single_mask = tf.one_hot(
-                tf.cast(single_mask[..., 0], tf.int32), self.number_of_classes
-            )
-            single_mask = tf.cast(single_mask, tf.float32)
+        single_mask = tf.one_hot(
+            tf.cast(single_mask, tf.int32), self.number_of_classes
+        )
+        single_mask = tf.cast(single_mask, tf.float32)
         return single_mask
