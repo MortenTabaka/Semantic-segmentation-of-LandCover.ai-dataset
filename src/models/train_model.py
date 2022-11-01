@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import tensorflow as tf
 
-from src.models.model_architectures import (
+from src.models.architectures import (
     deeplabv3plus,
     modified_deeplabv3plus,
     modified_deeplabv3plus_v8_3,

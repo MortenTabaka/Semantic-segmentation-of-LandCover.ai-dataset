@@ -56,7 +56,5 @@ class MaskFeatures:
             images=single_mask, size=[self.image_height, self.image_width]
         )
         single_mask = tf.cast(single_mask, tf.int32)
-        single_mask = tf.one_hot(
-            single_mask[..., 0], self.number_of_classes
-        )
+        single_mask = tf.one_hot(single_mask[..., 0], self.number_of_classes)
         return single_mask
