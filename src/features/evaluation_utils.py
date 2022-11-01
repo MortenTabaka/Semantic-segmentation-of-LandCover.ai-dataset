@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-
 from collections import defaultdict
 from json import dump
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -26,20 +26,22 @@ class HistoryUtilities:
 
 
 class History:
-
     def __init__(self):
         pass
 
     def display_history_plots(
-            self,
-            model_histories: None | list[dict] = None,
-            histories_filepaths: None | list[str] = None
+        self,
+        model_histories: None | list[dict] | list[str] = None,
     ):
-        all_history = defaultdict()
-        if model_histories:
+        if all(isinstance(item, dict) for item in model_histories):
             all_history = self.merge_multiple_histories(histories=model_histories)
-        elif histories_filepaths:
-            all_history = self.merge_multiple_histories(histories_filepaths=histories_filepaths)
+        elif all(isinstance(item, str) for item in model_histories):
+            all_history = self.merge_multiple_histories(
+                histories_filepaths=model_histories
+            )
+        else:
+            all_history = defaultdict()
+            print("History paths or dictionaries were not passed to function.")
 
         try:
             training_keys = []
@@ -56,25 +58,32 @@ class History:
 
                 plt.figure(figsize=(12, 10), dpi=140)
                 plt.plot(np.arange(1, number_of_epochs + 1, step=1), all_history[key])
-                plt.plot(np.arange(1, number_of_epochs + 1, step=1), all_history[validation_key])
-                plt.title(f"Training {key} (epoch)", fontsize='x-large')
-                plt.ylabel(f"{key}".capitalize(), fontsize='large')
-                plt.xlabel("Epoch", fontsize='large')
-                plt.legend([f'{key}'.capitalize(), f'Validation {key}'], fontsize='large')
+                plt.plot(
+                    np.arange(1, number_of_epochs + 1, step=1),
+                    all_history[validation_key],
+                )
+                plt.title(f"Training {key} (epoch)", fontsize="x-large")
+                plt.ylabel(f"{key}".capitalize(), fontsize="large")
+                plt.xlabel("Epoch", fontsize="large")
+                plt.legend(
+                    [f"{key}".capitalize(), f"Validation {key}"], fontsize="large"
+                )
                 plt.xticks(np.arange(1, number_of_epochs + 1, step=1))
                 plt.grid()
                 # plt.savefig(data_save_dir + f'/{name}_all.jpg')
                 plt.show()
 
         except AttributeError as err:
-            print("Validate if passed arguments are correct."
-                  "\nPython dictionary of model history or its filepath to JSON must be passed."
-                  f"\n{err}")
+            print(
+                "Validate if passed arguments are correct."
+                "\nPython dictionary of model history or its filepath to JSON must be passed."
+                f"\n{err}"
+            )
 
     @staticmethod
     def merge_multiple_histories(
-            histories: None | list[dict] = None,
-            histories_filepaths: None | list[str] = None
+        histories: None | list[dict] = None,
+        histories_filepaths: None | list[str] = None,
     ) -> defaultdict[list]:
         """
         Merges multiple histories into one.

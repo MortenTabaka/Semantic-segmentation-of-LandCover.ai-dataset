@@ -1,6 +1,7 @@
-import tensorflow as tf
 import keras.backend as K
+import tensorflow as tf
 from keras.losses import binary_crossentropy
+
 from src.features.data_features import MaskFeatures
 
 
