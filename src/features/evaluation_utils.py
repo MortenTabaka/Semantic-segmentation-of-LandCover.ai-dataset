@@ -33,6 +33,11 @@ class History:
         self,
         model_histories: None | list[dict] | list[str] = None,
     ):
+        """
+        Displays plots for train and validation values.
+        Args:
+            model_histories: None | list[dict] | list[str]: history dictionaries or its filepaths.
+        """
         if all(isinstance(item, dict) for item in model_histories):
             all_history = self.merge_multiple_histories(histories=model_histories)
         elif all(isinstance(item, str) for item in model_histories):
