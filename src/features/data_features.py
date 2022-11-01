@@ -51,15 +51,12 @@ class MaskFeatures:
 
         """
         single_mask = tf.io.read_file(absolute_mask_path)
-        single_mask = tf.image.decode_png(single_mask, channels=3)
-        single_mask = single_mask[..., 0]
-        single_mask = tf.reshape(single_mask, (self.image_height, self.image_width, 1))
-        single_mask.set_shape([None, None, 1])
+        single_mask = tf.image.decode_png(single_mask, channels=1)
         single_mask = tf.image.resize(
             images=single_mask, size=[self.image_height, self.image_width]
         )
+        single_mask = tf.cast(single_mask, tf.int32)
         single_mask = tf.one_hot(
-            tf.cast(single_mask, tf.int32), self.number_of_classes
+            single_mask[..., 0], self.number_of_classes
         )
-        single_mask = tf.cast(single_mask, tf.float32)
         return single_mask
