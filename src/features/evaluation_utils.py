@@ -200,9 +200,7 @@ class PredictionIoU:
         for class_id in range(self.number_of_classes):
             iou_per_class.append(IoU(self.number_of_classes, [class_id]))
 
-        print(iou_per_class)
         for single_batch in self.dataset:
-
             y_true, y_pred = ConfusionMatrix(
                 self.trained_model,
                 self.dataset,
@@ -219,8 +217,10 @@ class PredictionIoU:
                           index=[i for i in range(self.number_of_classes)],
                           columns=['IoU score'])
         if save_directory:
-            save_path = save_directory + '/iou_for_every_class.csv'
-            df.to_csv(save_path, sep='\t')
+            if save_directory[-1] != "/":
+                save_directory += "/"
+            save_path = save_directory + 'iou_for_every_class.csv'
+            df.to_csv(save_path)
             print(f'CSV saved to {save_path}')
         else:
             print('CSV won\'t be saved')
