@@ -6,6 +6,11 @@ from json import dump
 
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
+import pandas as pd
+import os
+
+from src.features.dataset import Dataset
 
 
 class HistoryUtilities:
@@ -31,12 +36,14 @@ class History:
 
     def display_history_plots(
         self,
-        model_histories: None | list[dict] | list[str] = None,
+        model_histories: list[dict] | list[str],
+        save_to_folder: str,
     ):
         """
         Displays plots for train and validation values.
         Args:
-            model_histories: None | list[dict] | list[str]: history dictionaries or its filepaths.
+            model_histories: list[dict] | list[str]: history dictionaries or its filepaths.
+            save_to_folder: str: path to folder where images should be saved
         """
         if all(isinstance(item, dict) for item in model_histories):
             all_history = self.merge_multiple_histories(histories=model_histories)
@@ -47,6 +54,12 @@ class History:
         else:
             all_history = defaultdict()
             print("History paths or dictionaries were not passed to function.")
+
+        if not os.path.exists(save_to_folder):
+            os.makedirs(save_to_folder)
+
+        if save_to_folder[-1] != "/":
+            save_to_folder += "/"
 
         try:
             training_keys = []
@@ -75,8 +88,7 @@ class History:
                 )
                 plt.xticks(np.arange(1, number_of_epochs + 1, step=1))
                 plt.grid()
-                # plt.savefig(data_save_dir + f'/{name}_all.jpg')
-                plt.show()
+                plt.savefig(save_to_folder + f"{key}.jpg")
 
         except AttributeError as err:
             print(
@@ -115,3 +127,47 @@ class History:
                 merged[key] += value
 
         return merged
+
+
+class ConfusionMatrix:
+    def __init__(
+            self,
+            trained_model: tf.keras.Model,
+            dataset: tf.data.Dataset,
+            number_of_classes: int,
+    ):
+        self.model = trained_model
+        self.dataset = dataset
+        self.number_of_classes = number_of_classes
+
+    def get_dataframe(self):
+        df_matrix = pd.DataFrame(0, index=[i for i in range(self.number_of_classes)],
+                                 columns=[i for i in range(self.number_of_classes)])
+
+        for single_batch in self.dataset:
+
+            predictions, labels = self.get_predictions_and_labels(single_batch)
+
+            matrix = tf.math.confusion_matrix(
+                labels=labels,
+                predictions=predictions,
+                num_classes=self.number_of_classes
+            ).numpy()
+
+            batch_df = pd.DataFrame(matrix, index=[i for i in range(self.number_of_classes)],
+                                    columns=[i for i in range(self.number_of_classes)])
+
+            df_matrix += batch_df
+
+        return df_matrix
+
+    def get_predictions_and_labels(self, single_batch):
+        images = single_batch[0]
+        y_pred = tf.argmax(self.model.predict(images), axis=-1)
+        y_true = tf.argmax(single_batch[1], axis=-1)
+
+        y_pred = tf.reshape(y_pred, [y_pred.shape[0] * y_pred.shape[1] * y_pred.shape[2]])
+        y_true = tf.reshape(y_true, [y_true.shape[0] * y_true.shape[1] * y_true.shape[2]])
+
+        return y_pred, y_true
+
