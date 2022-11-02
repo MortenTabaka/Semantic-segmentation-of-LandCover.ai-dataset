@@ -53,6 +53,11 @@ class Dataset:
         test_dataset = self.generate_single_dataset(test_images, test_masks)
         return train_dataset, val_dataset, test_dataset
 
+    def get_shuffled_test_dataset(self):
+        test_images, test_masks = self.paths_to_images_and_masks()[-2:]
+        test_dataset = self.generate_single_dataset(test_images, test_masks, shuffle=True)
+        return test_dataset
+
     def generate_single_dataset(
         self,
         images_paths: List[str],
@@ -60,6 +65,7 @@ class Dataset:
         data_transformation: bool = False,
         augmentation: bool = False,
         augmentation_factor: int = 2,
+        shuffle: bool = False,
     ) -> tf.data.Dataset:
         """
         Returns
@@ -82,6 +88,9 @@ class Dataset:
             dataset = dataset.map(
                 self.load_single_image_and_mask, num_parallel_calls=tf.data.AUTOTUNE
             )
+
+        if shuffle:
+            dataset = dataset.shuffle(100)
 
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
 

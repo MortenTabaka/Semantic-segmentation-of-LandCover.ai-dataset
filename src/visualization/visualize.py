@@ -25,9 +25,12 @@ class PredictionMasks:
         self.predictor = Predictor(self.model)
 
     def display_overlay_predictions_for_test_set(
-        self, how_many_images: int, colormap=COLORMAP
+        self, how_many_images: int, colormap=COLORMAP, randomly: bool = True
     ):
-        _, _, test_dataset = self.dataset.generate_datasets()
+        if randomly:
+            test_dataset = self.dataset.get_shuffled_test_dataset()
+        else:
+            _, _, test_dataset = self.dataset.generate_datasets()
 
         i = 0
         should_break = False
