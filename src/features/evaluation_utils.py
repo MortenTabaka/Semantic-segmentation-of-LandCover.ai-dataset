@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import json
+import os
 from collections import defaultdict
 from json import dump
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
 import pandas as pd
-import os
+import tensorflow as tf
 
-from src.features.dataset import Dataset
+from src.features.future_tensorflow import IoU
 
 
 class HistoryUtilities:
@@ -131,31 +131,37 @@ class History:
 
 class ConfusionMatrix:
     def __init__(
-            self,
-            trained_model: tf.keras.Model,
-            dataset: tf.data.Dataset,
-            number_of_classes: int,
+        self,
+        trained_model: tf.keras.Model,
+        dataset: tf.data.Dataset,
+        number_of_classes: int,
     ):
         self.model = trained_model
         self.dataset = dataset
         self.number_of_classes = number_of_classes
 
-    def get_dataframe(self):
-        df_matrix = pd.DataFrame(0, index=[i for i in range(self.number_of_classes)],
-                                 columns=[i for i in range(self.number_of_classes)])
+    def get_dataframe(self) -> pd.DataFrame:
+        df_matrix = pd.DataFrame(
+            0,
+            index=[i for i in range(self.number_of_classes)],
+            columns=[i for i in range(self.number_of_classes)],
+        )
 
         for single_batch in self.dataset:
 
-            predictions, labels = self.get_predictions_and_labels(single_batch)
+            y_true, y_pred = self.get_predictions_and_labels(single_batch)
 
             matrix = tf.math.confusion_matrix(
-                labels=labels,
-                predictions=predictions,
-                num_classes=self.number_of_classes
+                labels=y_true,
+                predictions=y_pred,
+                num_classes=self.number_of_classes,
             ).numpy()
 
-            batch_df = pd.DataFrame(matrix, index=[i for i in range(self.number_of_classes)],
-                                    columns=[i for i in range(self.number_of_classes)])
+            batch_df = pd.DataFrame(
+                matrix,
+                index=[i for i in range(self.number_of_classes)],
+                columns=[i for i in range(self.number_of_classes)],
+            )
 
             df_matrix += batch_df
 
@@ -166,8 +172,57 @@ class ConfusionMatrix:
         y_pred = tf.argmax(self.model.predict(images), axis=-1)
         y_true = tf.argmax(single_batch[1], axis=-1)
 
-        y_pred = tf.reshape(y_pred, [y_pred.shape[0] * y_pred.shape[1] * y_pred.shape[2]])
-        y_true = tf.reshape(y_true, [y_true.shape[0] * y_true.shape[1] * y_true.shape[2]])
+        y_pred = tf.reshape(
+            y_pred, [y_pred.shape[0] * y_pred.shape[1] * y_pred.shape[2]]
+        )
+        y_true = tf.reshape(
+            y_true, [y_true.shape[0] * y_true.shape[1] * y_true.shape[2]]
+        )
 
-        return y_pred, y_true
+        return y_true, y_pred
 
+
+class PredictionIoU:
+    def __init__(
+            self,
+            trained_model: tf.keras.Model,
+            dataset: tf.data.Dataset,
+            number_of_classes: int,
+    ):
+        self.trained_model = trained_model
+        self.dataset = dataset
+        self.number_of_classes = number_of_classes
+
+    def get_iou_for_every_class(self, save_directory=None):
+        iou_per_class = []
+        iou = []
+
+        for class_id in range(self.number_of_classes):
+            iou_per_class.append(IoU(self.number_of_classes, [class_id]))
+
+        print(iou_per_class)
+        for single_batch in self.dataset:
+
+            y_true, y_pred = ConfusionMatrix(
+                self.trained_model,
+                self.dataset,
+                self.number_of_classes,
+            ).get_predictions_and_labels(single_batch)
+
+            for m in iou_per_class:
+                m.update_state(y_true, y_pred)
+
+        for m in iou_per_class:
+            iou.append(m.result().numpy())
+
+        df = pd.DataFrame(iou,
+                          index=[i for i in range(self.number_of_classes)],
+                          columns=['IoU score'])
+        if save_directory:
+            save_path = save_directory + '/iou_for_every_class.csv'
+            df.to_csv(save_path, sep='\t')
+            print(f'CSV saved to {save_path}')
+        else:
+            print('CSV won\'t be saved')
+
+        return df
