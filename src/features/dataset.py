@@ -36,6 +36,8 @@ class Dataset:
         self.image_transformator = ImageTransformator(image_height, image_width)
         self.batch_size = batch_size
         self.number_of_classes = number_of_classes
+        self.image_height = image_height
+        self.image_width = image_width
 
     def generate_datasets(self):
         (
