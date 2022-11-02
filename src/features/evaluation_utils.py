@@ -184,10 +184,10 @@ class ConfusionMatrix:
 
 class PredictionIoU:
     def __init__(
-            self,
-            trained_model: tf.keras.Model,
-            dataset: tf.data.Dataset,
-            number_of_classes: int,
+        self,
+        trained_model: tf.keras.Model,
+        dataset: tf.data.Dataset,
+        number_of_classes: int,
     ):
         self.trained_model = trained_model
         self.dataset = dataset
@@ -213,16 +213,16 @@ class PredictionIoU:
         for m in iou_per_class:
             iou.append(m.result().numpy())
 
-        df = pd.DataFrame(iou,
-                          index=[i for i in range(self.number_of_classes)],
-                          columns=['IoU score'])
+        df = pd.DataFrame(
+            iou, index=[i for i in range(self.number_of_classes)], columns=["IoU score"]
+        )
         if save_directory:
             if save_directory[-1] != "/":
                 save_directory += "/"
-            save_path = save_directory + 'iou_for_every_class.csv'
+            save_path = save_directory + "iou_for_every_class.csv"
             df.to_csv(save_path)
-            print(f'CSV saved to {save_path}')
+            print(f"CSV saved to {save_path}")
         else:
-            print('CSV won\'t be saved')
+            print("CSV won't be saved")
 
         return df

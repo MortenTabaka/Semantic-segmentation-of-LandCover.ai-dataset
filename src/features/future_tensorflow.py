@@ -1,9 +1,9 @@
 from typing import List, Tuple, Union
-import numpy as np
 
+import numpy as np
 import tensorflow as tf
-from tensorflow.keras.metrics import Metric
 from tensorflow.keras import backend
+from tensorflow.keras.metrics import Metric
 
 
 class _IoUBase(Metric):
