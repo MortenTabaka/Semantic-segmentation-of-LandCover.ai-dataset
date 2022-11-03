@@ -3,6 +3,9 @@ Semantic segmentation of LandCover.ai dataset
 
 The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
+### Sample result
+![image](https://user-images.githubusercontent.com/29732555/199833063-9e4eb1d8-1fc2-4382-a2fd-b4aff7ab7d0d.png)
+
 ## Create a project environment
 
 To get Tensorflow and required drivers (if not installed), please visit [tutorial](https://www.youtube.com/watch?v=PnK1jO2kXOQ) and its [instruction](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/install/tensorflow-install-jul-2020.ipynb).
@@ -32,6 +35,8 @@ Visit [discussion](https://github.com/tensorflow/tensorflow/issues/45200#issue-7
 5. Run Jupyter `jupyter notebook`
 
 ## Jupyter Notebooks
+
+Please use this [template](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/Template_for_model_training.ipynb) for training your model.
 
 All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/tree/main/notebooks/exploratory).
 
@@ -138,6 +143,8 @@ model.load_weights(PATH_TO_DOWNLOADED_CHECKPOINT)
 - [ ] Check meticulously if annotations in provided masks are correctly assgined.
    * [x] [Create notebook for finding predicted mask with low IoU, to help determine which ground truth masks should be removed due to low quality.](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/6.1-Marcin-check_quality_of_provided_masks.ipynb)
    * [ ] Exclude low quality masks from train and validation sets and retrain model from start (downloaded weights trained on Cityscapes).
+- [x] Migrate notebooks' functionality to separate Python modules.
+- [ ] Resolve issue with environment's installation: https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/issues/1 
 
 ## References
 <a id="1">[1]</a> 
@@ -154,8 +161,6 @@ Project Organization
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
     │
@@ -187,7 +192,8 @@ Project Organization
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
-    │   │   ├── predict_model.py
+    |   |   ├── architectures      <- Model architectures available for training
+    │   │   ├── predict_model.py   
     │   │   └── train_model.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
