@@ -14,52 +14,81 @@ from src.features.future_tensorflow import IoU
 
 
 class HistoryUtilities:
-    def __init__(self, model_history_filepath):
-        self.filepath = model_history_filepath
+    def __init__(self):
+        """
+        Utilities for saving history or loading it from file.
+        """
+        pass
 
-    def dump_model_history_to_file(self, tensorflow_model_history):
+    def dump_model_history_to_file(
+        self,
+        tensorflow_model_history: tf.keras.callbacks.History,
+        folder_path: str,
+        file_name: str,
+    ):
         """
         Saves model history generated during training.
         Args:
             tensorflow_model_history: Tensorflow history; history = model.fit(...)
+            folder_path: path to data folder
+            file_name: history filename
         """
-        history = tensorflow_model_history.history
-        dump(history, open(self.filepath, "w"))
+        self.create_folders([folder_path])
 
-    def load_model_history_from_file(self) -> dict:
-        return json.load(open(self.filepath, "r"))
+        if folder_path[-1] != "/":
+            folder_path += "/"
+
+        history = tensorflow_model_history.history
+        dump(history, open(folder_path + file_name, "w"))
+
+    @staticmethod
+    def load_model_history_from_filepath(filepath) -> dict:
+        return json.load(open(filepath, "r"))
+
+    @staticmethod
+    def load_model_history_from_folder_path(folder_path: str, file_name: str) -> dict:
+        if folder_path[-1] != "/":
+            folder_path += "/"
+        return json.load(open(folder_path + file_name, "r"))
+
+    @staticmethod
+    def create_folders(paths: list[str]):
+        for path in paths:
+            if not os.path.exists(path):
+                os.makedirs(path)
 
 
 class History:
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        tensorflow_model_history: None | list[tf.keras.callbacks.History],
+    ):
+        """
+        Class representing single or multiple tensorflow training record.
+
+        Args:
+            tensorflow_model_history: record of the training;
+                training_history = model.fit(...)
+        """
+        self.multiple_history_files = tensorflow_model_history
 
     def display_history_plots(
         self,
-        model_histories: list[dict] | list[str],
-        save_to_folder: str,
+        save_folder_path: str = None,
     ):
         """
         Displays plots for train and validation values.
         Args:
-            model_histories: list[dict] | list[str]: history dictionaries or its filepaths.
-            save_to_folder: str: path to folder where images should be saved
+            save_folder_path: str: path to folder where images should be saved
         """
-        if all(isinstance(item, dict) for item in model_histories):
-            all_history = self.merge_multiple_histories(histories=model_histories)
-        elif all(isinstance(item, str) for item in model_histories):
-            all_history = self.merge_multiple_histories(
-                histories_filepaths=model_histories
-            )
-        else:
-            all_history = defaultdict()
-            print("History paths or dictionaries were not passed to function.")
+        all_history = self.merge_multiple_histories()
 
-        if not os.path.exists(save_to_folder):
-            os.makedirs(save_to_folder)
+        if save_folder_path:
+            if not os.path.exists(save_folder_path):
+                os.makedirs(save_folder_path)
 
-        if save_to_folder[-1] != "/":
-            save_to_folder += "/"
+            if save_folder_path[-1] != "/":
+                save_folder_path += "/"
 
         try:
             training_keys = []
@@ -67,7 +96,6 @@ class History:
 
             for key in all_history.keys():
                 if "val" not in key:
-                    print(key)
                     training_keys.append(key)
 
             for key in training_keys:
@@ -88,38 +116,27 @@ class History:
                 )
                 plt.xticks(np.arange(1, number_of_epochs + 1, step=1))
                 plt.grid()
-                plt.savefig(save_to_folder + f"{key}.jpg")
+                if save_folder_path:
+                    plt.savefig(save_folder_path + f"{key}.jpg")
+                plt.show()
 
         except AttributeError as err:
             print(
                 "Validate if passed arguments are correct."
-                "\nPython dictionary of model history or its filepath to JSON must be passed."
+                "\nPython dictionary of model history or its filepath to textfile must be passed."
                 f"\n{err}"
             )
+            raise err
 
-    @staticmethod
-    def merge_multiple_histories(
-        histories: None | list[dict] = None,
-        histories_filepaths: None | list[str] = None,
-    ) -> defaultdict[list]:
+    def merge_multiple_histories(self) -> defaultdict[list]:
         """
-        Merges multiple histories into one.
-        Pass only one history's dictionaries or filepaths.
-        Args:
-            histories: list[dict]: list of histories dictionaries
-            histories_filepaths: list[str]: list of history filepaths
+        Merges multiple multiple_history_files into one.
 
-        Returns: Merged histories according to key.
+        Returns: Merged multiple_history_files according to key.
         """
         added_histories = []
-
-        if histories:
-            for history in histories:
-                added_histories.append(history)
-        elif histories_filepaths:
-            for filepath in histories_filepaths:
-                history = HistoryUtilities(filepath).load_model_history_from_file()
-                added_histories.append(history)
+        for history in self.multiple_history_files:
+            added_histories.append(history.history)
 
         merged = defaultdict(list)
         for single_history in added_histories:

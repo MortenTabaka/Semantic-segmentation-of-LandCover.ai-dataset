@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import numpy as np
-import tensorflow_addons as tfa
-import tensorflow as tf
 import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow as tf
+import tensorflow_addons as tfa
 
 from src.features.dataset import Dataset
 from src.models.predict_model import Predictor
-
 
 COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 
@@ -62,9 +61,13 @@ class PredictionMasks:
     def get_overlay(self, image, colored_mask):
         image = tf.keras.preprocessing.image.array_to_img(image)
         image = np.array(image).astype(np.uint8)
-        image = tf.image.resize(image, [self.dataset.image_height, self.dataset.image_width])
+        image = tf.image.resize(
+            image, [self.dataset.image_height, self.dataset.image_width]
+        )
         image.set_shape([None, None, 3])
-        image = tf.reshape(image, (self.dataset.image_height, self.dataset.image_width, 3))
+        image = tf.reshape(
+            image, (self.dataset.image_height, self.dataset.image_width, 3)
+        )
         overlay = tfa.image.blend(image, colored_mask, 0.5)
         return overlay
 

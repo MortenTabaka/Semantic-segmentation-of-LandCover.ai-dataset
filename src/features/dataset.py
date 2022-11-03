@@ -55,7 +55,9 @@ class Dataset:
 
     def get_shuffled_test_dataset(self):
         test_images, test_masks = self.paths_to_images_and_masks()[-2:]
-        test_dataset = self.generate_single_dataset(test_images, test_masks, shuffle=True)
+        test_dataset = self.generate_single_dataset(
+            test_images, test_masks, shuffle=True
+        )
         return test_dataset
 
     def generate_single_dataset(
