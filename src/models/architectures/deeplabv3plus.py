@@ -1,24 +1,8 @@
 # https://github.com/bonlime/keras-deeplab-v3-plus
 
 from __future__ import absolute_import, division, print_function
-
 import tensorflow as tf
-from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import layers
-from tensorflow.python.keras.applications.imagenet_utils import preprocess_input
-from tensorflow.python.keras.layers import (
-    Activation,
-    Add,
-    BatchNormalization,
-    Concatenate,
-    Conv2D,
-    DepthwiseConv2D,
-    Dropout,
-    GlobalAveragePooling2D,
-    Input,
-    Reshape,
-    ZeroPadding2D,
-)
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.utils.data_utils import get_file
 from tensorflow.python.keras.utils.layer_utils import get_source_inputs
@@ -59,12 +43,12 @@ def SepConv_BN(
         pad_total = kernel_size_effective - 1
         pad_beg = pad_total // 2
         pad_end = pad_total - pad_beg
-        x = ZeroPadding2D((pad_beg, pad_end))(x)
+        x = tf.keras.layers.ZeroPadding2D((pad_beg, pad_end))(x)
         depth_padding = "valid"
 
     if not depth_activation:
-        x = Activation(tf.nn.relu)(x)
-    x = DepthwiseConv2D(
+        x = tf.keras.layers.Activation(tf.nn.relu)(x)
+    x = tf.keras.layers.DepthwiseConv2D(
         (kernel_size, kernel_size),
         strides=(stride, stride),
         dilation_rate=(rate, rate),
@@ -72,15 +56,15 @@ def SepConv_BN(
         use_bias=False,
         name=prefix + "_depthwise",
     )(x)
-    x = BatchNormalization(name=prefix + "_depthwise_BN", epsilon=epsilon)(x)
+    x = tf.keras.layers.BatchNormalization(name=prefix + "_depthwise_BN", epsilon=epsilon)(x)
     if depth_activation:
-        x = Activation(tf.nn.relu)(x)
-    x = Conv2D(
+        x = tf.keras.layers.Activation(tf.nn.relu)(x)
+    x = tf.keras.layers.Conv2D(
         filters, (1, 1), padding="same", use_bias=False, name=prefix + "_pointwise"
     )(x)
-    x = BatchNormalization(name=prefix + "_pointwise_BN", epsilon=epsilon)(x)
+    x = tf.keras.layers.BatchNormalization(name=prefix + "_pointwise_BN", epsilon=epsilon)(x)
     if depth_activation:
-        x = Activation(tf.nn.relu)(x)
+        x = tf.keras.layers.Activation(tf.nn.relu)(x)
 
     return x
 
@@ -97,7 +81,7 @@ def _conv2d_same(x, filters, prefix, stride=1, kernel_size=3, rate=1):
         rate: atrous rate for depthwise convolution
     """
     if stride == 1:
-        return Conv2D(
+        return tf.keras.layers.Conv2D(
             filters,
             (kernel_size, kernel_size),
             strides=(stride, stride),
@@ -111,8 +95,8 @@ def _conv2d_same(x, filters, prefix, stride=1, kernel_size=3, rate=1):
         pad_total = kernel_size_effective - 1
         pad_beg = pad_total // 2
         pad_end = pad_total - pad_beg
-        x = ZeroPadding2D((pad_beg, pad_end))(x)
-        return Conv2D(
+        x = tf.keras.layers.ZeroPadding2D((pad_beg, pad_end))(x)
+        return tf.keras.layers.Conv2D(
             filters,
             (kernel_size, kernel_size),
             strides=(stride, stride),
@@ -160,7 +144,7 @@ def _xception_block(
         shortcut = _conv2d_same(
             inputs, depth_list[-1], prefix + "_shortcut", kernel_size=1, stride=stride
         )
-        shortcut = BatchNormalization(name=prefix + "_shortcut_BN")(shortcut)
+        shortcut = tf.keras.layers.BatchNormalization(name=prefix + "_shortcut_BN")(shortcut)
         outputs = layers.add([residual, shortcut])
     elif skip_connection_type == "sum":
         outputs = layers.add([residual, inputs])
@@ -193,7 +177,7 @@ def _inverted_res_block(
     if block_id:
         # Expand
 
-        x = Conv2D(
+        x = tf.keras.layers.Conv2D(
             expansion * in_channels,
             kernel_size=1,
             padding="same",
@@ -201,14 +185,14 @@ def _inverted_res_block(
             activation=None,
             name=prefix + "expand",
         )(x)
-        x = BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "expand_BN")(
+        x = tf.keras.layers.BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "expand_BN")(
             x
         )
-        x = Activation(tf.nn.relu6, name=prefix + "expand_relu")(x)
+        x = tf.keras.layers.Activation(tf.nn.relu6, name=prefix + "expand_relu")(x)
     else:
         prefix = "expanded_conv_"
     # Depthwise
-    x = DepthwiseConv2D(
+    x = tf.keras.layers.DepthwiseConv2D(
         kernel_size=3,
         strides=stride,
         activation=None,
@@ -217,14 +201,14 @@ def _inverted_res_block(
         dilation_rate=(rate, rate),
         name=prefix + "depthwise",
     )(x)
-    x = BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "depthwise_BN")(
+    x = tf.keras.layers.BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "depthwise_BN")(
         x
     )
 
-    x = Activation(tf.nn.relu6, name=prefix + "depthwise_relu")(x)
+    x = tf.keras.layers.Activation(tf.nn.relu6, name=prefix + "depthwise_relu")(x)
 
     # Project
-    x = Conv2D(
+    x = tf.keras.layers.Conv2D(
         pointwise_filters,
         kernel_size=1,
         padding="same",
@@ -232,10 +216,10 @@ def _inverted_res_block(
         activation=None,
         name=prefix + "project",
     )(x)
-    x = BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "project_BN")(x)
+    x = tf.keras.layers.BatchNormalization(epsilon=1e-3, momentum=0.999, name=prefix + "project_BN")(x)
 
     if skip_connection:
-        return Add(name=prefix + "add")([inputs, x])
+        return tf.keras.layers.Add(name=prefix + "add")([inputs, x])
 
     # if in_channels == pointwise_filters and stride == 1:
     #    return Add(name='res_connect_' + str(block_id))([inputs, x])
@@ -300,7 +284,7 @@ def Deeplabv3(
         )
 
     if input_tensor is None:
-        img_input = Input(shape=input_shape)
+        img_input = tf.keras.layers.Input(shape=input_shape)
     else:
         img_input = input_tensor
 
@@ -316,7 +300,7 @@ def Deeplabv3(
             exit_block_rates = (1, 2)
             atrous_rates = (6, 12, 18)
 
-        x = Conv2D(
+        x = tf.keras.layers.Conv2D(
             32,
             (3, 3),
             strides=(2, 2),
@@ -324,12 +308,12 @@ def Deeplabv3(
             use_bias=False,
             padding="same",
         )(img_input)
-        x = BatchNormalization(name="entry_flow_conv1_1_BN")(x)
-        x = Activation(tf.nn.relu)(x)
+        x = tf.keras.layers.BatchNormalization(name="entry_flow_conv1_1_BN")(x)
+        x = tf.keras.layers.Activation(tf.nn.relu)(x)
 
         x = _conv2d_same(x, 64, "entry_flow_conv1_2", kernel_size=3, stride=1)
-        x = BatchNormalization(name="entry_flow_conv1_2_BN")(x)
-        x = Activation(tf.nn.relu)(x)
+        x = tf.keras.layers.BatchNormalization(name="entry_flow_conv1_2_BN")(x)
+        x = tf.keras.layers.Activation(tf.nn.relu)(x)
 
         x = _xception_block(
             x,
@@ -390,7 +374,7 @@ def Deeplabv3(
     else:
         OS = 8
         first_block_filters = _make_divisible(32 * alpha, 8)
-        x = Conv2D(
+        x = tf.keras.layers.Conv2D(
             first_block_filters,
             kernel_size=3,
             strides=(2, 2),
@@ -398,8 +382,8 @@ def Deeplabv3(
             use_bias=False,
             name="Conv" if input_shape[2] == 3 else "Conv_",
         )(img_input)
-        x = BatchNormalization(epsilon=1e-3, momentum=0.999, name="Conv_BN")(x)
-        x = Activation(tf.nn.relu6, name="Conv_Relu6")(x)
+        x = tf.keras.layers.BatchNormalization(epsilon=1e-3, momentum=0.999, name="Conv_BN")(x)
+        x = tf.keras.layers.Activation(tf.nn.relu6, name="Conv_Relu6")(x)
 
         x = _inverted_res_block(
             x,
@@ -578,22 +562,22 @@ def Deeplabv3(
 
     # Image Feature branch
     shape_before = tf.shape(x)
-    b4 = GlobalAveragePooling2D()(x)
+    b4 = tf.keras.layers.GlobalAveragePooling2D()(x)
     b4_shape = tf.keras.backend.int_shape(b4)
     # from (b_size, channels)->(b_size, 1, 1, channels)
-    b4 = Reshape((1, 1, b4_shape[1]))(b4)
-    b4 = Conv2D(256, (1, 1), padding="same", use_bias=False, name="image_pooling")(b4)
-    b4 = BatchNormalization(name="image_pooling_BN", epsilon=1e-5)(b4)
-    b4 = Activation(tf.nn.relu)(b4)
+    b4 = tf.keras.layers.Reshape((1, 1, b4_shape[1]))(b4)
+    b4 = tf.keras.layers.Conv2D(256, (1, 1), padding="same", use_bias=False, name="image_pooling")(b4)
+    b4 = tf.keras.layers.BatchNormalization(name="image_pooling_BN", epsilon=1e-5)(b4)
+    b4 = tf.keras.layers.Activation(tf.nn.relu)(b4)
     # upsample. have to use compat because of the option align_corners
     size_before = tf.keras.backend.int_shape(x)
     b4 = tf.keras.layers.experimental.preprocessing.Resizing(
         *size_before[1:3], interpolation="bilinear"
     )(b4)
     # simple 1x1
-    b0 = Conv2D(256, (1, 1), padding="same", use_bias=False, name="aspp0")(x)
-    b0 = BatchNormalization(name="aspp0_BN", epsilon=1e-5)(b0)
-    b0 = Activation(tf.nn.relu, name="aspp0_activation")(b0)
+    b0 = tf.keras.layers.Conv2D(256, (1, 1), padding="same", use_bias=False, name="aspp0")(x)
+    b0 = tf.keras.layers.BatchNormalization(name="aspp0_BN", epsilon=1e-5)(b0)
+    b0 = tf.keras.layers.Activation(tf.nn.relu, name="aspp0_activation")(b0)
 
     # there are only 2 branches in mobilenetV2. not sure why
     if backbone == "xception":
@@ -611,14 +595,14 @@ def Deeplabv3(
         )
 
         # concatenate ASPP branches & project
-        x = Concatenate()([b4, b0, b1, b2, b3])
+        x = tf.keras.layers.Concatenate()([b4, b0, b1, b2, b3])
     else:
-        x = Concatenate()([b4, b0])
+        x = tf.keras.layers.Concatenate()([b4, b0])
 
-    x = Conv2D(256, (1, 1), padding="same", use_bias=False, name="concat_projection")(x)
-    x = BatchNormalization(name="concat_projection_BN", epsilon=1e-5)(x)
-    x = Activation(tf.nn.relu)(x)
-    x = Dropout(0.1)(x)
+    x = tf.keras.layers.Conv2D(256, (1, 1), padding="same", use_bias=False, name="concat_projection")(x)
+    x = tf.keras.layers.BatchNormalization(name="concat_projection_BN", epsilon=1e-5)(x)
+    x = tf.keras.layers.Activation(tf.nn.relu)(x)
+    x = tf.keras.layers.Dropout(0.1)(x)
     # DeepLab v.3+ decoder
 
     if backbone == "xception":
@@ -628,14 +612,14 @@ def Deeplabv3(
         x = tf.keras.layers.experimental.preprocessing.Resizing(
             *skip_size[1:3], interpolation="bilinear"
         )(x)
-        dec_skip1 = Conv2D(
+        dec_skip1 = tf.keras.layers.Conv2D(
             48, (1, 1), padding="same", use_bias=False, name="feature_projection0"
         )(skip1)
-        dec_skip1 = BatchNormalization(name="feature_projection0_BN", epsilon=1e-5)(
+        dec_skip1 = tf.keras.layers.BatchNormalization(name="feature_projection0_BN", epsilon=1e-5)(
             dec_skip1
         )
-        dec_skip1 = Activation(tf.nn.relu)(dec_skip1)
-        x = Concatenate()([x, dec_skip1])
+        dec_skip1 = tf.keras.layers.Activation(tf.nn.relu)(dec_skip1)
+        x = tf.keras.layers.Concatenate()([x, dec_skip1])
         x = SepConv_BN(x, 256, "decoder_conv0", depth_activation=True, epsilon=1e-5)
         x = SepConv_BN(x, 256, "decoder_conv1", depth_activation=True, epsilon=1e-5)
 
@@ -647,7 +631,7 @@ def Deeplabv3(
     else:
         last_layer_name = "custom_logits_semantic"
 
-    x = Conv2D(classes, (1, 1), padding="same", name=last_layer_name)(x)
+    x = tf.keras.layers.Conv2D(classes, (1, 1), padding="same", name=last_layer_name)(x)
     size_before3 = tf.keras.backend.int_shape(img_input)
     x = tf.keras.layers.experimental.preprocessing.Resizing(
         *size_before3[1:3], interpolation="bilinear"
@@ -695,13 +679,3 @@ def Deeplabv3(
             )
         model.load_weights(weights_path, by_name=True)
     return model
-
-
-def preprocess_input(x):
-    """Preprocesses a numpy array encoding a batch of images.
-    # Arguments
-        x: a 4D numpy array consists of RGB values within [0, 255].
-    # Returns
-        Input array scaled to [-1.,1.]
-    """
-    return preprocess_input(x, mode="tf")

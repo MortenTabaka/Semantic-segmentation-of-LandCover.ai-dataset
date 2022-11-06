@@ -5,12 +5,10 @@ from __future__ import absolute_import, division, print_function
 import tensorflow as tf
 from tensorflow.python.keras import layers
 
-# from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.applications.imagenet_utils import preprocess_input
+from tensorflow.keras.layers import BatchNormalization
 from tensorflow.python.keras.layers import (
     Activation,
     Add,
-    BatchNormalization,
     Concatenate,
     Conv2D,
     DepthwiseConv2D,
@@ -732,13 +730,3 @@ def Deeplabv3(
         model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
     return model
-
-
-def preprocess_input(x):
-    """Preprocesses a numpy array encoding a batch of images.
-    # Arguments
-        x: a 4D numpy array consists of RGB values within [0, 255].
-    # Returns
-        Input array scaled to [-1.,1.]
-    """
-    return preprocess_input(x, mode="tf")
