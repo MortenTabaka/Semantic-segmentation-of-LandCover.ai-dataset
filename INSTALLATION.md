@@ -68,6 +68,9 @@ make data
 ``` 
 *During the process, pip packages specified in requirenments.txt, will be installed.*
 
+### [Notebook for checking installation](https://github.com/MortenTabaka/main/notebooks/testing/check_tensorflow_installation.ipynb)
+Filepath: `/notebooks/testing/check_tensorflow_installation.ipynb`
+
 # My environemnt 
 ## OS
 * Ubuntu 22.04.1
