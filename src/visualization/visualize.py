@@ -74,7 +74,7 @@ class PredictionMasks:
     @staticmethod
     def decode_segmentation_mask(
         landcover_mask, custom_colormap: list[list[float]], num_classes: int
-    ):
+    ) -> np.array:
         """
         Transforms Landcover dataset's masks to RGB image.
 
@@ -99,13 +99,22 @@ class PredictionMasks:
         return rgb
 
     @staticmethod
-    def plot_samples_matplotlib(display_list, figure_size=(5, 3)):
-        _, axes = plt.subplots(nrows=1, ncols=len(display_list), figsize=figure_size)
-        for i in range(len(display_list)):
-            if display_list[i].shape[-1] == 3:
-                axes[i].imshow(
-                    tf.keras.preprocessing.image.array_to_img(display_list[i])
-                )
+    def plot_samples_matplotlib(
+        display_list: list[np.array], figure_size: tuple[int] = (5, 3)
+    ):
+        sub_names = [
+            "Image",
+            "Ground truth overlay",
+            "Predicted mask overlay",
+            "Predicted mask",
+        ]
+        fig, axes = plt.subplots(nrows=1, ncols=len(display_list), figsize=figure_size)
+
+        for i, (name, image) in enumerate(zip(sub_names, display_list)):
+            axes[i].set_title(name, size=16)
+            axes[i].axis("off")
+            if image.shape[-1] == 3:
+                axes[i].imshow(tf.keras.preprocessing.image.array_to_img(image))
             else:
-                axes[i].imshow(display_list[i])
+                axes[i].imshow(image)
         plt.show()
