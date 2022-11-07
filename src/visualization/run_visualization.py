@@ -26,7 +26,7 @@ model = model_creator.get_deeplab_model(
     freeze_layers=True,
     custom_freeze_border=359,
     activation="softmax",
-    architecture_version="original"
+    architecture_version="original",
 )
 
 model.load_weights(
