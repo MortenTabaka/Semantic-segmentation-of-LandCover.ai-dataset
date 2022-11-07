@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import tensorflow as tf
 
 from src.models.architectures import (
