@@ -91,3 +91,4 @@ target/
 .mypy_cache/
 notebooks/exploratory/results/
 models/saved_weights
+/notebooks/templates/results/
