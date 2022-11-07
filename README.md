@@ -6,47 +6,21 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 ### Sample result
 ![image](https://user-images.githubusercontent.com/29732555/199833063-9e4eb1d8-1fc2-4382-a2fd-b4aff7ab7d0d.png)
 
-## Create a project environment
+# [Installation guide](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
 
-To get Tensorflow and required drivers (if not installed), please visit [tutorial](https://www.youtube.com/watch?v=PnK1jO2kXOQ) and its [instruction](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/install/tensorflow-install-jul-2020.ipynb).
+# Jupyter Notebooks
 
-Project was created using:
-* Python 3.8
-* Tensorflow 2.5
+### [Templates](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/tree/main/notebooks/templates)
 
-### Possible errors
+### [Experiments](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/tree/main/notebooks/exploratory)
 
-I. `Could not load dynamic library 'libcudnn.so.8'`
-
-Solution:
-
-Visit [discussion](https://github.com/tensorflow/tensorflow/issues/45200#issue-7514283790) or `conda install -c nvidia cudnn`
-
-## Prepare dataset
-
-1. Open terminal in chosen directory. 
-
-2. Clone repository: `git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git`
-
-3. Change current directory to repository's one with command: `cd Semantic-segmentation-of-LandCover.ai-dataset/`
-
-4. Download and preapare data by using **`pip install gdown && make data`** command in repository directory. Dataset will be downloaded and preprocessed according to [these Python files](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/tree/main/src/data). After preparing the data, it is possible to run notebooks. 
-
-5. Run Jupyter `jupyter notebook`
-
-## Jupyter Notebooks
-
-Please use this [template](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/exploratory/Template_for_model_training.ipynb) for training your model.
-
-All notebooks can be found [here](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/tree/main/notebooks/exploratory).
-
-### Data exploration
+## Data exploration
 
 1. [Check the class convention in the mask](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/1.0-Marcin-verify_mask_convention_for_classes.ipynb).
 
 2. [Preparing images for training](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/main/notebooks/exploratory/2.0-Marcin-prepare_data_for_training.ipynb).
 
-### Model exploration
+## Model exploration
 
 1. [GAN; Generator: MUNet](https://github.com/MortenTabaka/Improving-semantic-segmentation-accuracy-for-roads-class-in-LandCover.ai-dataset/blob/GAN_with_MUnet_generator/notebooks/exploratory/4.0-Marcin-GAN_model_v2.ipynb). It is possible to run training the model, but it gives completely wrong results (needs further development; not completed).
 
