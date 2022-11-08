@@ -3,7 +3,7 @@ from tensorflow.compat.v1 import InteractiveSession
 
 
 from src.features.evaluation_utils import ConfusionMatrix, PredictionIoU
-from src.models.train_model import Model
+from src.models.model_builder import Model
 from src.features.dataset import Dataset
 from src.visualization.visualize import PredictionMasks
 

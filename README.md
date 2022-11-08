@@ -168,7 +168,7 @@ Project Organization
     │   │   │                 predictions
     |   |   ├── architectures      <- Model architectures available for training
     │   │   ├── predict_model.py   
-    │   │   └── train_model.py
+    │   │   └── model_builder.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py

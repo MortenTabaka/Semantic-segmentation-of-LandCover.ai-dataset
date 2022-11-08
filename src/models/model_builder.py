@@ -64,8 +64,9 @@ class Model:
             1.0,
             activation,
         ]
-
-        if architecture_version == "v1":
+        if architecture_version == "original":
+            model = deeplabv3plus.Deeplabv3(*arguments)
+        elif architecture_version == "v1":
             model = modified_deeplabv3plus.Deeplabv3(*arguments)
         elif architecture_version == "v2":
             model = modified_deeplabv3plus_v8_3.Deeplabv3(*arguments)
