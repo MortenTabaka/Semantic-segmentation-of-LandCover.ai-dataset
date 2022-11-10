@@ -7,6 +7,7 @@ import tensorflow_addons as tfa
 
 from src.features.dataset import Dataset
 from src.models.predict_model import Predictor
+from src.features.metrics import CustomMeanIoU
 
 COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 
@@ -24,7 +25,11 @@ class PredictionMasks:
         self.predictor = Predictor(self.model)
 
     def display_overlay_predictions_for_test_set(
-        self, how_many_images: int, colormap=COLORMAP, randomly: bool = True
+        self,
+        how_many_images: int,
+        colormap=COLORMAP,
+        randomly: bool = True,
+        show_miou: bool = True,
     ):
         if randomly:
             test_dataset = self.dataset.get_shuffled_test_dataset()
@@ -47,9 +52,18 @@ class PredictionMasks:
                     )
                     overlay = self.get_overlay(image, mask_pred)
                     overlay_original = self.get_overlay(image, mask_true)
+
+                    if show_miou:
+                        miou_score = self.get_miou_score_for_single_prediction(
+                            mask_true.copy(), mask_pred.copy()
+                        )
+                    else:
+                        miou_score = None
+
                     self.plot_samples_matplotlib(
                         [image, overlay_original, mask_true, overlay, mask_pred],
                         figure_size=(18, 14),
+                        miou_score=miou_score,
                     )
                     i += 1
                 else:
@@ -70,6 +84,13 @@ class PredictionMasks:
         )
         overlay = tfa.image.blend(image, colored_mask, 0.5)
         return overlay
+
+    def get_miou_score_for_single_prediction(
+        self, real_mask: np.array, predicted_mask: np.array
+    ):
+        miou = CustomMeanIoU(self.num_classes)
+        miou.update_state(real_mask, predicted_mask)
+        return miou.result().numpy()
 
     @staticmethod
     def decode_segmentation_mask(
@@ -100,14 +121,20 @@ class PredictionMasks:
 
     @staticmethod
     def plot_samples_matplotlib(
-        images: list[np.array], figure_size: tuple[int] = (5, 3)
+        images: list[np.array],
+        figure_size: tuple[int, int] = (10, 6),
+        miou_score: float = None,
     ):
+        score = ""
+        if miou_score:
+            score = "\nMean IoU = {0:.2f}%".format(miou_score * 100)
+
         sub_names = [
             "Image",
             "Ground truth mask\n superimposed on the image",
             "Ground truth mask",
             "Predicted mask\n superimposed on the image",
-            "Predicted mask",
+            f"Predicted mask" + score,
         ]
         fig, axes = plt.subplots(nrows=1, ncols=len(images), figsize=figure_size)
 
