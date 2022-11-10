@@ -48,7 +48,7 @@ class PredictionMasks:
                     overlay = self.get_overlay(image, mask_pred)
                     overlay_original = self.get_overlay(image, mask_true)
                     self.plot_samples_matplotlib(
-                        [image, overlay_original, overlay, mask_pred],
+                        [image, overlay_original, mask_true, overlay, mask_pred],
                         figure_size=(18, 14),
                     )
                     i += 1
@@ -100,17 +100,18 @@ class PredictionMasks:
 
     @staticmethod
     def plot_samples_matplotlib(
-        display_list: list[np.array], figure_size: tuple[int] = (5, 3)
+        images: list[np.array], figure_size: tuple[int] = (5, 3)
     ):
         sub_names = [
             "Image",
-            "Ground truth overlay",
-            "Predicted mask overlay",
+            "Ground truth mask\n superimposed on the image",
+            "Ground truth mask",
+            "Predicted mask\n superimposed on the image",
             "Predicted mask",
         ]
-        fig, axes = plt.subplots(nrows=1, ncols=len(display_list), figsize=figure_size)
+        fig, axes = plt.subplots(nrows=1, ncols=len(images), figsize=figure_size)
 
-        for i, (name, image) in enumerate(zip(sub_names, display_list)):
+        for i, (name, image) in enumerate(zip(sub_names, images)):
             axes[i].set_title(name, size=16)
             axes[i].axis("off")
             if image.shape[-1] == 3:
