@@ -135,7 +135,7 @@ class PredictionMasks:
             "Ground truth mask\n superimposed on the image",
             "Ground truth mask",
             "Predicted mask\n superimposed on the image",
-            f"Predicted mask\nMean IoU = {score}",
+            f"Predicted mask\nMean IoU = {score}%",
         ]
         fig, axes = plt.subplots(nrows=1, ncols=len(images), figsize=figure_size)
 
