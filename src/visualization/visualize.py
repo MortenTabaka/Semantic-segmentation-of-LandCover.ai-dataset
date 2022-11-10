@@ -30,9 +30,10 @@ class PredictionMasks:
     def display_overlay_predictions_for_test_set(
         self,
         how_many_images: int,
+        figure_size: tuple[int, int],
         colormap=COLORMAP,
         randomly: bool = True,
-        should_save_to_file: bool = False,
+        export_to_file: bool = False,
     ):
         if randomly:
             test_dataset = self.dataset.get_shuffled_test_dataset()
@@ -63,8 +64,8 @@ class PredictionMasks:
                     self.plot_single_prediction(
                         [image, overlay_original, mask_true, overlay, mask_pred],
                         miou_score,
-                        figure_size=(18, 14),
-                        should_save_to_file=should_save_to_file,
+                        figure_size=figure_size,
+                        should_save_to_file=export_to_file,
                     )
                     i += 1
                 else:
