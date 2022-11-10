@@ -3,7 +3,7 @@ from tensorflow.compat.v1 import InteractiveSession
 
 
 from src.features.evaluation_utils import ConfusionMatrix, PredictionIoU
-from src.models.train_model import Model
+from src.models.model_builder import Model
 from src.features.dataset import Dataset
 from src.visualization.visualize import PredictionMasks
 
@@ -26,7 +26,7 @@ model = model_creator.get_deeplab_model(
     freeze_layers=True,
     custom_freeze_border=359,
     activation="softmax",
-    architecture_version="original"
+    architecture_version="original",
 )
 
 model.load_weights(
