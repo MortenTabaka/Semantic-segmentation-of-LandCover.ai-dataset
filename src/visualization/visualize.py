@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from random import randint
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -29,7 +32,7 @@ class PredictionMasks:
         how_many_images: int,
         colormap=COLORMAP,
         randomly: bool = True,
-        show_miou: bool = True,
+        should_save_to_file: bool = False,
     ):
         if randomly:
             test_dataset = self.dataset.get_shuffled_test_dataset()
@@ -53,17 +56,15 @@ class PredictionMasks:
                     overlay = self.get_overlay(image, mask_pred)
                     overlay_original = self.get_overlay(image, mask_true)
 
-                    if show_miou:
-                        miou_score = self.get_miou_score_for_single_prediction(
-                            mask_true.copy(), mask_pred.copy()
-                        )
-                    else:
-                        miou_score = None
+                    miou_score = self.get_miou_score_for_single_prediction(
+                        mask_true.copy(), mask_pred.copy()
+                    )
 
-                    self.plot_samples_matplotlib(
+                    self.plot_single_prediction(
                         [image, overlay_original, mask_true, overlay, mask_pred],
+                        miou_score,
                         figure_size=(18, 14),
-                        miou_score=miou_score,
+                        should_save_to_file=should_save_to_file,
                     )
                     i += 1
                 else:
@@ -120,21 +121,20 @@ class PredictionMasks:
         return rgb
 
     @staticmethod
-    def plot_samples_matplotlib(
+    def plot_single_prediction(
         images: list[np.array],
+        miou_score: float,
         figure_size: tuple[int, int] = (10, 6),
-        miou_score: float = None,
-    ):
-        score = ""
-        if miou_score:
-            score = "\nMean IoU = {0:.2f}%".format(miou_score * 100)
+        should_save_to_file: bool = False,
+    ) -> None:
+        score = round(miou_score * 100, 2)
 
         sub_names = [
             "Image",
             "Ground truth mask\n superimposed on the image",
             "Ground truth mask",
             "Predicted mask\n superimposed on the image",
-            f"Predicted mask" + score,
+            f"Predicted mask\nMean IoU = {score}",
         ]
         fig, axes = plt.subplots(nrows=1, ncols=len(images), figsize=figure_size)
 
@@ -145,4 +145,11 @@ class PredictionMasks:
                 axes[i].imshow(tf.keras.preprocessing.image.array_to_img(image))
             else:
                 axes[i].imshow(image)
+        if should_save_to_file:
+            dir_path = os.path.abspath(f"results/prediction_plots")
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            filename = f"meanIoU_{score}_percent__{randint(1000, 9999)}"
+            filepath = dir_path + f"/{filename}.png"
+            plt.savefig(filepath)
         plt.show()
