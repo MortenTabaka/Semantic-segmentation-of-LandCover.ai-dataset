@@ -3,8 +3,17 @@ Semantic segmentation of LandCover.ai dataset
 
 The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
-### Sample result
-![image](https://user-images.githubusercontent.com/29732555/199833063-9e4eb1d8-1fc2-4382-a2fd-b4aff7ab7d0d.png)
+## Sample results
+
+### High mIoU
+![meanIoU_100 0_percent__4952](https://user-images.githubusercontent.com/29732555/201164572-ee6b56b6-b87f-4480-a52d-943678f5245b.png)
+![meanIoU_73 03_percent__3929](https://user-images.githubusercontent.com/29732555/201164620-34ecbb4c-b6d4-4385-ac3b-0a9540842589.png)
+![meanIoU_63 92_percent__5447](https://user-images.githubusercontent.com/29732555/201164668-920369ed-1c7c-45b6-96e0-6142ac71f1ba.png)
+
+### Low mIoU
+![meanIoU_6 12_percent__3183](https://user-images.githubusercontent.com/29732555/201164960-118c1efa-fb5b-496e-b8b6-2609c461a92f.png)
+![meanIoU_23 39_percent__5703](https://user-images.githubusercontent.com/29732555/201165001-045e3f7a-9dac-4bce-b0f2-e457130f6f3c.png)
+
 
 # [Installation guide](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
 
@@ -38,73 +47,19 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 | [5.7](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.7-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | No | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.359 |
 | [5.8](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.8-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
 | [5.9](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.9-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Pascal VOC | Partially | Soft Dice Loss | No | 7470 | No | 0.607 |
-| [**5.10**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | No | 7470 | No | **0.718** |
+| [**5.10**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | No | 7470 | No | **0.718** |
 | [5.11](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.11-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
 | [5.12](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.12-Marcin-DeepLabv3%2B_model.ipynb) | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
 
 ## Currently best mIoU score
 
-![alt text](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/reports/figures/Currently_best_classes_iou.png)
+![alt text](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/reports/figures/Currently_best_classes_iou.png)
 
 meanIoU = 0.718
 
-Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/DeepLabv3%2B/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
-
-Weights generating best mIOU on test set are [**available to download from Gdrive.**](https://drive.google.com/drive/folders/1MyJ0_lQxBW7ekOzuVaBG4BRIpbaA-7xj?usp=sharing)
-
-Run below script in the project folder to create a model and load the weights.
-
-```
-#get local path to the project
-ABS_PATH = %pwd
-slash_idx = [idx for idx,ch in enumerate(ABS_PATH) if ch=='/']
-ABS_PATH = ABS_PATH[:slash_idx[-2]]
-
-#add folder with models to sys.path to be able to make imports in Jupyter
-module_path = ABS_PATH + '/src/models'
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
-from deeplabv3plus import Deeplabv3
+Notebook is available [**here**](https://github.com/MortenTabaka/Semantic-segmentation-for-LandCover.ai-dataset/blob/main/notebooks/exploratory/5.10-Marcin-DeepLabv3%2B_model.ipynb).
 
 
-IMG_SIZE = 512
-NUM_CLASSES = 5
-
-
-def get_deeplab_model(weights=None, activation=None):
-    
-    """Returns pre-configured Deeplabv3+ used in the project.
-    
-    Args:
-    weights: one of 'pascal_voc' (pre-trained on pascal voc),
-            'cityscapes' (pre-trained on cityscape) or None (random initialization)
-    activation: optional activation to add to the top of the network.
-            One of 'softmax', 'sigmoid' or None
-    """
-    
-    model = Deeplabv3(
-        weights=weights,
-        classes=NUM_CLASSES,
-        backbone='xception',
-        OS=16,
-        input_shape=(IMG_SIZE, IMG_SIZE, 3),
-        activation=activation)
-        
-    return model
-    
-
-# path to downloaded folder with weights when put in the project's data folder 
-PATH_TO_DOWNLOADED_CHECKPOINT = ABS_PATH + '/data/0.718mIOU/checkpoint'
-
-#since we are loading weights
-#there is no need to load pre-trained Cityscapes or Pascal weights
-model = get_deeplab_model()
-
-#load downloaded weights
-model.load_weights(PATH_TO_DOWNLOADED_CHECKPOINT)
-
-```
 
 ## TODO
 
