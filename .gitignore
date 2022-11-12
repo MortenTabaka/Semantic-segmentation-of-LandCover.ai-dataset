@@ -93,4 +93,3 @@ notebooks/exploratory/results/
 models/saved_weights
 /notebooks/templates/results/
 /notebooks/templates/best_miou_score_weights/
-/notebooks/exploratory/
