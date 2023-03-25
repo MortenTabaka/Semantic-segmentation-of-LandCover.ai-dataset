@@ -15,8 +15,36 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 ![meanIoU_23 39_percent__5703](https://user-images.githubusercontent.com/29732555/201165001-045e3f7a-9dac-4bce-b0f2-e457130f6f3c.png)
 
 
-# [Installation guide](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
+# Installation
+[Installation guide - Legacy](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
 
+## Docker - Tensorflow GPU
+To be able to use dockerized version of Tensorflow, follow this official Nvidia installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
+
+Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
+```
+docker build -t landcover_semantic_segmentation .
+```
+Official image was used as a base: https://hub.docker.com/layers/tensorflow/tensorflow/2.5.1-gpu-jupyter/images/sha256-5cdcd4446fc110817e5f6c5784eba6254258632036b426b9f194087e200f8a96?context=explore
+
+Run Jupyter Notebook with:
+```
+docker run --gpus all -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
+```
+If port `8888` is already in use, then change its value e.g. `-p 5555:8888`. Remember to manually change localhost port to chosen value. 
+
+Would be: `http://127.0.0.1:8888/?token=...`
+
+Should be: `http://127.0.0.1:5555/?token=...`
+
+## Docker - Tensorflow CPU (not tested)
+In [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile) 
+change tensorflow image name to `tensorflow/tensorflow:2.5.1-jupyter`.
+To run container, do not use flag `--gpus all`:
+
+```
+docker run -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
+```
 # Jupyter Notebooks
 
 ## [Development notebooks](https://drive.google.com/drive/folders/105HjfaU6_3NHRozYWXR9IjKiKKJRW5ez?usp=sharing)
@@ -40,21 +68,21 @@ Jupyter notebook templates for machine learning operations in the project.
 
 [Developemnt notebooks](https://drive.google.com/drive/folders/105HjfaU6_3NHRozYWXR9IjKiKKJRW5ez?usp=sharing)
 
-| Ver. | Backbone | Weights | Frozen convolution base | Loss function | Data augmentation | Train dataset size | Loss weights | mIoU on test dataset |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 5.1 | Tensorflow Xception | Imagenet | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.587 | 
-| 5.2 | Imagenet | Yes | Sparse Categorical Crossentropy | Yes | 14940 | No | 0.423 |
-| 5.3 | Tensorflow Xception | Imagenet | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.542 |
-| 5.4 | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.549 |
-| 5.4 | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.562 |
-| 5.5 | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.567 |
-| 5.6 | Modified Xception | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.536 |
-| 5.7 | Modified Xception | Cityscapes | No | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.359 |
-| 5.8 | Modified Xception | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
-| 5.9 | Modified Xception | Pascal VOC | Partially | Soft Dice Loss | No | 7470 | No | 0.607 |
-| **5.10** | Modified Xception | Cityscapes | Partially | Soft Dice Loss | No | 7470 | No | **0.718** |
-| 5.11 | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
-| 5.12 | Modified Xception | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
+| Ver. | Backbone                     | Weights    | Frozen convolution base | Loss function | Data augmentation | Train dataset size | Loss weights | mIoU on test dataset |
+| --- |------------------------------|------------| --- | --- | --- | --- | --- | --- |
+| 5.1 | Tensorflow Xception          | Imagenet   | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.587 | 
+| 5.2 | Tensorflow Xception | Imagenet   | Yes | Sparse Categorical Crossentropy | Yes | 14940 | No | 0.423 |
+| 5.3 | Tensorflow Xception          | Imagenet   | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.542 |
+| 5.4 | Modified Xception            | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | No | 0.549 |
+| 5.4 | Modified Xception            | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.562 |
+| 5.5 | Modified Xception            | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.567 |
+| 5.6 | Modified Xception            | Cityscapes | Yes | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.536 |
+| 5.7 | Modified Xception            | Cityscapes | No | Sparse Categorical Crossentropy | No | 7470 | Yes | 0.359 |
+| 5.8 | Modified Xception            | Cityscapes | Yes | Soft Dice Loss | No | 7470 | No | 0.559 |
+| 5.9 | Modified Xception            | Pascal VOC | Partially | Soft Dice Loss | No | 7470 | No | 0.607 |
+| **5.10** | Modified Xception            | Cityscapes | Partially | Soft Dice Loss | No | 7470 | No | **0.718** |
+| 5.11 | Modified Xception            | Cityscapes | Partially | Soft Dice Loss | Yes | 14940 | No | 0.659 |
+| 5.12 | Modified Xception            | Cityscapes | Partially | Soft Dice Loss | Yes | 7470 | No | 0.652 |
 
 ## Currently best mIoU score
 
