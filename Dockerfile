@@ -3,8 +3,10 @@ WORKDIR /app
 
 RUN python3 -m pip install --upgrade pip
 
-COPY dockerfile-requirements.txt /app/requirements.txt
-RUN pip install -r requirements.txt
+ENV NVIDIA_VISIBLE_DEVICES all
+
+COPY dockerfile-requirements.txt /app/dockerfile-requirements.txt
+RUN pip install -r dockerfile-requirements.txt
 
 COPY . /app
 
