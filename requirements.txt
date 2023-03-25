@@ -4,6 +4,6 @@ src==0.1.0
 pandas==1.2.4
 gdown==4.4.0
 tensorflow==2.5.0
-numpy==1.19.5
+numpy==1.23.5
 matplotlib==3.4.2
 setuptools==65.5.0
