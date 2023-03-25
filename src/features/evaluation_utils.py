@@ -1,9 +1,8 @@
-from __future__ import annotations
-
 import json
 import os
 from collections import defaultdict
 from json import dump
+from typing import List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -52,7 +51,7 @@ class HistoryUtilities:
         return json.load(open(folder_path + file_name, "r"))
 
     @staticmethod
-    def create_folders(paths: list[str]):
+    def create_folders(paths: List[str]):
         for path in paths:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -61,7 +60,7 @@ class HistoryUtilities:
 class History:
     def __init__(
         self,
-        tensorflow_model_history: None | list[tf.keras.callbacks.History],
+        tensorflow_model_history: Optional[List[tf.keras.callbacks.History]],
     ):
         """
         Class representing single or multiple tensorflow training record.
@@ -128,7 +127,7 @@ class History:
             )
             raise err
 
-    def merge_multiple_histories(self) -> defaultdict[list]:
+    def merge_multiple_histories(self):
         """
         Merges multiple multiple_history_files into one.
 
@@ -138,7 +137,7 @@ class History:
         for history in self.multiple_history_files:
             added_histories.append(history.history)
 
-        merged = defaultdict(list)
+        merged = defaultdict(List)
         for single_history in added_histories:
             for key, value in single_history.items():
                 merged[key] += value

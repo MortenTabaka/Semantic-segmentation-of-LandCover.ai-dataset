@@ -1,4 +1,4 @@
-import tensorflow.python.keras.backend as K
+import tensorflow.keras.backend as K
 import tensorflow as tf
 from keras.losses import binary_crossentropy
 
