@@ -27,7 +27,7 @@ requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
 ## Make Dataset
-data: 	requirements
+dataset:
 	$(PYTHON_INTERPRETER) src/data/create_directories_for_data.py
 	@echo ">>> Downloading dataset."
 	$(PYTHON_INTERPRETER) src/data/download_dataset.py
