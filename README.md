@@ -3,6 +3,13 @@ Semantic segmentation of LandCover.ai dataset
 
 The LandCover dataset consists of aerial images of urban and rural areas of Poland. The project focuses on the application of various neural networks for semantic segmentation, including the reconstruction of the neural network implemented by the authors of the dataset. 
 
+The dataset used in this project is the [Landcover.ai Dataset](https://landcover.ai.linuxpolska.com/), 
+which was originally published with [LandCover.ai: Dataset for Automatic Mapping of Buildings, Woodlands, Water and Roads from Aerial Imagery paper](https://arxiv.org/abs/2005.02264)
+also accessible on [PapersWithCode](https://paperswithcode.com/paper/landcover-ai-dataset-for-automatic-mapping-of).
+
+**Please note that I am not the author or owner of this dataset, and I am using it under the terms of the license specified by the original author. 
+All credits for the dataset go to the original author and contributors.**
+
 ## Sample results
 
 ### High mIoU
