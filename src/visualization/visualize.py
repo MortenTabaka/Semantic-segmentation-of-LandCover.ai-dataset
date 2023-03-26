@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from random import randint
 import os
 
@@ -7,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
+from typing import List, Tuple
 
 from src.features.dataset import Dataset
 from src.models.predict_model import Predictor
@@ -30,7 +29,7 @@ class PredictionMasks:
     def display_overlay_predictions_for_test_set(
         self,
         how_many_images: int,
-        figure_size: tuple[int, int],
+        figure_size: Tuple[int, int],
         colormap=COLORMAP,
         randomly: bool = True,
         export_to_file: bool = False,
@@ -96,7 +95,7 @@ class PredictionMasks:
 
     @staticmethod
     def decode_segmentation_mask(
-        landcover_mask, custom_colormap: list[list[float]], num_classes: int
+        landcover_mask, custom_colormap: List[List[float]], num_classes: int
     ) -> np.array:
         """
         Transforms Landcover dataset's masks to RGB image.
@@ -123,9 +122,9 @@ class PredictionMasks:
 
     @staticmethod
     def plot_single_prediction(
-        images: list[np.array],
+        images: List[np.array],
         miou_score: float,
-        figure_size: tuple[int, int] = (10, 6),
+        figure_size: Tuple[int, int] = (10, 6),
         should_save_to_file: bool = False,
     ) -> None:
         score = round(miou_score * 100, 2)
