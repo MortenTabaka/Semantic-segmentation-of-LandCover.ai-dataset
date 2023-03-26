@@ -26,7 +26,26 @@ All credits for the dataset go to the original author and contributors.**
 The project provides two ways of running the project. The first is environment installed via Anaconda 
 and the other is running a Docker container (recommended).
 
-## Docker - Tensorflow GPU (recommended)
+## DockerHub Image for Linux
+Ready image is accessible on Docker Hub.
+
+### Pull image
+```
+docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+```
+### Run image in interactive mode
+```
+docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+
+```
+### Run the image and create files locally
+```
+export PROJECT_PATH_LOCALLY="/path/to/local/code/directory" && 
+git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git "$PROJECT_PATH_LOCALLY" --branch v.0.0.2 &&
+docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+```
+
+## Dockerfile - Tensorflow GPU (recommended)
 To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
 
 Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
@@ -46,7 +65,7 @@ Would be: `http://127.0.0.1:8888/?token=...`
 
 Should be: `http://127.0.0.1:5555/?token=...`
 
-## Docker - Tensorflow CPU (not tested)
+## Dockerfile - Tensorflow CPU (not tested)
 In [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile) 
 change tensorflow image name to `tensorflow/tensorflow:2.5.1-jupyter`.
 To run container, do not use flag `--gpus all`:
