@@ -6,3 +6,5 @@ numpy==1.19.5
 matplotlib==3.3.4
 setuptools==59.6.0
 tensorflow_addons==0.14.0
+tqdm
+requests
