@@ -96,7 +96,7 @@ Jupyter notebook templates for machine learning operations in the project.
 
 **Notebook v.5.10** with **meanIoU = 0.718**.
 
-Notebooks are available [**here**](https://drive.google.com/drive/folders/105HjfaU6_3NHRozYWXR9IjKiKKJRW5ez?usp=sharing).
+Notebooks are available [**on Google Drive**](https://drive.google.com/drive/folders/105HjfaU6_3NHRozYWXR9IjKiKKJRW5ez?usp=sharing).
 
 ## References
 <a id="1">[1]</a> 
