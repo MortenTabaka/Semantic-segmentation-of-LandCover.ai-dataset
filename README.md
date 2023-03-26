@@ -19,7 +19,7 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 [Installation guide - Legacy](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
 
 ## Docker - Tensorflow GPU
-To be able to use dockerized version of Tensorflow, follow this official Nvidia installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
+To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
 
 Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
 ```
@@ -31,7 +31,8 @@ Run Jupyter Notebook with:
 ```
 docker run --gpus all -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
 ```
-If port `8888` is already in use, then change its value e.g. `-p 5555:8888`. Remember to manually change localhost port to chosen value. 
+If port `8888` is already in use, then change its value, e.g. `-p 5555:8888`. 
+Remember to manually replace port in a link to the chosen value:
 
 Would be: `http://127.0.0.1:8888/?token=...`
 
