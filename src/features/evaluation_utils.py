@@ -60,7 +60,7 @@ class HistoryUtilities:
 class History:
     def __init__(
         self,
-        tensorflow_model_history: Optional[List[tf.keras.callbacks.History]],
+        tensorflow_model_history: List[tf.keras.callbacks.History],
     ):
         """
         Class representing single or multiple tensorflow training record.
@@ -137,7 +137,7 @@ class History:
         for history in self.multiple_history_files:
             added_histories.append(history.history)
 
-        merged = defaultdict(List)
+        merged = defaultdict(list)
         for single_history in added_histories:
             for key, value in single_history.items():
                 merged[key] += value
