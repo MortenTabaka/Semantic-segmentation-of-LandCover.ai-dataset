@@ -16,9 +16,10 @@ The LandCover dataset consists of aerial images of urban and rural areas of Pola
 
 
 # Installation
-[Installation guide - Legacy](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
+The project provides two ways of running the project. The first is environment installed via Anaconda 
+and the other is running a Docker container (recommended).
 
-## Docker - Tensorflow GPU
+## Docker - Tensorflow GPU (recommended)
 To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
 
 Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
@@ -46,6 +47,10 @@ To run container, do not use flag `--gpus all`:
 ```
 docker run -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
 ```
+
+## Anaconda Enviornment (legacy)
+[Installation guide - Legacy](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
+
 # Jupyter Notebooks
 
 ## [Development notebooks](https://drive.google.com/drive/folders/105HjfaU6_3NHRozYWXR9IjKiKKJRW5ez?usp=sharing)
