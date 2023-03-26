@@ -156,6 +156,46 @@ class ConfusionMatrix:
         self.dataset = dataset
         self.number_of_classes = number_of_classes
 
+    def display_confusion_matrix(self, class_names: List[str]):
+        df_matrix = np.array(self.get_dataframe())
+
+        # Normalize the confusion matrix
+        confusion_matrix = df_matrix.astype('float') / df_matrix.sum(axis=1)[:, np.newaxis]
+
+        # Set up the figure and axes
+        fig, ax = plt.subplots(figsize=(10, 10))
+        im = ax.imshow(confusion_matrix, cmap='Blues')
+
+        # Add colorbar
+        cbar = ax.figure.colorbar(im, ax=ax)
+
+        # Add labels to the x-axis and y-axis
+        ax.set_xticks(np.arange(len(class_names)))
+        ax.set_yticks(np.arange(len(class_names)))
+        ax.set_xticklabels(class_names, fontsize=14)
+        ax.set_yticklabels(class_names, fontsize=14)
+
+        # Rotate the x-axis labels
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+                 rotation_mode="anchor")
+
+        # Loop over data dimensions and create text annotations
+        thresh = confusion_matrix.max() / 2.
+        for i in range(len(class_names)):
+            for j in range(len(class_names)):
+                ax.text(j, i, "{:.2f}".format(confusion_matrix[i, j]),
+                        ha="center", va="center",
+                        color="white" if confusion_matrix[i, j] > thresh else "black",
+                        fontsize=14)
+
+        # Add title and axis labels
+        ax.set_title("Confusion Matrix", fontsize=14)
+        ax.set_xlabel("Predicted label", fontsize=14)
+        ax.set_ylabel("True label", fontsize=14)
+
+        # Show the figure
+        plt.show()
+
     def get_dataframe(self) -> pd.DataFrame:
         df_matrix = pd.DataFrame(
             0,
