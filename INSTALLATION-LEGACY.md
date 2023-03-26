@@ -64,7 +64,7 @@ python -m ipykernel install --user --name tensorflow --display-name "Python 3.8 
 Now you should be able to change kernel in Jupyter Notebook.
 #### Create dataset and install pip packages with one command
 ```
-make data
+make dataset
 ``` 
 *During the process, pip packages specified in requirenments.txt, will be installed.*
 

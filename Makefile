@@ -27,10 +27,10 @@ requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
 ## Make Dataset
-data: 	requirements
-	$(PYTHON_INTERPRETER) src/data/create_directories_for_data.py
+dataset:
+	$(PYTHON_INTERPRETER) src/data/scripts/create_directories_for_data.py
 	@echo ">>> Downloading dataset."
-	$(PYTHON_INTERPRETER) src/data/download_dataset.py
+	$(PYTHON_INTERPRETER) src/data/scripts/download_raw_dataset.py
 	@echo ">>> Unzipping."
 	unzip data/raw/landcover.zip -d data/raw
 	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw

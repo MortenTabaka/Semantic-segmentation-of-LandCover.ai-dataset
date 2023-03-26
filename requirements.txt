@@ -7,3 +7,4 @@ tensorflow==2.5.0
 numpy==1.23.5
 matplotlib==3.4.2
 setuptools==65.5.0
+tqdm
