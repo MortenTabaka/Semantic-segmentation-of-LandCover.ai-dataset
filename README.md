@@ -26,6 +26,8 @@ All credits for the dataset go to the original author and contributors.**
 The project provides two ways of running the project. The first is environment installed via Anaconda 
 and the other is running a Docker container (recommended).
 
+To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
+
 ## DockerHub Image for Linux
 Ready image is accessible on Docker Hub.
 
@@ -46,7 +48,6 @@ docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentaba
 ```
 
 ## Dockerfile - Tensorflow GPU (recommended)
-To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
 
 Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
 ```
