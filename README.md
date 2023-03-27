@@ -48,6 +48,10 @@ docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentaba
 ```
 
 ## Dockerfile - Tensorflow GPU (recommended)
+Clone the repository
+```
+git clone git@github.com:MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git && cd Semantic-segmentation-of-LandCover.ai-dataset/
+```
 
 Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
 ```
@@ -67,9 +71,20 @@ Would be: `http://127.0.0.1:8888/?token=...`
 Should be: `http://127.0.0.1:5555/?token=...`
 
 ## Dockerfile - Tensorflow CPU (not tested)
+Clone the repository
+```
+git clone git@github.com:MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git && cd Semantic-segmentation-of-LandCover.ai-dataset/
+```
+
 In [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile) 
 change tensorflow image name to `tensorflow/tensorflow:2.5.1-jupyter`.
-To run container, do not use flag `--gpus all`:
+
+Build a image.
+```
+docker build -t landcover_semantic_segmentation .
+```
+
+To run the image, do not use flag `--gpus all`:
 
 ```
 docker run -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
