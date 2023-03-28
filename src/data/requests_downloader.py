@@ -10,7 +10,7 @@ class UrlDownloader:
     def __init__(self):
         pass
 
-    def download_single_file(self, url: str, file_name: str, output_path: str, unzip: bool = False):
+    def download_single_zip_file(self, url: str, file_name: str, output_path: str, unzip: bool = True):
         write_to = path.join(output_path, file_name)
         if not path.isfile(write_to):
             if not path.exists(output_path):
@@ -45,7 +45,7 @@ class UrlDownloader:
         path_from_root: str = "data"
         url = "https://huggingface.co/datasets/MortenTabaka/LandCover-Aerial-Imagery-for-semantic-segmentation/resolve/main/landcover_processed_for_training.zip"
         output = os.path.join(self.get_project_root(), path_from_root)
-        self.download_single_file(url, file_name, output, True)
+        self.download_single_zip_file(url, file_name, output, True)
 
     @staticmethod
     def unzip_file(zip_path: str, extract_path: str):
