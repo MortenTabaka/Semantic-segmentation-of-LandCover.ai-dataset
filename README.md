@@ -33,18 +33,18 @@ Ready image is accessible on Docker Hub.
 
 ### Pull image
 ```
-docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
 ```
 ### Run image in interactive mode
 ```
-docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
 
 ```
 ### Run the image and create files locally
 ```
 export PROJECT_PATH_LOCALLY="/path/to/local/code/directory" && 
-git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git "$PROJECT_PATH_LOCALLY" --branch v.0.0.2 &&
-docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.2
+git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git "$PROJECT_PATH_LOCALLY" --branch v.0.0.3 &&
+docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
 ```
 
 ## Dockerfile - Tensorflow GPU (recommended)
@@ -63,12 +63,6 @@ Run Jupyter Notebook with:
 ```
 docker run --gpus all -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
 ```
-If port `8888` is already in use, then change its value, e.g. `-p 5555:8888`. 
-Remember to manually replace port in a link to the chosen value:
-
-Would be: `http://127.0.0.1:8888/?token=...`
-
-Should be: `http://127.0.0.1:5555/?token=...`
 
 ## Dockerfile - Tensorflow CPU (not tested)
 Clone the repository
@@ -89,6 +83,15 @@ To run the image, do not use flag `--gpus all`:
 ```
 docker run -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
 ```
+
+### If port is already in use
+
+If port `8888` is already in use, then change its value, e.g. `-p 5555:8888`. 
+Remember to manually replace port in a link to the chosen value:
+
+Would be: `http://127.0.0.1:8888/?token=...`
+
+Should be: `http://127.0.0.1:5555/?token=...`
 
 ## Anaconda Enviornment (legacy)
 [Installation guide - Legacy](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/INSTALLATION.md)
