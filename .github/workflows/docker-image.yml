@@ -1,0 +1,42 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: Bump tag version
+      id: bump_tag_version
+      run: |
+        tag=$(git describe --tags --abbrev=0)
+        tag_number=$(echo $tag | sed 's/0.0.//')
+        new_tag_number=$((tag_number + 1))
+        new_tag="0.0.$new_tag_number"
+        echo "::set-output name=new_tag::$new_tag"
+      shell: bash
+    - name: Build and push Docker image
+      env:
+        DOCKER_BUILDKIT: 1
+        DOCKER_TAG: ${{ steps.bump_tag_version.outputs.new_tag }}
+      run: |
+        docker buildx build \
+          --platform linux/amd64,linux/arm64 \
+          --push \
+          --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:${DOCKER_TAG} \
+          .
