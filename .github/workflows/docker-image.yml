@@ -22,7 +22,7 @@ jobs:
     - name: Bump tag version
       id: bump_tag_version
       run: |
-        tag=$(git describe --tags --abbrev=0 2>/dev/null)
+        tag=$(git describe --tags --abbrev=0)
         if [[ -z "$tag" ]]; then
           new_tag="v1.0.0"
         else
@@ -41,3 +41,6 @@ jobs:
           --platform linux/amd64,linux/arm64 \
           --push \
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:${DOCKER_TAG} \
+          --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:latest \
+          .
+
