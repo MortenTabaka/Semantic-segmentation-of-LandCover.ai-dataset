@@ -33,18 +33,18 @@ Ready image is accessible on Docker Hub.
 
 ### Pull image
 ```
-docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
+docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:1.0.0
 ```
 ### Run image in interactive mode
 ```
-docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
+docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:1.0.0
 
 ```
 ### Run the image and create files locally
 ```
 export PROJECT_PATH_LOCALLY="/path/to/local/code/directory" && 
-git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git "$PROJECT_PATH_LOCALLY" --branch v.0.0.3 &&
-docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:0.0.3
+git clone https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git "$PROJECT_PATH_LOCALLY" --branch v.1.0.0 &&
+docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:1.0.0
 ```
 
 ## Dockerfile - Tensorflow GPU (recommended)
