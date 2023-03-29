@@ -22,7 +22,7 @@ jobs:
     - name: Bump tag version
       id: bump_tag_version
       run: |
-        tag=$(git describe --tags --abbrev=0)
+        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
         if [[ -z "$tag" ]]; then
           new_tag="v1.0.0"
         else
