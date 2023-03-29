@@ -12,11 +12,11 @@ git clone git@github.com:MortenTabaka/Semantic-segmentation-of-LandCover.ai-data
 ```
 conda create --name landcover_semantic_segmentation jupyter python=3.8
 ```
-### Activate the environemnt.
+### Activate the environment.
 ```
 conda activate landcover_semantic_segmentation
 ```
-### Add Jupyter support for the environemnt.
+### Add Jupyter support for the environment.
 ```
 conda install -c conda-forge nb_conda
 ```
@@ -53,11 +53,11 @@ python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'
 ```
 ["If a list of GPU devices is returned, you've installed TensorFlow successfully."](https://www.tensorflow.org/install/pip?hl=en)
 
-Success of Tensorflow2's installation is highly depenend on your OS and Nvidia drivers, therefore above guide will not always be correct.
+Success of Tensorflow2's installation is highly depend on your OS and Nvidia drivers, therefore above guide will not always be correct.
 
 I will be experimenting with customizing [Tensorflow's Docker image](https://www.tensorflow.org/install/docker?hl=en), to create a docker image designed for this project.
 
-### Register created Anaconda environemnt for Jupyter.
+### Register created Anaconda environment for Jupyter.
 ```
 python -m ipykernel install --user --name tensorflow --display-name "Python 3.8 (tensorflow)"
 ```
@@ -66,7 +66,7 @@ Now you should be able to change kernel in Jupyter Notebook.
 ```
 make dataset
 ``` 
-*During the process, pip packages specified in requirenments.txt, will be installed.*
+*During the process, pip packages specified in requirements.txt, will be installed.*
 
 ### [Notebook for checking installation](https://github.com/MortenTabaka/main/notebooks/testing/check_tensorflow_installation.ipynb)
 Filepath: `/notebooks/testing/check_tensorflow_installation.ipynb`
