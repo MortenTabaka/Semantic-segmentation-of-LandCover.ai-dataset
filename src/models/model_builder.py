@@ -29,12 +29,13 @@ class Model:
         self.number_of_classes = number_of_classes
 
     def get_deeplab_model(
-        self,
-        weights: str = None,
-        freeze_layers: bool = False,
-        custom_freeze_border: int = None,
-        activation: str = None,
-        architecture_version: str = None,
+            self,
+            weights: str = None,
+            freeze_layers: bool = False,
+            custom_freeze_border: int = None,
+            activation: str = None,
+            architecture_version: str = None,
+            output_stride: int = 16
     ) -> tf.keras.Model:
         """
         Creates model Deeplabv3plus or its modification.
@@ -49,10 +50,13 @@ class Model:
             custom_freeze_border: below that layer, all will be frozen
             activation: optional activation to add to the top of the network.
             One of 'softmax', 'sigmoid' or None
-
-        Returns:
+            output_stride: determines input_shape/feature_extractor_output ratio. One of {8,16}.
 
         """
+
+        if output_stride not in (8, 16):
+            print("output_stride must be 8 or 16. output_stride will be set to 16.")
+            output_stride = 16
 
         arguments = [
             weights,
@@ -60,7 +64,7 @@ class Model:
             (self.image_height, self.image_width, 3),
             self.number_of_classes,
             "xception",
-            16,
+            output_stride,
             1.0,
             activation,
         ]
