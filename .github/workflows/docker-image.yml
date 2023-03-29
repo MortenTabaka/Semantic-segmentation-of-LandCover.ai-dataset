@@ -43,4 +43,12 @@ jobs:
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:${DOCKER_TAG} \
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:latest \
           .
+    - name: Create Git tag
+      if: always()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ steps.bump_tag_version.outputs.new_tag }}
+      run: |
+        git tag $TAG
+        git push origin $TAG
 
