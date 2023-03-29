@@ -3,9 +3,7 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
@@ -24,10 +22,14 @@ jobs:
     - name: Bump tag version
       id: bump_tag_version
       run: |
-        tag=$(git describe --tags --abbrev=0)
-        tag_number=$(echo $tag | sed 's/0.0.//')
-        new_tag_number=$((tag_number + 1))
-        new_tag="0.0.$new_tag_number"
+        tag=$(git describe --tags --abbrev=0 2>/dev/null)
+        if [[ -z "$tag" ]]; then
+          new_tag="v1.0.0"
+        else
+          tag_number=$(echo $tag | sed 's/v1.0.//')
+          new_tag_number=$((tag_number + 1))
+          new_tag="v1.0.$new_tag_number"
+        fi
         echo "::set-output name=new_tag::$new_tag"
       shell: bash
     - name: Build and push Docker image
@@ -39,4 +41,3 @@ jobs:
           --platform linux/amd64,linux/arm64 \
           --push \
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:${DOCKER_TAG} \
-          .
