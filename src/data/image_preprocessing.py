@@ -14,7 +14,6 @@ import os
 import os.path
 
 import cv2
-import pandas as pd
 
 
 class DataProcessor:
@@ -22,20 +21,19 @@ class DataProcessor:
     Class for reading, processing, and writing data.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, path_to_folder_with_input_images: str):
+        self.path_to_folder_with_input_images = path_to_folder_with_input_images
 
-    @staticmethod
-    def split_images(raw_data_path):
+    def split_dataset_images(self):
         """Split each original image and its corresponding mask into 512x512
         tiles and shuffle them.
 
         Source: LandCover.ai
         """
 
-        IMGS_DIR = raw_data_path + "/images"
-        MASKS_DIR = raw_data_path + "/masks"
-        OUTPUT_DIR = raw_data_path + "/tiles"
+        IMGS_DIR = self.path_to_folder_with_input_images + "/images"
+        MASKS_DIR = self.path_to_folder_with_input_images + "/masks"
+        OUTPUT_DIR = self.path_to_folder_with_input_images + "/tiles"
 
         TARGET_SIZE = 512
 
