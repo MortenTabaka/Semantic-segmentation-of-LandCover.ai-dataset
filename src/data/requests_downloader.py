@@ -1,8 +1,9 @@
-import zipfile
 import os
-from os import path, makedirs
-import requests
 import shutil
+import zipfile
+from os import makedirs, path
+
+import requests
 from tqdm import tqdm
 
 
@@ -10,16 +11,18 @@ class UrlDownloader:
     def __init__(self):
         pass
 
-    def download_single_zip_file(self, url: str, file_name: str, output_path: str, unzip: bool = True):
+    def download_single_zip_file(
+        self, url: str, file_name: str, output_path: str, unzip: bool = True
+    ):
         write_to = path.join(output_path, file_name)
         if not path.isfile(write_to):
             if not path.exists(output_path):
                 makedirs(output_path)
             response = requests.get(url, stream=True)
-            total_size_in_bytes = int(response.headers.get('content-length', 0))
+            total_size_in_bytes = int(response.headers.get("content-length", 0))
             block_size = 1024
-            progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-            with open(write_to, 'wb') as f:
+            progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)
+            with open(write_to, "wb") as f:
                 for data in response.iter_content(block_size):
                     progress_bar.update(len(data))
                     f.write(data)
@@ -58,6 +61,6 @@ class UrlDownloader:
     def get_project_root() -> str:
         """Returns the absolute path of the project root directory."""
         current_dir = os.path.abspath(os.curdir)
-        while not os.path.isfile(os.path.join(current_dir, 'README.md')):
+        while not os.path.isfile(os.path.join(current_dir, "README.md")):
             current_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
         return current_dir

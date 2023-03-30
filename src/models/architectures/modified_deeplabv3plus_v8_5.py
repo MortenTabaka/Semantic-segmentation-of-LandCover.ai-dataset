@@ -3,9 +3,8 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
-from tensorflow.python.keras import layers
-
 from tensorflow.keras.layers import BatchNormalization
+from tensorflow.python.keras import layers
 from tensorflow.python.keras.layers import (
     Activation,
     Add,

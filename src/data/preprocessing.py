@@ -12,7 +12,6 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 import glob
 import os
 import os.path
-import shutil
 
 import cv2
 import pandas as pd

@@ -1,15 +1,15 @@
-from random import randint
 import os
+from random import randint
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
-from typing import List, Tuple
 
 from src.features.dataset import Dataset
-from src.models.predict_model import Predictor
 from src.features.metrics import CustomMeanIoU
+from src.models.predict_model import Predictor
 
 COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 

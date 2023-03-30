@@ -29,13 +29,13 @@ class Model:
         self.number_of_classes = number_of_classes
 
     def get_deeplab_model(
-            self,
-            weights: str = None,
-            freeze_layers: bool = False,
-            custom_freeze_border: int = None,
-            activation: str = None,
-            architecture_version: str = None,
-            output_stride: int = 16
+        self,
+        weights: str = None,
+        freeze_layers: bool = False,
+        custom_freeze_border: int = None,
+        activation: str = None,
+        architecture_version: str = None,
+        output_stride: int = 16,
     ) -> tf.keras.Model:
         """
         Creates model Deeplabv3plus or its modification.
