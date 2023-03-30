@@ -81,3 +81,46 @@ class DataProcessor:
                     k += 1
 
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
+
+    def split_custom_images_before_prediction(
+        self,
+        path_to_output_folder: str,
+    ):
+        TARGET_SIZE = 512
+
+        img_paths = glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.tif")
+        )
+        img_paths += glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.jpg")
+        )
+        img_paths += glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.png")
+        )
+        img_paths.sort()
+
+        if not os.path.exists(path_to_output_folder):
+            os.makedirs(path_to_output_folder)
+
+        for i, img_path in enumerate(img_paths):
+            img_filename = os.path.splitext(os.path.basename(img_path))[0]
+            img = cv2.imread(img_path)
+
+            k = 0
+            for y in range(0, img.shape[0], TARGET_SIZE):
+                for x in range(0, img.shape[1], TARGET_SIZE):
+                    img_tile = img[y : y + TARGET_SIZE, x : x + TARGET_SIZE]
+
+                    if (
+                        img_tile.shape[0] == TARGET_SIZE
+                        and img_tile.shape[1] == TARGET_SIZE
+                    ):
+                        out_img_path = os.path.join(
+                            path_to_output_folder, "{}_{}.jpg".format(img_filename, k)
+                        )
+
+                        if not os.path.isfile(out_img_path):
+                            cv2.imwrite(out_img_path, img_tile)
+                    k += 1
+
+            print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
