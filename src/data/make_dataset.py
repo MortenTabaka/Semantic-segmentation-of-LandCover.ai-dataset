@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 from dotenv import find_dotenv, load_dotenv
 
-from src.data.image_preprocessing import DataProcessor
+from src.data.image_preprocessing import ImagePreprocessor
 
 
 @click.command()
@@ -20,7 +20,7 @@ def main(input_filepath):
     logger.info("making final data set from raw data")
 
     logger.info("splitting images into tiles")
-    DataProcessor(input_filepath).split_dataset_images()
+    ImagePreprocessor(input_filepath).split_dataset_images()
 
 
 if __name__ == "__main__":

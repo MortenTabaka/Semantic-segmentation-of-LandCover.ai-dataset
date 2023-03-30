@@ -16,7 +16,7 @@ import os.path
 import cv2
 
 
-class DataProcessor:
+class ImagePreprocessor:
     """
     Class for reading, processing, and writing data.
     """
