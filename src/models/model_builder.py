@@ -1,5 +1,7 @@
 import tensorflow as tf
+from typing import List, Optional
 
+from src.features.utils import revision_a_model
 from src.models.architectures import (
     deeplabv3plus,
     modified_deeplabv3plus,
@@ -7,21 +9,23 @@ from src.models.architectures import (
     modified_deeplabv3plus_v8_4,
     modified_deeplabv3plus_v8_5,
 )
-from src.features.utils import save_model_version_to_yaml
 
 
 class Model:
     def __init__(
-            self,
-            input_image_height: int,
-            input_image_width: int,
-            number_of_classes: int,
-            pretrained_weights: str = None,
-            do_freeze_layers: bool = False,
-            last_layer_frozen: int = None,
-            activation: str = None,
-            model_architecture: str = None,
-            output_stride: int = 16,
+        self,
+        version: int,
+        revision: int,
+        batch_size: int,
+        input_image_height: int,
+        input_image_width: int,
+        number_of_classes: int,
+        pretrained_weights: str = None,
+        do_freeze_layers: bool = False,
+        last_layer_frozen: int = None,
+        activation: str = None,
+        model_architecture: str = None,
+        output_stride: int = 16,
     ):
         """
         Class describing a single Tensorflow2 model.
@@ -51,8 +55,11 @@ class Model:
             1.0,
             activation,
         ]
+        self.version = str(version)
+        self.revision = str(revision)
+        self.batch_size = batch_size
         self.input_image_height = input_image_height
-        self.image_width = input_image_width
+        self.input_image_width = input_image_width
         self.number_of_classes = number_of_classes
         self.pretrained_weights = pretrained_weights
         self.do_freeze_layers = do_freeze_layers
@@ -60,6 +67,17 @@ class Model:
         self.activation = activation
         self.model_architecture = model_architecture
         self.output_stride = output_stride
+
+    def get_compiled_model(
+        self,
+        optimizer: tf.keras.optimizers.Optimizer,
+        loss: tf.keras.losses.Loss,
+        metrics: Optional[List[tf.keras.metrics], str],
+    ):
+        self.save_model_revision(optimizer=optimizer, loss=loss, metrics=metrics)
+        return self.get_deeplab_model().compile(
+            optimizer=optimizer, loss=loss, metrics=metrics
+        )
 
     def get_deeplab_model(self) -> tf.keras.Model:
         """
@@ -85,11 +103,38 @@ class Model:
         if self.do_freeze_layers and self.last_layer_frozen:
             return self.freeze_model_layers(model, self.last_layer_frozen)
 
+        self.save_model_revision()
+
         return model
+
+    def save_model_revision(
+        self,
+        optimizer: Optional[tf.keras.optimizers.Optimizer] = None,
+        loss: Optional[tf.keras.losses.Loss] = None,
+        metrics: Optional[List[tf.keras.metrics], str] = None,
+    ):
+        revision_a_model(
+            "Deeplabv3plus",
+            str(self.version),
+            str(self.revision),
+            self.batch_size,
+            self.input_image_height,
+            self.input_image_width,
+            self.number_of_classes,
+            self.pretrained_weights,
+            self.do_freeze_layers,
+            self.last_layer_frozen,
+            self.activation,
+            self.model_architecture,
+            self.output_stride,
+            optimizer,
+            loss,
+            metrics,
+        )
 
     @staticmethod
     def freeze_model_layers(
-            model: tf.keras.models.Model, custom_freeze_border: int
+        model: tf.keras.models.Model, custom_freeze_border: int
     ) -> tf.keras.Model:
         for i, layer in enumerate(model.layers):
             if i < custom_freeze_border:
