@@ -1,5 +1,6 @@
 import os
-from typing import List
+from typing import List, Optional
+from tensorflow import keras
 
 from yaml import dump, safe_load
 
@@ -18,23 +19,23 @@ def get_absolute_path_to_project_location(path_from_project_root: str) -> str:
     return os.path.join(get_project_root(), path_from_project_root)
 
 
-def save_model_version_to_yaml(
+def revision_a_model(
     model_architecture: str,
     version: str,
     revision: str,
     batch_size: int,
-    input_image_height: str,
-    input_image_width: str,
+    input_image_height: int,
+    input_image_width: int,
     number_of_classes: int,
     pretrained_weights: str,
     were_layers_weights_frozen: bool,
-    last_layer_frozen: int,
+    last_layer_frozen: Optional[int],
     activation_used: str,
     project_version_of_deeplab: str,
     output_stride: int,
-    optimizer: str,
-    loss_function: str,
-    metrics: List[str],
+    optimizer: Optional[keras.optimizers.Optimizer],
+    loss_function: Optional[keras.losses.Loss],
+    metrics: Optional[List[keras.metrics], str],
 ):
     config_dict = {
         "model_architecture": model_architecture,
@@ -58,9 +59,9 @@ def save_model_version_to_yaml(
             "output_stride": output_stride,
         },
         "model_compile_parameters": {
-            "optimizer": optimizer,
-            "loss_function": loss_function,
-            "metrics": metrics,
+            "optimizer": str(optimizer),
+            "loss_function": str(loss_function),
+            "metrics": str(metrics),
         },
     }
 
