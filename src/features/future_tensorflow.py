@@ -18,7 +18,7 @@ class _IoUBase(Metric):
     the individual IoUs.
     To compute IoUs, the predictions are accumulated in a confusion matrix,
     weighted by `sample_weight` and the metric is then calculated from it.
-    If `sample_weight` is `None`, weights default to 1.
+    If `sample_weight` is `None`, pretrained_weights default to 1.
     Use `sample_weight` of 0 to mask values.
     Args:
     num_classes: The possible number of labels the prediction task can have.
@@ -93,7 +93,7 @@ class IoU(_IoUBase):
     To compute IoUs, the predictions are accumulated in a confusion matrix,
     weighted by `sample_weight` and the metric is then calculated from it.
 
-    If `sample_weight` is `None`, weights default to 1.
+    If `sample_weight` is `None`, pretrained_weights default to 1.
     Use `sample_weight` of 0 to mask values.
 
     Note, this class first computes IoUs for all individual classes, then returns
