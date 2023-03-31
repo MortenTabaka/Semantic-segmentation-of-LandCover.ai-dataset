@@ -1,5 +1,5 @@
 import tensorflow as tf
-from typing import List, Optional
+from typing import List, Union
 
 from src.features.utils import revision_a_model
 from src.models.architectures import (
@@ -68,17 +68,6 @@ class Model:
         self.model_architecture = model_architecture
         self.output_stride = output_stride
 
-    def get_compiled_model(
-        self,
-        optimizer: tf.keras.optimizers.Optimizer,
-        loss: tf.keras.losses.Loss,
-        metrics: Optional[List[tf.keras.metrics], str],
-    ):
-        self.save_model_revision(optimizer=optimizer, loss=loss, metrics=metrics)
-        return self.get_deeplab_model().compile(
-            optimizer=optimizer, loss=loss, metrics=metrics
-        )
-
     def get_deeplab_model(self) -> tf.keras.Model:
         """
         Build a Tensorflow2 model.
@@ -107,12 +96,7 @@ class Model:
 
         return model
 
-    def save_model_revision(
-        self,
-        optimizer: Optional[tf.keras.optimizers.Optimizer] = None,
-        loss: Optional[tf.keras.losses.Loss] = None,
-        metrics: Optional[List[tf.keras.metrics], str] = None,
-    ):
+    def save_model_revision(self):
         revision_a_model(
             "Deeplabv3plus",
             str(self.version),
@@ -127,9 +111,6 @@ class Model:
             self.activation,
             self.model_architecture,
             self.output_stride,
-            optimizer,
-            loss,
-            metrics,
         )
 
     @staticmethod
