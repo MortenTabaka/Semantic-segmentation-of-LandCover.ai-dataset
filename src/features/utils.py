@@ -44,7 +44,7 @@ def save_model_version_to_yaml(
             "input_image_height": input_image_height,
             "input_image_width": input_image_width,
             "number_of_classes": number_of_classes,
-            "batch_size": batch_size
+            "batch_size": batch_size,
         },
         "model_build_parameters": {
             "input_image_height": input_image_height,
@@ -61,7 +61,7 @@ def save_model_version_to_yaml(
             "optimizer": optimizer,
             "loss_function": loss_function,
             "metrics": metrics,
-        }
+        },
     }
 
     yaml_filepath = get_absolute_path_to_project_location("models/model_weights.yaml")
