@@ -3,9 +3,8 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
-from tensorflow.python.keras import layers
-
 from tensorflow.keras.layers import BatchNormalization
+from tensorflow.python.keras import layers
 from tensorflow.python.keras.layers import (
     Activation,
     Add,
@@ -253,17 +252,17 @@ def Deeplabv3(
     activation=None,
 ):
     """Instantiates the Deeplabv3+ architecture
-    Optionally loads weights pre-trained
+    Optionally loads pretrained_weights pre-trained
     on PASCAL VOC or Cityscapes. This model is available for TensorFlow only.
     # Arguments
-        weights: one of 'pascal_voc' (pre-trained on pascal voc),
+        pretrained_weights: one of 'pascal_voc' (pre-trained on pascal voc),
             'cityscapes' (pre-trained on cityscape) or None (random initialization)
         input_tensor: optional Keras tensor (i.e. output of `layers.Input()`)
             to use as image input for the model.
         input_shape: shape of input image. format HxWxC
             PASCAL VOC model was trained on (512,512,3) images. None is allowed as shape/width
         classes: number of desired classes. PASCAL VOC has 21 classes, Cityscapes has 19 classes.
-            If number of classes not aligned with the weights used, last layer is initialized randomly
+            If number of classes not aligned with the pretrained_weights used, last layer is initialized randomly
         backbone: backbone to use. one of {'xception','mobilenetv2'}
         activation: optional activation to add to the top of the network.
             One of 'softmax', 'sigmoid' or None
@@ -283,12 +282,12 @@ def Deeplabv3(
     # Raises
         RuntimeError: If attempting to run this model with a
             backend that does not support separable convolutions.
-        ValueError: in case of invalid argument for `weights` or `backbone`
+        ValueError: in case of invalid argument for `pretrained_weights` or `backbone`
     """
 
     if not (weights in {"pascal_voc", "cityscapes", None}):
         raise ValueError(
-            "The `weights` argument should be either "
+            "The `pretrained_weights` argument should be either "
             "`None` (random initialization), `pascal_voc`, or `cityscapes` "
             "(pre-trained on PASCAL VOC)"
         )
@@ -643,22 +642,27 @@ def Deeplabv3(
 
     # added skip connection
     if backbone == "xception":
-        # Feature projection
-        # x4 (x2) block
-        skip_size_0 = tf.keras.backend.int_shape(skip0)
-        x = tf.keras.layers.experimental.preprocessing.Resizing(
-            *skip_size_0[1:3], interpolation="bilinear"
-        )(x)
         x = Conv2D(
-            128,
+            64,
             (1, 1),
             padding="same",
             use_bias=False,
             name="feature_projection_decoder_1",
         )(x)
+        x = BatchNormalization(name="feature_projection_decoder_1_BN", epsilon=1e-5)(x)
+        x = Activation(tf.nn.relu)(x)
+        x = Dropout(0.1)(x)
+
+        # Feature projection
+        skip_size_0 = tf.keras.backend.int_shape(skip0)
+        x = tf.keras.layers.experimental.preprocessing.Resizing(
+            *skip_size_0[1:3], interpolation="bilinear"
+        )(x)
+        # x = Conv2D(128, (1, 1), padding='same',
+        #            use_bias=False, name='feature_projection_decoder_1')(x)
 
         dec_skip0 = Conv2D(
-            8, (1, 1), padding="same", use_bias=False, name="feature_projection1"
+            16, (1, 1), padding="same", use_bias=False, name="feature_projection1"
         )(skip0)
         dec_skip0 = BatchNormalization(name="feature_projection1_BN", epsilon=1e-5)(
             dec_skip0
@@ -691,9 +695,9 @@ def Deeplabv3(
     if activation in {"softmax", "sigmoid"}:
         x = tf.keras.layers.Activation(activation)(x)
 
-    model = Model(inputs, x, name="modified_deeplabv3plus")
+    model = Model(inputs, x, name="modified_v4_deeplabv3plus")
 
-    # load weights
+    # load pretrained_weights
 
     if weights == "pascal_voc":
         if backbone == "xception":

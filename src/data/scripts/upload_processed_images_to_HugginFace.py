@@ -1,6 +1,6 @@
-from huggingface_hub import login, Repository
 import os
 
+from huggingface_hub import Repository, login
 
 login()
 repo = Repository("MortenTabaka/LandCover-Aerial-Imagery-for-semantic-segmentation")

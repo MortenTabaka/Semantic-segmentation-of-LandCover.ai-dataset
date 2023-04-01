@@ -12,31 +12,28 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 import glob
 import os
 import os.path
-import shutil
 
 import cv2
-import pandas as pd
 
 
-class DataProcessor:
+class ImagePreprocessor:
     """
     Class for reading, processing, and writing data.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, path_to_folder_with_input_images: str):
+        self.path_to_folder_with_input_images = path_to_folder_with_input_images
 
-    @staticmethod
-    def split_images(raw_data_path):
+    def split_dataset_images(self):
         """Split each original image and its corresponding mask into 512x512
         tiles and shuffle them.
 
         Source: LandCover.ai
         """
 
-        IMGS_DIR = raw_data_path + "/images"
-        MASKS_DIR = raw_data_path + "/masks"
-        OUTPUT_DIR = raw_data_path + "/tiles"
+        IMGS_DIR = self.path_to_folder_with_input_images + "/images"
+        MASKS_DIR = self.path_to_folder_with_input_images + "/masks"
+        OUTPUT_DIR = self.path_to_folder_with_input_images + "/tiles"
 
         TARGET_SIZE = 512
 
@@ -81,6 +78,49 @@ class DataProcessor:
                         if not os.path.isfile(out_mask_path):
                             cv2.imwrite(out_mask_path, mask_tile)
 
+                    k += 1
+
+            print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
+
+    def split_custom_images_before_prediction(
+        self,
+        path_to_output_folder: str,
+    ):
+        TARGET_SIZE = 512
+
+        img_paths = glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.tif")
+        )
+        img_paths += glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.jpg")
+        )
+        img_paths += glob.glob(
+            os.path.join(self.path_to_folder_with_input_images, "*.png")
+        )
+        img_paths.sort()
+
+        if not os.path.exists(path_to_output_folder):
+            os.makedirs(path_to_output_folder)
+
+        for i, img_path in enumerate(img_paths):
+            img_filename = os.path.splitext(os.path.basename(img_path))[0]
+            img = cv2.imread(img_path)
+
+            k = 0
+            for y in range(0, img.shape[0], TARGET_SIZE):
+                for x in range(0, img.shape[1], TARGET_SIZE):
+                    img_tile = img[y : y + TARGET_SIZE, x : x + TARGET_SIZE]
+
+                    if (
+                        img_tile.shape[0] == TARGET_SIZE
+                        and img_tile.shape[1] == TARGET_SIZE
+                    ):
+                        out_img_path = os.path.join(
+                            path_to_output_folder, "{}_{}.jpg".format(img_filename, k)
+                        )
+
+                        if not os.path.isfile(out_img_path):
+                            cv2.imwrite(out_img_path, img_tile)
                     k += 1
 
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))

@@ -1,0 +1,30 @@
+deeplabv3plus_v5.10.2:
+  model_name: deeplabv3plus
+  revision: 5.10.2
+  dataset_parameters:
+    input_image_height: 512
+    input_image_width: 512
+    number_of_classes: 5
+    batch_size: 2
+  model_build_parameters:
+    pretrained_weights: cityscapes
+    second_input: null
+    input_shape:
+      input_image_height: 512
+      input_image_width: 512
+      channels: 3
+    num_classes: 5
+    backbone: xception
+    output_stride: 16
+    alpha: 1.0
+    activation: softmax
+  model_compile_parameters:
+    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7f72e473a580>
+    loss_function:
+      object: <bound method SemanticSegmentationLoss.soft_dice_loss of <src.features.loss_functions.SemanticSegmentationLoss
+        object at 0x7f72e473a700>>
+      initial_learning_rate: 0.0001
+      final_learning_rate: null
+    metrics:
+    - accuracy
+    - <src.features.metrics.CustomMeanIoU object at 0x7f72fdfd2a30>
