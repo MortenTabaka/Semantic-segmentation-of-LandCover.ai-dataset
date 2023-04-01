@@ -16,7 +16,8 @@ class Predictor:
             model_key: name of revision from models/models_revision.yaml, e.g. deeplabv3plus_v5.10.1
         """
         self.model_key = model_key
-        self.url_with_zipped_weights = f"https://huggingface.co/MortenTabaka/LandcoverSemanticSegmentation/resolve/main/Weights/{model_key}.zip"
+        self.url_with_zipped_weights = f"https://huggingface.co/MortenTabaka/LandcoverSemanticSegmentation" \
+                                       f"/resolve/main/Weights/{model_key}.zip"
 
     def get_single_batch_prediction(self, single_batch):
         model = Model(*self.get_model_build_parameters()).get_deeplab_model()
@@ -40,5 +41,10 @@ class Predictor:
             )
             for key in build_params:
                 params.append(build_params[key])
+
+        if not params:
+            raise ValueError(
+                "Build parameters are empty. Probably passed model revision does not exist."
+            )
 
         return params
