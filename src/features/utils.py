@@ -62,7 +62,7 @@ def revision_a_model(
         "model_compile_parameters": {
             "optimizer": str(optimizer),
             "loss_function": str(loss_function),
-            "metrics": str(metrics),
+            "metrics": [str(metric) for metric in metrics],
         },
     }
 
