@@ -114,6 +114,9 @@ class Model:
             self.activation,
             self.model_architecture,
             self.output_stride,
+            self.optimizer,
+            self.loss_function,
+            self.metrics,
         )
 
     @property

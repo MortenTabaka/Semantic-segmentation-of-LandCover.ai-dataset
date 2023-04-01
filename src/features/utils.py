@@ -33,11 +33,11 @@ def revision_a_model(
     activation_used: str,
     project_version_of_deeplab: str,
     output_stride: int,
-    optimizer: keras.optimizers.Optimizer = None,
-    loss_function: keras.losses.Loss = None,
+    optimizer: keras.optimizers.Optimizer,
+    loss_function: keras.losses.Loss,
     metrics: Union[
         keras.metrics.Metric, str, List[Union[keras.metrics.Metric, str]]
-    ] = None,
+    ],
 ):
     config_dict = {
         "model_architecture": model_architecture,
