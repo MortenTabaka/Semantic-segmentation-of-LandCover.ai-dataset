@@ -30,7 +30,7 @@ jobs:
           new_tag_number=$((tag_number + 1))
           new_tag="v1.0.$new_tag_number"
         fi
-        echo "::set-output name=new_tag::$new_tag"
+        echo "{new_tag}={$new_tag}" >> $GITHUB_OUTPUT
       shell: bash
     - name: Build and push Docker image
       env:
