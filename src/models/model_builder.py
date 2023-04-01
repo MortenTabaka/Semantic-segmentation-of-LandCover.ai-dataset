@@ -4,10 +4,10 @@ from typing import List, Union
 from src.features.utils import revision_a_model
 from src.models.architectures import (
     deeplabv3plus,
-    modified_deeplabv3plus,
-    modified_deeplabv3plus_v8_3,
-    modified_deeplabv3plus_v8_4,
-    modified_deeplabv3plus_v8_5,
+    modified_v1_deeplabv3plus,
+    modified_v2_deeplabv3plus,
+    modified_v3_deeplabv3plus,
+    modified_v4_deeplabv3plus
 )
 
 
@@ -79,13 +79,13 @@ class Model:
         if self.model_architecture == "original":
             model = deeplabv3plus.Deeplabv3(*self.model_build_parameters)
         elif self.model_architecture == "v1":
-            model = modified_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
+            model = modified_v1_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
         elif self.model_architecture == "v2":
-            model = modified_deeplabv3plus_v8_3.Deeplabv3(*self.model_build_parameters)
+            model = modified_v2_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
         elif self.model_architecture == "v3":
-            model = modified_deeplabv3plus_v8_4.Deeplabv3(*self.model_build_parameters)
+            model = modified_v3_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
         elif self.model_architecture == "v4":
-            model = modified_deeplabv3plus_v8_5.Deeplabv3(*self.model_build_parameters)
+            model = modified_v4_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
         else:
             model = deeplabv3plus.Deeplabv3(*self.model_build_parameters)
 

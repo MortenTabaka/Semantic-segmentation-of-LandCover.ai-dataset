@@ -690,7 +690,7 @@ def Deeplabv3(
     if activation in {"softmax", "sigmoid"}:
         x = tf.keras.layers.Activation(activation)(x)
 
-    model = Model(inputs, x, name="modified_deeplabv3plus")
+    model = Model(inputs, x, name="modified_v2_deeplabv3plus")
 
     # load pretrained_weights
 

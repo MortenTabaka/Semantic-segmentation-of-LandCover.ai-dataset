@@ -3,6 +3,8 @@
 from __future__ import absolute_import, division, print_function
 
 import tensorflow as tf
+
+# from tensorflow.python.keras import backend as K
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.python.keras import layers
 from tensorflow.python.keras.layers import (
@@ -649,7 +651,7 @@ def Deeplabv3(
             *skip_size_0[1:3], interpolation="bilinear"
         )(x)
         x = Conv2D(
-            128,
+            56,
             (1, 1),
             padding="same",
             use_bias=False,
@@ -664,8 +666,8 @@ def Deeplabv3(
         )
         dec_skip0 = Activation(tf.nn.relu)(dec_skip0)
         x = Concatenate()([x, dec_skip0])
-        x = SepConv_BN(x, 64, "decoder_conv2", depth_activation=True, epsilon=1e-5)
-        x = SepConv_BN(x, 64, "decoder_conv3", depth_activation=True, epsilon=1e-5)
+        x = SepConv_BN(x, 32, "decoder_conv2", depth_activation=True, epsilon=1e-5)
+        x = SepConv_BN(x, 32, "decoder_conv3", depth_activation=True, epsilon=1e-5)
 
     # you can use it with arbitary number of classes
     if (weights == "pascal_voc" and classes == 21) or (
@@ -690,7 +692,7 @@ def Deeplabv3(
     if activation in {"softmax", "sigmoid"}:
         x = tf.keras.layers.Activation(activation)(x)
 
-    model = Model(inputs, x, name="modified_deeplabv3plus")
+    model = Model(inputs, x, name="modified_v1_deeplabv3plus")
 
     # load pretrained_weights
 

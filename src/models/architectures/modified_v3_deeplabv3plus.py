@@ -642,27 +642,22 @@ def Deeplabv3(
 
     # added skip connection
     if backbone == "xception":
+        # Feature projection
+        # x4 (x2) block
+        skip_size_0 = tf.keras.backend.int_shape(skip0)
+        x = tf.keras.layers.experimental.preprocessing.Resizing(
+            *skip_size_0[1:3], interpolation="bilinear"
+        )(x)
         x = Conv2D(
-            64,
+            128,
             (1, 1),
             padding="same",
             use_bias=False,
             name="feature_projection_decoder_1",
         )(x)
-        x = BatchNormalization(name="feature_projection_decoder_1_BN", epsilon=1e-5)(x)
-        x = Activation(tf.nn.relu)(x)
-        x = Dropout(0.1)(x)
-
-        # Feature projection
-        skip_size_0 = tf.keras.backend.int_shape(skip0)
-        x = tf.keras.layers.experimental.preprocessing.Resizing(
-            *skip_size_0[1:3], interpolation="bilinear"
-        )(x)
-        # x = Conv2D(128, (1, 1), padding='same',
-        #            use_bias=False, name='feature_projection_decoder_1')(x)
 
         dec_skip0 = Conv2D(
-            16, (1, 1), padding="same", use_bias=False, name="feature_projection1"
+            8, (1, 1), padding="same", use_bias=False, name="feature_projection1"
         )(skip0)
         dec_skip0 = BatchNormalization(name="feature_projection1_BN", epsilon=1e-5)(
             dec_skip0
@@ -695,7 +690,7 @@ def Deeplabv3(
     if activation in {"softmax", "sigmoid"}:
         x = tf.keras.layers.Activation(activation)(x)
 
-    model = Model(inputs, x, name="modified_deeplabv3plus")
+    model = Model(inputs, x, name="modified_v3_deeplabv3plus")
 
     # load pretrained_weights
 
