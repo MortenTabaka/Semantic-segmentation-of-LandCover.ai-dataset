@@ -102,8 +102,6 @@ def revision_a_model(
         "models/models_revisions.yaml"
     )
 
-    print(yaml_filepath)
-
     if not os.path.exists(yaml_filepath):
         # create empty file if it doesn't exist
         with open(yaml_filepath, "w") as f:
@@ -120,11 +118,7 @@ def revision_a_model(
     else:
         existing_models_revisions[model_key] = config_dict
 
-    sorted_models_revisions = dict(
-        sorted(existing_models_revisions.items(), reverse=True)
-    )
-
     with open(yaml_filepath, "w") as f:
-        dump(sorted_models_revisions, f, default_flow_style=False)
+        dump(existing_models_revisions, f, default_flow_style=False, sort_keys=False)
 
     return model_key
