@@ -104,16 +104,7 @@ def revision_a_model(
 
 
 def get_model_build_params_for_revision(model_key):
-    yaml_filepath = get_absolute_path_to_project_location(
-        "models/models_revisions.yaml"
-    )
-    if not os.path.exists(yaml_filepath):
-        raise ValueError(f"YAML file {yaml_filepath} does not exist")
-
-    with open(yaml_filepath, "r") as f:
-        existing_models_revisions = safe_load(f)
-
-    data = existing_models_revisions.get(model_key, {})
+    data = load_data_for_revision(model_key)
 
     try:
         pretrained_weights = data["model_build_parameters"]["pretrained_weights"]
@@ -133,12 +124,31 @@ def get_model_build_params_for_revision(model_key):
                                   output_stride, alpha, activation, ]
     except KeyError as e:
         raise ValueError(
-            f"YAML file {yaml_filepath} does not contain expected data: {e}"
-        )
-
-    if not model_build_parameters:
-        raise ValueError(
-            f"YAML file {yaml_filepath} does not contain expected data"
+            f"YAML file does not contain expected data: {e}"
         )
 
     return model_build_parameters
+
+
+def get_revision_model_architecture(model_key: str):
+    data = load_data_for_revision(model_key)
+    return data["model_name"]
+
+
+def load_data_for_revision(model_key):
+    yaml_filepath = get_absolute_path_to_project_location(
+        "models/models_revisions.yaml"
+    )
+    if not os.path.exists(yaml_filepath):
+        raise ValueError(f"YAML file {yaml_filepath} does not exist")
+
+    with open(yaml_filepath, "r") as f:
+        existing_models_revisions = safe_load(f)
+
+    data = existing_models_revisions.get(model_key, {})
+
+    if not data:
+        raise ValueError(
+            f"YAML file {yaml_filepath} does not contain expected data."
+        )
+    return data
