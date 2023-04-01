@@ -24,20 +24,14 @@ jobs:
       run: |
         tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
         if [[ -z "$tag" ]]; then
-          new_tag="1.0.0"
+          new_tag="v1.0.0"
         else
-          major=$(echo $tag | cut -d '.' -f 1)
-          minor=$(echo $tag | cut -d '.' -f 2)
-          patch=$(echo $tag | cut -d '.' -f 3)
-          if [[ $minor == "9" ]]; then
-            major=$((major + 1))
-            minor=0
-          else
-            minor=$((minor + 1))
-          fi
-          new_tag="$major.$minor.0"
+          tag_number=$(echo $tag | sed 's/v1.0.//')
+          new_tag_number=$((tag_number + 1))
+          new_tag="v1.0.$new_tag_number"
         fi
         echo "::set-output name=new_tag::$new_tag"
+      shell: bash
     - name: Build and push Docker image
       env:
         DOCKER_BUILDKIT: 1
@@ -57,4 +51,3 @@ jobs:
       run: |
         git tag $TAG
         git push origin $TAG
-
