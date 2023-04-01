@@ -82,18 +82,9 @@ class Model:
             print("output_stride must be 8 or 16. output_stride will be set to 16.")
             self.output_stride = 16
 
-        if self.model_architecture == "original":
-            model = deeplabv3plus.Deeplabv3(*self.model_build_parameters)
-        elif self.model_architecture == "v1":
-            model = modified_v1_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
-        elif self.model_architecture == "v2":
-            model = modified_v2_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
-        elif self.model_architecture == "v3":
-            model = modified_v3_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
-        elif self.model_architecture == "v4":
-            model = modified_v4_deeplabv3plus.Deeplabv3(*self.model_build_parameters)
-        else:
-            model = deeplabv3plus.Deeplabv3(*self.model_build_parameters)
+        model = build_deeplabv3plus(
+            self.model_architecture, self.model_build_parameters
+        )
 
         if self.do_freeze_layers and self.last_layer_frozen:
             return self.freeze_model_layers(model, self.last_layer_frozen)
@@ -114,7 +105,7 @@ class Model:
             "input_shape": {
                 "input_image_height": self.input_image_height,
                 "input_image_width": self.input_image_width,
-                "channels": 3
+                "channels": 3,
             },
             "num_classes": self.number_of_classes,
             "backbone": "xception",
@@ -152,3 +143,20 @@ class Model:
             else:
                 layer.trainable = True
         return model
+
+
+def build_deeplabv3plus(model_architecture: str, model_build_parameters: List):
+    if model_architecture == "deeplabv3plus":
+        model = deeplabv3plus.Deeplabv3(*model_build_parameters)
+    elif model_architecture == "modified_v1_deeplabv3plus":
+        model = modified_v1_deeplabv3plus.Deeplabv3(*model_build_parameters)
+    elif model_architecture == "modified_v2_deeplabv3plus":
+        model = modified_v2_deeplabv3plus.Deeplabv3(*model_build_parameters)
+    elif model_architecture == "modified_v3_deeplabv3plus":
+        model = modified_v3_deeplabv3plus.Deeplabv3(*model_build_parameters)
+    elif model_architecture == "modified_v4_deeplabv3plus":
+        model = modified_v4_deeplabv3plus.Deeplabv3(*model_build_parameters)
+    else:
+        raise ValueError("Model architecture does not exists.")
+
+    return model
