@@ -96,7 +96,7 @@ def revision_a_model(
         },
     }
 
-    model_key = f"{model_name}_{revision}"
+    model_key = f"{model_name}_v{revision}"
 
     yaml_filepath = get_absolute_path_to_project_location(
         "models/models_revisions.yaml"

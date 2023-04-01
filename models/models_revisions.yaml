@@ -1,4 +1,4 @@
-deeplabv3plus_5.10.1:
+deeplabv3plus_v5.10.1:
   dataset_parameters:
     batch_size: 2
     input_image_height: 512
@@ -26,7 +26,7 @@ deeplabv3plus_5.10.1:
     optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7ff65c0ca550>
   model_name: deeplabv3plus
   revision: 5.10.1
-deeplabv3plus_5.10.2:
+deeplabv3plus_v5.10.2:
   dataset_parameters:
     batch_size: 2
     input_image_height: 512
