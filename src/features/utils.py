@@ -35,15 +35,13 @@ def revision_a_model(
     output_stride: int,
     optimizer: keras.optimizers.Optimizer,
     loss_function: keras.losses.Loss,
-    metrics: Union[
-        keras.metrics.Metric, str, List[Union[keras.metrics.Metric, str]]
-    ],
+    initial_learning_rate: float,
+    final_learning_rate: Union[float, None],
+    metrics: Union[keras.metrics.Metric, str, List[Union[keras.metrics.Metric, str]]],
 ):
     """
     Utility to create yaml file for model revisions
     Args:
-        number_of_classes:
-        metrics:
         model_name: name of model got with model.name
             e.g. deeplabv3plus or modified_v2_deeplabv3plus
         revision: version of model during training, e.g. 10.0.1
@@ -56,7 +54,14 @@ def revision_a_model(
                 One of 'softmax', 'sigmoid' or None
         project_version_of_deeplab: one of "original", "v1", "v2", "v3", "v4"
         output_stride: determines input_shape/feature_extractor_output ratio. One of {8,16}.
-
+        input_image_width:
+        input_image_height:
+        optimizer:
+        loss_function:
+        initial_learning_rate:
+        final_learning_rate: learning rate in decaying scheduler
+        number_of_classes:
+        metrics:
     Returns:
         model_key: f"{model_architecture}_{revision}"
     """
@@ -82,7 +87,11 @@ def revision_a_model(
         },
         "model_compile_parameters": {
             "optimizer": str(optimizer),
-            "loss_function": str(loss_function),
+            "loss_function": {
+                "object": str(loss_function),
+                "initial_learning_rate": initial_learning_rate,
+                "final_learning_rate": final_learning_rate,
+            },
             "metrics": [str(metric) for metric in metrics],
         },
     }
@@ -111,7 +120,11 @@ def revision_a_model(
     else:
         existing_models_revisions[model_key] = config_dict
 
+    sorted_models_revisions = dict(
+        sorted(existing_models_revisions.items(), reverse=True)
+    )
+
     with open(yaml_filepath, "w") as f:
-        dump(existing_models_revisions, f, default_flow_style=False)
+        dump(sorted_models_revisions, f, default_flow_style=False)
 
     return model_key

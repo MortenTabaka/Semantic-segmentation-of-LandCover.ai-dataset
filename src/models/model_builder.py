@@ -100,14 +100,33 @@ class Model:
 
         return model
 
-    def save_model_revision(self):
+    def save_model_revision(
+            self,
+            initial_learning_rate: float,
+            final_learning_rate: Union[float, None] = None,
+    ):
         """
         Save model parameters to predefined file in models/models_revisions.yaml
         """
-        revision_a_model(self.get_deeplab_model().name, self.revision, self.batch_size, self.input_image_height,
-                         self.input_image_width, self.number_of_classes, self.pretrained_weights, self.do_freeze_layers,
-                         self.last_layer_frozen, self.activation, self.model_architecture, self.output_stride,
-                         self.optimizer, self.loss_function, self.metrics)
+        revision_a_model(
+            self.get_deeplab_model().name,
+            self.revision,
+            self.batch_size,
+            self.input_image_height,
+            self.input_image_width,
+            self.number_of_classes,
+            self.pretrained_weights,
+            self.do_freeze_layers,
+            self.last_layer_frozen,
+            self.activation,
+            self.model_architecture,
+            self.output_stride,
+            self.optimizer,
+            self.loss_function,
+            initial_learning_rate,
+            final_learning_rate,
+            self.metrics,
+        )
 
     @property
     def get_compile_parameters(self):
