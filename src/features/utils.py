@@ -21,7 +21,6 @@ def get_absolute_path_to_project_location(path_from_project_root: str) -> str:
 
 def revision_a_model(
     model_architecture: str,
-    version: str,
     revision: str,
     batch_size: int,
     input_image_height: int,
@@ -41,7 +40,7 @@ def revision_a_model(
 ):
     config_dict = {
         "model_architecture": model_architecture,
-        "version": version,
+        "revision": revision,
         "dataset_parameters": {
             "input_image_height": input_image_height,
             "input_image_width": input_image_width,
@@ -66,11 +65,26 @@ def revision_a_model(
         },
     }
 
-    yaml_filepath = get_absolute_path_to_project_location("models/model_weights.yaml")
-    with open(yaml_filepath, "r") as f:
-        existing_model_revisions = safe_load(f)
+    yaml_filepath = get_absolute_path_to_project_location(
+        "models/models_revisions.yaml"
+    )
+    print(yaml_filepath)
 
-    existing_model_revisions.update(config_dict)
+    if not os.path.exists(yaml_filepath):
+        # create empty file if it doesn't exist
+        with open(yaml_filepath, "w") as f:
+            f.write("")
+
+    with open(yaml_filepath, "r") as f:
+        existing_models_revisions = safe_load(f)
+
+    if existing_models_revisions is None:
+        existing_models_revisions = config_dict
+
+    if (model_architecture, revision) in existing_models_revisions:
+        existing_models_revisions[(model_architecture, revision)].update(config_dict)
+    else:
+        existing_models_revisions[(model_architecture, revision)] = config_dict
 
     with open(yaml_filepath, "w") as f:
-        dump(existing_model_revisions, f)
+        dump(existing_models_revisions, f)

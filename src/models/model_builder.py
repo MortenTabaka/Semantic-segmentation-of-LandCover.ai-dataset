@@ -7,14 +7,14 @@ from src.models.architectures import (
     modified_v1_deeplabv3plus,
     modified_v2_deeplabv3plus,
     modified_v3_deeplabv3plus,
-    modified_v4_deeplabv3plus
+    modified_v4_deeplabv3plus,
 )
 
 
 class Model:
     def __init__(
         self,
-        version: str,
+        revision: str,
         batch_size: int,
         input_image_height: int,
         input_image_width: int,
@@ -54,7 +54,7 @@ class Model:
             1.0,
             activation,
         ]
-        self.version = version
+        self.revision = revision
         self.batch_size = batch_size
         self.input_image_height = input_image_height
         self.input_image_width = input_image_width
@@ -90,14 +90,12 @@ class Model:
         if self.do_freeze_layers and self.last_layer_frozen:
             return self.freeze_model_layers(model, self.last_layer_frozen)
 
-        self.save_model_revision(model.name)
-
         return model
 
-    def save_model_revision(self, model_name: tf.keras.Model.name):
+    def save_model_revision(self):
         revision_a_model(
-            model_name,
-            self.version,
+            self.get_deeplab_model().name,
+            self.revision,
             self.batch_size,
             self.input_image_height,
             self.input_image_width,
