@@ -1,26 +1,56 @@
-deeplabv3plus_10.0.1:
+deeplabv3plus_5.10.1:
   dataset_parameters:
-    batch_size: 4
+    batch_size: 2
     input_image_height: 512
     input_image_width: 512
     number_of_classes: 5
-  model_architecture: deeplabv3plus
   model_build_parameters:
     activation_used: softmax
     input_image_height: 512
     input_image_width: 512
-    last_layer_frozen: 359
+    last_layer_frozen: 324
     number_of_classes: 5
     output_stride: 16
     pretrained_weights: cityscapes
     project_version_of_deeplab: original
     were_layers_weights_frozen: true
   model_compile_parameters:
-    loss_function: <bound method SemanticSegmentationLoss.soft_dice_loss of <src.features.loss_functions.SemanticSegmentationLoss
-      object at 0x7fbc480f3340>>
+    loss_function:
+      final_learning_rate: null
+      initial_learning_rate: 0.0001
+      object: <bound method SemanticSegmentationLoss.soft_dice_loss of <src.features.loss_functions.SemanticSegmentationLoss
+        object at 0x7ff65c0ca220>>
     metrics:
     - accuracy
-    - <src.features.metrics.CustomMeanIoU object at 0x7fbc4fed6250>
-    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7fbc480f3e80>
+    - <src.features.metrics.CustomMeanIoU object at 0x7ff65fec5fd0>
+    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7ff65c0ca550>
   model_name: deeplabv3plus
-  revision: 10.0.1
+  revision: 5.10.1
+deeplabv3plus_5.10.2:
+  dataset_parameters:
+    batch_size: 2
+    input_image_height: 512
+    input_image_width: 512
+    number_of_classes: 5
+  model_build_parameters:
+    activation_used: softmax
+    input_image_height: 512
+    input_image_width: 512
+    last_layer_frozen: 324
+    number_of_classes: 5
+    output_stride: 16
+    pretrained_weights: cityscapes
+    project_version_of_deeplab: original
+    were_layers_weights_frozen: true
+  model_compile_parameters:
+    loss_function:
+      final_learning_rate: null
+      initial_learning_rate: 1.0e-05
+      object: <bound method SemanticSegmentationLoss.soft_dice_loss of <src.features.loss_functions.SemanticSegmentationLoss
+        object at 0x7ff65c0ca220>>
+    metrics:
+    - accuracy
+    - <src.features.metrics.CustomMeanIoU object at 0x7ff65fec5fd0>
+    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7ff65c0ca550>
+  model_name: deeplabv3plus
+  revision: 5.10.2
