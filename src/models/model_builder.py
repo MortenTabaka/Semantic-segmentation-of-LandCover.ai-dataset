@@ -101,31 +101,41 @@ class Model:
         return model
 
     def save_model_revision(
-            self,
-            initial_learning_rate: float,
-            final_learning_rate: Union[float, None] = None,
+        self,
+        initial_learning_rate: float,
+        final_learning_rate: Union[float, None] = None,
     ):
         """
         Save model parameters to predefined file in models/models_revisions.yaml
         """
+        model_build_parameters = {
+            "pretrained_weights": self.pretrained_weights,
+            "second_input": None,
+            "input_shape": {
+                "input_image_height": self.input_image_height,
+                "input_image_width": self.input_image_width,
+                "channels": 3
+            },
+            "num_classes": self.number_of_classes,
+            "backbone": "xception",
+            "output_stride": self.output_stride,
+            "alpha": 1.0,
+            "activation": self.activation,
+        }
+
         revision_a_model(
-            self.get_deeplab_model().name,
-            self.revision,
-            self.batch_size,
-            self.input_image_height,
-            self.input_image_width,
-            self.number_of_classes,
-            self.pretrained_weights,
-            self.do_freeze_layers,
-            self.last_layer_frozen,
-            self.activation,
-            self.model_architecture,
-            self.output_stride,
-            self.optimizer,
-            self.loss_function,
-            initial_learning_rate,
-            final_learning_rate,
-            self.metrics,
+            model_name=self.get_deeplab_model().name,
+            revision=self.revision,
+            batch_size=self.batch_size,
+            input_image_height=self.input_image_height,
+            input_image_width=self.input_image_width,
+            number_of_classes=self.number_of_classes,
+            model_build_params=model_build_parameters,
+            optimizer=self.optimizer,
+            loss_function=self.loss_function,
+            initial_learning_rate=initial_learning_rate,
+            final_learning_rate=final_learning_rate,
+            metrics=self.metrics,
         )
 
     @property

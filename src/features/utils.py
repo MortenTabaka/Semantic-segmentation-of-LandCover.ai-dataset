@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Union
+from typing import List, Dict, Tuple, Union
 from tensorflow import keras
 from pandas import DataFrame
 
@@ -27,12 +27,7 @@ def revision_a_model(
     input_image_height: int,
     input_image_width: int,
     number_of_classes: int,
-    pretrained_weights: str,
-    were_layers_weights_frozen: bool,
-    last_layer_frozen: Optional[int],
-    activation_used: str,
-    project_version_of_deeplab: str,
-    output_stride: int,
+    model_build_params: Dict[str, Union[int, Tuple[int, int, int], str, None, float]],
     optimizer: keras.optimizers.Optimizer,
     loss_function: keras.losses.Loss,
     initial_learning_rate: float,
@@ -46,16 +41,10 @@ def revision_a_model(
             e.g. deeplabv3plus or modified_v2_deeplabv3plus
         revision: version of model during training, e.g. 10.0.1
         batch_size: size of single batch
-        pretrained_weights: weights to load to model
-        were_layers_weights_frozen: should some layers be not trainable;
-                must set value for border by using last_layer_frozen;
-        last_layer_frozen: below that layer, all will be frozen
-        activation_used: optional activation to add to the top of the network.
-                One of 'softmax', 'sigmoid' or None
-        project_version_of_deeplab: one of "original", "v1", "v2", "v3", "v4"
-        output_stride: determines input_shape/feature_extractor_output ratio. One of {8,16}.
         input_image_width:
         input_image_height:
+        model_build_params: params needed to build model with
+            e.g. src.models.architectures.deeplabv3plus
         optimizer:
         loss_function:
         initial_learning_rate:
@@ -74,17 +63,7 @@ def revision_a_model(
             "number_of_classes": number_of_classes,
             "batch_size": batch_size,
         },
-        "model_build_parameters": {
-            "input_image_height": input_image_height,
-            "input_image_width": input_image_width,
-            "number_of_classes": number_of_classes,
-            "pretrained_weights": pretrained_weights,
-            "were_layers_weights_frozen": were_layers_weights_frozen,
-            "last_layer_frozen": last_layer_frozen,
-            "activation_used": activation_used,
-            "project_version_of_deeplab": project_version_of_deeplab,
-            "output_stride": output_stride,
-        },
+        "model_build_parameters": model_build_params,
         "model_compile_parameters": {
             "optimizer": str(optimizer),
             "loss_function": {
