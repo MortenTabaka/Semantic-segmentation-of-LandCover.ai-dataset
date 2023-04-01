@@ -37,7 +37,7 @@ jobs:
           fi
           new_tag="$major.$minor.0"
         fi
-        echo "{new_tag}={$new_tag}" >> $GITHUB_OUTPUT
+        echo "${new_tag}=${new_tag}" >> $GITHUB_ENV
       shell: bash
     - name: Build and push Docker image
       env:
