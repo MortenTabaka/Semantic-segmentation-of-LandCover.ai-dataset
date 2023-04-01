@@ -25,6 +25,11 @@ class Model:
         activation: str = None,
         model_architecture: str = None,
         output_stride: int = 16,
+        optimizer: tf.keras.optimizers.Optimizer = None,
+        loss_function: tf.keras.losses.Loss = None,
+        metrics: Union[
+            tf.keras.metrics.Metric, str, List[Union[tf.keras.metrics.Metric, str]]
+        ] = None,
     ):
         """
         Class describing a single Tensorflow2 model.
@@ -65,6 +70,9 @@ class Model:
         self.activation = activation
         self.model_architecture = model_architecture
         self.output_stride = output_stride
+        self.optimizer = optimizer
+        self.loss_function = loss_function
+        self.metrics = metrics
 
     def get_deeplab_model(self) -> tf.keras.Model:
         """
@@ -107,6 +115,10 @@ class Model:
             self.model_architecture,
             self.output_stride,
         )
+
+    @property
+    def get_compile_parameters(self):
+        return [self.optimizer, self.loss_function, self.metrics]
 
     @staticmethod
     def freeze_model_layers(
