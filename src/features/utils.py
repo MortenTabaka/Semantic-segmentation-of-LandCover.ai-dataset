@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional, Union
 from tensorflow import keras
+from pandas import DataFrame
 
 from yaml import dump, safe_load
 
@@ -65,9 +66,12 @@ def revision_a_model(
         },
     }
 
+    model_key = f"{model_architecture}_{revision}"
+
     yaml_filepath = get_absolute_path_to_project_location(
         "models/models_revisions.yaml"
     )
+
     print(yaml_filepath)
 
     if not os.path.exists(yaml_filepath):
@@ -79,12 +83,13 @@ def revision_a_model(
         existing_models_revisions = safe_load(f)
 
     if existing_models_revisions is None:
-        existing_models_revisions = config_dict
+        existing_models_revisions = {}
 
-    if (model_architecture, revision) in existing_models_revisions:
-        existing_models_revisions[(model_architecture, revision)].update(config_dict)
+    if model_key in existing_models_revisions:
+        existing_models_revisions[model_key].update(config_dict)
     else:
-        existing_models_revisions[(model_architecture, revision)] = config_dict
+        existing_models_revisions[model_key] = config_dict
 
     with open(yaml_filepath, "w") as f:
-        dump(existing_models_revisions, f)
+        dump(existing_models_revisions, f, default_flow_style=False)
+
