@@ -21,7 +21,7 @@ def get_absolute_path_to_project_location(path_from_project_root: str) -> str:
 
 
 def revision_a_model(
-    model_architecture: str,
+    model_name: str,
     revision: str,
     batch_size: int,
     input_image_height: int,
@@ -39,8 +39,29 @@ def revision_a_model(
         keras.metrics.Metric, str, List[Union[keras.metrics.Metric, str]]
     ],
 ):
+    """
+    Utility to create yaml file for model revisions
+    Args:
+        number_of_classes:
+        metrics:
+        model_name: name of model got with model.name
+            e.g. deeplabv3plus or modified_v2_deeplabv3plus
+        revision: version of model during training, e.g. 10.0.1
+        batch_size: size of single batch
+        pretrained_weights: weights to load to model
+        were_layers_weights_frozen: should some layers be not trainable;
+                must set value for border by using last_layer_frozen;
+        last_layer_frozen: below that layer, all will be frozen
+        activation_used: optional activation to add to the top of the network.
+                One of 'softmax', 'sigmoid' or None
+        project_version_of_deeplab: one of "original", "v1", "v2", "v3", "v4"
+        output_stride: determines input_shape/feature_extractor_output ratio. One of {8,16}.
+
+    Returns:
+        model_key: f"{model_architecture}_{revision}"
+    """
     config_dict = {
-        "model_architecture": model_architecture,
+        "model_name": model_name,
         "revision": revision,
         "dataset_parameters": {
             "input_image_height": input_image_height,
@@ -66,7 +87,7 @@ def revision_a_model(
         },
     }
 
-    model_key = f"{model_architecture}_{revision}"
+    model_key = f"{model_name}_{revision}"
 
     yaml_filepath = get_absolute_path_to_project_location(
         "models/models_revisions.yaml"
@@ -93,3 +114,4 @@ def revision_a_model(
     with open(yaml_filepath, "w") as f:
         dump(existing_models_revisions, f, default_flow_style=False)
 
+    return model_key
