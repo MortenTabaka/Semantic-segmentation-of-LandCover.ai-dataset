@@ -101,3 +101,44 @@ def revision_a_model(
         dump(existing_models_revisions, f, default_flow_style=False, sort_keys=False)
 
     return model_key
+
+
+def get_model_build_params_for_revision(model_key):
+    yaml_filepath = get_absolute_path_to_project_location(
+        "models/models_revisions.yaml"
+    )
+    if not os.path.exists(yaml_filepath):
+        raise ValueError(f"YAML file {yaml_filepath} does not exist")
+
+    with open(yaml_filepath, "r") as f:
+        existing_models_revisions = safe_load(f)
+
+    data = existing_models_revisions.get(model_key, {})
+
+    try:
+        pretrained_weights = data["model_build_parameters"]["pretrained_weights"]
+        second_input = data["model_build_parameters"]["second_input"]
+        input_shape = (
+            data["model_build_parameters"]["input_shape"]["input_image_height"],
+            data["model_build_parameters"]["input_shape"]["input_image_width"],
+            data["model_build_parameters"]["input_shape"]["channels"],
+        )
+        num_classes = data["model_build_parameters"]["num_classes"]
+        backbone = data["model_build_parameters"]["backbone"]
+        output_stride = data["model_build_parameters"]["output_stride"]
+        alpha = data["model_build_parameters"]["alpha"]
+        activation = data["model_build_parameters"]["activation"]
+
+        model_build_parameters = [pretrained_weights, second_input, input_shape, num_classes, backbone,
+                                  output_stride, alpha, activation, ]
+    except KeyError as e:
+        raise ValueError(
+            f"YAML file {yaml_filepath} does not contain expected data: {e}"
+        )
+
+    if not model_build_parameters:
+        raise ValueError(
+            f"YAML file {yaml_filepath} does not contain expected data"
+        )
+
+    return model_build_parameters
