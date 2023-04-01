@@ -26,9 +26,16 @@ jobs:
         if [[ -z "$tag" ]]; then
           new_tag="v1.0.0"
         else
-          tag_number=$(echo $tag | sed 's/v1.0.//')
-          new_tag_number=$((tag_number + 1))
-          new_tag="v1.0.$new_tag_number"
+          major=$(echo $tag | cut -d '.' -f 1)
+          minor=$(echo $tag | cut -d '.' -f 2)
+          patch=$(echo $tag | cut -d '.' -f 3)
+          if [[ $minor == "9" ]]; then
+            major=$((major + 1))
+            minor=0
+          else
+            minor=$((minor + 1))
+          fi
+          new_tag="$major.$minor.0"
         fi
         echo "{new_tag}={$new_tag}" >> $GITHUB_OUTPUT
       shell: bash
