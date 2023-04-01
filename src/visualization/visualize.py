@@ -17,14 +17,14 @@ COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 class PredictionMasks:
     def __init__(
         self,
-        trained_model: tf.keras.Model,
         dataset_object: Dataset,
         number_of_classes: int,
+        model_revision: str
     ):
-        self.model = trained_model
         self.dataset = dataset_object
         self.num_classes = number_of_classes
-        self.predictor = Predictor(self.model)
+        self.predictor = Predictor(model_revision)
+        self.prediction_model = Predictor(model_revision).get_prediction_model_of_revision
 
     def display_overlay_predictions_for_test_set(
         self,
@@ -43,7 +43,7 @@ class PredictionMasks:
         should_break = False
         for single_batch in test_dataset:
             images, y_true, y_pred = self.predictor.get_single_batch_prediction(
-                single_batch
+                single_batch, self.prediction_model
             )
             for image, mask_true, mask_pred in zip(images, y_true, y_pred):
                 if i < how_many_images:

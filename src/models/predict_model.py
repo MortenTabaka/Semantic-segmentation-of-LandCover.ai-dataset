@@ -32,14 +32,6 @@ class Predictor:
             images_and_predictions.append((images, y_pred))
         return images_and_predictions
 
-    def get_single_batch_prediction(self, single_batch):
-        model = self.get_prediction_model_of_revision
-        images = single_batch[0]
-        y_pred = tf.argmax(model.predict(images), axis=-1)
-        y_true = tf.argmax(single_batch[1], axis=-1)
-
-        return images, y_true, y_pred
-
     @property
     def get_prediction_model_of_revision(self):
         build_params = get_model_build_params_for_revision(self.model_key)
@@ -65,3 +57,10 @@ class Predictor:
         )
 
         return os.path.join(*[weights_path, self.model_key, "checkpoint"])
+
+    @staticmethod
+    def get_single_batch_prediction(single_batch, model):
+        images = single_batch[0]
+        y_pred = tf.argmax(model.predict(images), axis=-1)
+        y_true = tf.argmax(single_batch[1], axis=-1)
+        return images, y_true, y_pred
