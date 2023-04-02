@@ -46,8 +46,12 @@ class PredictionPipeline:
     def save_predictions(self):
         pass
 
-    def make_prediction_for_single_tile(self, single_image: np.array):
-        if tf.shape(single_image) == self.input_image_shape:
-            return tf.argmax(self.model.predict(single_image), axis=-1)
-        else:
-            raise ValueError("Input image has incompatible shape.")
+    @staticmethod
+    def __get_input_tiles(tiles_folder: str) -> List[str]:
+        img_paths = glob(path.join(tiles_folder, "*.jpg"))
+        return img_paths
+
+    @staticmethod
+    def __clear_cache(paths: List[str]):
+        for path_to_remove in paths:
+            os.removedirs(path_to_remove)
