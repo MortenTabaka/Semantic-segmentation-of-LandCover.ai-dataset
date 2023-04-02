@@ -7,12 +7,11 @@ from typing import List
 import numpy as np
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 from src.data.image_preprocessing import ImagePreprocessor
-from src.features.loss_functions import SemanticSegmentationLoss
 from src.models.predict_model import Predictor
 from src.features.data_features import ImageFeatures
+from src.features.model_features import decode_segmentation_mask_to_rgb
 
 
 class PredictionPipeline:
@@ -58,10 +57,16 @@ class PredictionPipeline:
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
+            # TODO: fix decoding
+            prediction = decode_segmentation_mask_to_rgb(prediction)
             self.__save_prediction(prediction, file_name)
 
-    def __save_prediction(self, predicted_mask, file_name):
-        pass
+    def __save_prediction(self, image, file_name):
+        save_to = path.join(self.output_folder, ".cache/prediction_tiles")
+        os.makedirs(save_to, exist_ok=True)
+        file_path = os.path.join(save_to, file_name)
+        image.save(file_path)
+        print("Image saved to:", file_path)
 
     def __concatenate_tiles(self):
         pass
