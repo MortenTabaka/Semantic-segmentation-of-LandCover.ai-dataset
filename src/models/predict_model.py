@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.python.keras.utils.data_utils import get_file
 
 from src.models.model_builder import build_deeplabv3plus
-from src.features.utils import (
+from src.features.model_features import (
     get_model_build_params_for_revision,
     get_revision_model_architecture,
 )
@@ -53,7 +53,7 @@ class Predictor:
             url=self.url_with_zipped_weights,
             file_name=f"{self.model_key}.zip",
             output_path=weights_path,
-            unzip=True
+            unzip=True,
         )
 
         return os.path.join(*[weights_path, self.model_key, "checkpoint"])
