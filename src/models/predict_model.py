@@ -1,7 +1,6 @@
 import os
 
 import tensorflow as tf
-from tensorflow.python.keras.utils.data_utils import get_file
 
 from src.models.model_builder import build_deeplabv3plus
 from src.features.model_features import (
