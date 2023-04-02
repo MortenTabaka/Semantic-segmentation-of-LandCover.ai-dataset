@@ -70,6 +70,10 @@ class Predictor:
     def get_model_build_parameters(self):
         return get_model_build_params_for_revision(self.model_key)
 
+    @property
+    def get_model_architecture(self):
+        return get_revision_model_architecture(self.model_key)
+
     @staticmethod
     def get_single_batch_prediction(single_batch, model):
         images = single_batch[0]
