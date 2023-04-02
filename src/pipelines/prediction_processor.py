@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from src.data.image_preprocessing import ImagePreprocessor
 from src.features.loss_functions import SemanticSegmentationLoss
 from src.models.predict_model import Predictor
+from src.features.data_features import ImageFeatures
 
 
 class PredictionPipeline:
@@ -25,6 +26,10 @@ class PredictionPipeline:
             model_revision
         ).get_prediction_model_of_revision
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
+        self.image_features = ImageFeatures(
+            self.revision_predictor.get_required_input_shape_of_an_image[0],
+            self.revision_predictor.get_required_input_shape_of_an_image[1],
+        )
 
     def process(self):
         config = ConfigProto()
@@ -35,13 +40,7 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[0]
         )
         tiles = self.__get_input_tiles(tiles_folder)
-
-        for tile in tiles:
-            preprocessed_tile = img_to_array(load_img(tile))
-            prediction = tf.argmax(
-                self.prediction_model.predict(preprocessed_tile), axis=-1
-            )
-            print(type(prediction))
+        self.__make_predictions(tiles)
 
         self.__clear_cache([tiles_folder])
 
@@ -52,14 +51,23 @@ class PredictionPipeline:
         )
         return save_to
 
-    def make_predictions(self):
+    def __make_predictions(self, tiles: List[str]):
+        for tile in tiles:
+            preprocessed_tile = self.get_image_for_prediction(tile)
+            file_name = os.path.basename(tile)
+            prediction = tf.argmax(
+                self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
+            )
+            self.__save_prediction(prediction, file_name)
+
+    def __save_prediction(self, predicted_mask, file_name):
         pass
 
-    def concatenate_tiles(self):
+    def __concatenate_tiles(self):
         pass
 
-    def save_predictions(self):
-        pass
+    def get_image_for_prediction(self, filepath: str):
+        return self.image_features.load_image_from_drive(filepath)
 
     @staticmethod
     def __get_input_tiles(tiles_folder: str) -> List[str]:
