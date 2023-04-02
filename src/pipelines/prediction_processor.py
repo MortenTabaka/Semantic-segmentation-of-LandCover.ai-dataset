@@ -14,16 +14,11 @@ class PredictionPipeline:
     OPTIMIZER = tf.keras.optimizers.Adam()
 
     def __init__(self, model_revision: str, input_folder: Path, output_folder: Path):
-        self.predictor = Predictor(model_revision)
-        self.model = self.predictor.get_prediction_model_of_revision.compile(
-            self.OPTIMIZER,
-            SemanticSegmentationLoss(
-                self.predictor.get_model_build_parameters[3]
-            ).soft_dice_loss,
-        )
-        self.input_image_shape = self.predictor.get_required_input_shape_of_an_image
         self.input_folder = input_folder
         self.output_folder = output_folder
+        self.revision_predictor = Predictor(model_revision)
+        self.prediction_model = Predictor(model_revision).get_prediction_model_of_revision
+        self.model_build_parameters = self.revision_predictor.get_model_build_parameters
 
     def process(self):
         self.__preprocesses_images()
