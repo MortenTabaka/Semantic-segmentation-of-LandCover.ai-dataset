@@ -16,15 +16,14 @@ COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 
 class PredictionMasks:
     def __init__(
-        self,
-        dataset_object: Dataset,
-        number_of_classes: int,
-        model_revision: str
+        self, dataset_object: Dataset, number_of_classes: int, model_revision: str
     ):
         self.dataset = dataset_object
         self.num_classes = number_of_classes
         self.predictor = Predictor(model_revision)
-        self.prediction_model = Predictor(model_revision).get_prediction_model_of_revision
+        self.prediction_model = Predictor(
+            model_revision
+        ).get_prediction_model_of_revision
 
     def display_overlay_predictions_for_test_set(
         self,

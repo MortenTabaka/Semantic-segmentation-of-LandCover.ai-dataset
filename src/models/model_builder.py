@@ -1,5 +1,6 @@
-import tensorflow as tf
 from typing import List, Union
+
+import tensorflow as tf
 
 from src.features.model_features import revision_a_model
 from src.models.architectures import (

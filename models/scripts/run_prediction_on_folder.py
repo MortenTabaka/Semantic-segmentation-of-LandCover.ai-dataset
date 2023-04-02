@@ -1,5 +1,6 @@
-import typer
 from pathlib import Path
+
+import typer
 
 from src.features.utils import get_absolute_path_to_project_location
 from src.pipelines.prediction_processor import PredictionPipeline

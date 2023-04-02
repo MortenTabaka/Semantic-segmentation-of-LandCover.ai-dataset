@@ -1,7 +1,7 @@
 import os
-from typing import List, Dict, Tuple, Union
-from tensorflow import keras
+from typing import Dict, List, Tuple, Union
 
+from tensorflow import keras
 from yaml import dump, safe_load
 
 from src.features.utils import get_absolute_path_to_project_location
@@ -107,12 +107,18 @@ def get_model_build_params_for_revision(model_key) -> List:
         alpha = data["model_build_parameters"]["alpha"]
         activation = data["model_build_parameters"]["activation"]
 
-        model_build_parameters = [pretrained_weights, second_input, input_shape, num_classes, backbone,
-                                  output_stride, alpha, activation, ]
+        model_build_parameters = [
+            pretrained_weights,
+            second_input,
+            input_shape,
+            num_classes,
+            backbone,
+            output_stride,
+            alpha,
+            activation,
+        ]
     except KeyError as e:
-        raise ValueError(
-            f"YAML file does not contain expected data: {e}"
-        )
+        raise ValueError(f"YAML file does not contain expected data: {e}")
 
     return model_build_parameters
 
@@ -135,7 +141,5 @@ def load_data_for_revision(model_key):
     data = existing_models_revisions.get(model_key, {})
 
     if not data:
-        raise ValueError(
-            f"YAML file {yaml_filepath} does not contain expected data."
-        )
+        raise ValueError(f"YAML file {yaml_filepath} does not contain expected data.")
     return data

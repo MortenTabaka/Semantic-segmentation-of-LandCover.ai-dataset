@@ -3,12 +3,12 @@ from typing import Tuple
 
 import tensorflow as tf
 
-from src.models.model_builder import build_deeplabv3plus
+from src.data.requests_downloader import UrlDownloader
 from src.features.model_features import (
     get_model_build_params_for_revision,
     get_revision_model_architecture,
 )
-from src.data.requests_downloader import UrlDownloader
+from src.models.model_builder import build_deeplabv3plus
 
 
 class Predictor:

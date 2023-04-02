@@ -1,13 +1,17 @@
+import os
+from glob import glob
+from os import path
 from pathlib import Path
+from typing import List
 
 import numpy as np
-from os.path import join as join_paths
-
 import tensorflow as tf
+from tensorflow.compat.v1 import ConfigProto, InteractiveSession
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-from src.models.predict_model import Predictor
-from src.features.loss_functions import SemanticSegmentationLoss
 from src.data.image_preprocessing import ImagePreprocessor
+from src.features.loss_functions import SemanticSegmentationLoss
+from src.models.predict_model import Predictor
 
 
 class PredictionPipeline:
@@ -17,7 +21,9 @@ class PredictionPipeline:
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.revision_predictor = Predictor(model_revision)
-        self.prediction_model = Predictor(model_revision).get_prediction_model_of_revision
+        self.prediction_model = Predictor(
+            model_revision
+        ).get_prediction_model_of_revision
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
 
     def process(self):
