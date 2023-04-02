@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 import tensorflow as tf
 
@@ -33,9 +34,8 @@ class Predictor:
 
     @property
     def get_prediction_model_of_revision(self):
-        build_params = get_model_build_params_for_revision(self.model_key)
         model_name = get_revision_model_architecture(self.model_key)
-        model = build_deeplabv3plus(model_name, build_params)
+        model = build_deeplabv3plus(model_name, *self.get_model_build_parameters)
         model.load_weights(self.get_model_revision_weights)
         return model
 
@@ -56,6 +56,25 @@ class Predictor:
         )
 
         return os.path.join(*[weights_path, self.model_key, "checkpoint"])
+
+    @property
+    def get_required_input_shape_of_an_image(self) -> Tuple[int, int, int]:
+        """
+        Gets required shape of input image for the initialized Predictor.
+
+        Returns: (image_height, image_width, channels)
+        """
+        data = self.get_model_build_parameters
+        input_shape = (
+            int(data["input_shape"]["input_image_height"]),
+            int(data["input_shape"]["input_image_width"]),
+            int(data["input_shape"]["channels"]),
+        )
+        return input_shape
+
+    @property
+    def get_model_build_parameters(self):
+        return get_model_build_params_for_revision(self.model_key)
 
     @staticmethod
     def get_single_batch_prediction(single_batch, model):
