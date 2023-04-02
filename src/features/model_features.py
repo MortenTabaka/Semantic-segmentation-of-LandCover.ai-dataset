@@ -90,7 +90,7 @@ def revision_a_model(
     return model_key
 
 
-def get_model_build_params_for_revision(model_key):
+def get_model_build_params_for_revision(model_key) -> List:
     data = load_data_for_revision(model_key)
 
     try:

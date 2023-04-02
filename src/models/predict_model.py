@@ -64,13 +64,7 @@ class Predictor:
 
         Returns: (image_height, image_width, channels)
         """
-        data = self.get_model_build_parameters
-        input_shape = (
-            int(data["input_shape"]["input_image_height"]),
-            int(data["input_shape"]["input_image_width"]),
-            int(data["input_shape"]["channels"]),
-        )
-        return input_shape
+        return self.get_model_build_parameters[2]
 
     @property
     def get_model_build_parameters(self):
