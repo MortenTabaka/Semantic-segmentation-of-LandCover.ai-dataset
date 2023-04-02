@@ -21,16 +21,30 @@ class PredictionPipeline:
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
 
     def process(self):
-        self.__preprocesses_images()
+        config = ConfigProto()
+        config.gpu_options.allow_growth = True
+        InteractiveSession(config=config)
 
-    def __preprocesses_images(self):
-        ImagePreprocessor(self.input_folder).split_custom_images_before_prediction(
-            self.input_image_shape[0],
-            join_paths(self.input_folder, ".cache/tiles")
+        tiles_folder = self.__preprocess_images_and_get_path(
+            self.revision_predictor.get_required_input_shape_of_an_image[0]
         )
+        tiles = self.__get_input_tiles(tiles_folder)
 
-    def __load_input_images(self):
-        pass
+        for tile in tiles:
+            preprocessed_tile = img_to_array(load_img(tile))
+            prediction = tf.argmax(
+                self.prediction_model.predict(preprocessed_tile), axis=-1
+            )
+            print(type(prediction))
+
+        self.__clear_cache([tiles_folder])
+
+    def __preprocess_images_and_get_path(self, targeted_tile_size: int) -> str:
+        save_to = path.join(self.input_folder, ".cache/tiles")
+        ImagePreprocessor(self.input_folder).split_custom_images_before_prediction(
+            targeted_tile_size, save_to
+        )
+        return save_to
 
     def make_predictions(self):
         pass
