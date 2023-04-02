@@ -1,7 +1,9 @@
 import os
 from typing import Dict, List, Tuple, Union
 
+from numpy import array, zeros_like, stack, uint8
 from tensorflow import keras
+from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
 
 from src.features.utils import get_absolute_path_to_project_location
@@ -143,3 +145,35 @@ def load_data_for_revision(model_key):
     if not data:
         raise ValueError(f"YAML file {yaml_filepath} does not contain expected data.")
     return data
+
+
+def decode_segmentation_mask_to_rgb(
+    mask, num_classes: int = 5
+) -> array:
+    """
+    Transforms Landcover dataset's masks to RGB image.
+
+    Args:
+        mask: prediction;
+        num_classes: number of classes;
+    """
+    custom_colormap = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
+
+    if len(custom_colormap) != num_classes:
+        raise AttributeError("")
+
+    r = zeros_like(mask).astype(uint8)
+    g = zeros_like(mask).astype(uint8)
+    b = zeros_like(mask).astype(uint8)
+
+    print("Mask shape:", mask.shape)
+    for i in range(0, num_classes):
+        idx = mask == i
+        print(f"Class {i}: idx shape={idx.shape}, idx.sum()={idx.sum()}")
+        r[idx] = custom_colormap[i][0]
+        g[idx] = custom_colormap[i][1]
+        b[idx] = custom_colormap[i][2]
+
+    rgb = stack([r, g, b], axis=2)
+    image = array_to_img(rgb)
+    return image
