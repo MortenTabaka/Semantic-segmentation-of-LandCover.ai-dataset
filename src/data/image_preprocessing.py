@@ -12,6 +12,8 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 import glob
 import os
 import os.path
+from pathlib import Path
+from typing import Union
 
 import cv2
 
@@ -21,7 +23,7 @@ class ImagePreprocessor:
     Class for reading, processing, and writing data.
     """
 
-    def __init__(self, path_to_folder_with_input_images: str):
+    def __init__(self, path_to_folder_with_input_images: Union[Path, str]):
         self.path_to_folder_with_input_images = path_to_folder_with_input_images
 
     def split_dataset_images(self):
@@ -84,9 +86,9 @@ class ImagePreprocessor:
 
     def split_custom_images_before_prediction(
         self,
-        path_to_output_folder: str,
+        target_size: int,
+        path_to_output_folder: Union[Path, str],
     ):
-        TARGET_SIZE = 512
 
         img_paths = glob.glob(
             os.path.join(self.path_to_folder_with_input_images, "*.tif")
@@ -107,13 +109,13 @@ class ImagePreprocessor:
             img = cv2.imread(img_path)
 
             k = 0
-            for y in range(0, img.shape[0], TARGET_SIZE):
-                for x in range(0, img.shape[1], TARGET_SIZE):
-                    img_tile = img[y : y + TARGET_SIZE, x : x + TARGET_SIZE]
+            for y in range(0, img.shape[0], target_size):
+                for x in range(0, img.shape[1], target_size):
+                    img_tile = img[y : y + target_size, x : x + target_size]
 
                     if (
-                        img_tile.shape[0] == TARGET_SIZE
-                        and img_tile.shape[1] == TARGET_SIZE
+                        img_tile.shape[0] == target_size
+                        and img_tile.shape[1] == target_size
                     ):
                         out_img_path = os.path.join(
                             path_to_output_folder, "{}_{}.jpg".format(img_filename, k)
