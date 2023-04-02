@@ -6,10 +6,21 @@ on:
     
 jobs:
   build_and_push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      id: bump_tag_version
+      uses: anothrNick/github-tag-action@1.61.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+    - name: Get latest tag of branch
+      id: get_latest_tag
+      run: echo ::set-output name=latest_tag::$(git describe --abbrev=0 --tags)
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
@@ -19,30 +30,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-    - name: Bump tag version
-      id: bump_tag_version
-      run: |
-        tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
-        if [[ -z "$tag" ]]; then
-          new_tag="v1.0.0"
-        else
-          major=$(echo $tag | cut -d '.' -f 1)
-          minor=$(echo $tag | cut -d '.' -f 2)
-          patch=$(echo $tag | cut -d '.' -f 3)
-          if [[ $minor == "9" ]]; then
-            major=$((major + 1))
-            minor=0
-          else
-            minor=$((minor + 1))
-          fi
-          new_tag="$major.$minor.0"
-        fi
-        echo "${new_tag}=${new_tag}" >> $GITHUB_ENV
-      shell: bash
     - name: Build and push Docker image
       env:
         DOCKER_BUILDKIT: 1
-        DOCKER_TAG: ${{ steps.bump_tag_version.outputs.new_tag }}
+        DOCKER_TAG: ${{ steps.get_latest_tag.outputs.latest_tag }}
       run: |
         docker buildx build \
           --platform linux/amd64,linux/arm64 \
@@ -50,11 +41,3 @@ jobs:
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:${DOCKER_TAG} \
           --tag mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:latest \
           .
-    - name: Create Git tag
-      if: always()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAG: ${{ steps.bump_tag_version.outputs.new_tag }}
-      run: |
-        git tag $TAG
-        git push origin $TAG
