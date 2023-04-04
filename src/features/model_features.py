@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Tuple, Union
 
-from numpy import array, zeros_like, stack, uint8
+from numpy import array, stack, uint8, zeros_like
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
@@ -147,7 +147,9 @@ def load_data_for_revision(model_key):
     return data
 
 
-def decode_segmentation_mask_to_rgb(mask, custom_colormap, num_classes: int = 5) -> array:
+def decode_segmentation_mask_to_rgb(
+    mask, custom_colormap, num_classes: int = 5
+) -> array:
     """
     Transforms Landcover dataset's masks to RGB image.
 
