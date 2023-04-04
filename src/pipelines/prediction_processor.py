@@ -75,7 +75,7 @@ class PredictionPipeline:
         image.save(file_path)
 
     def __concatenate_tiles(self, input_folder):
-        ImagePostprocessor(input_path=input_folder, output_path=self.output_folder)
+        ImagePostprocessor(input_path=input_folder, output_path=self.output_folder).concatenate_images()
 
     def get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
