@@ -147,17 +147,16 @@ def load_data_for_revision(model_key):
     return data
 
 
-def decode_segmentation_mask_to_rgb(
-    mask, num_classes: int = 5
-) -> array:
+def decode_segmentation_mask_to_rgb(mask, custom_colormap, num_classes: int = 5) -> array:
     """
     Transforms Landcover dataset's masks to RGB image.
 
     Args:
+        custom_colormap:
         mask: prediction;
         num_classes: number of classes;
     """
-    custom_colormap = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
+    mask = mask[0]
 
     if len(custom_colormap) != num_classes:
         raise AttributeError("")
@@ -166,10 +165,8 @@ def decode_segmentation_mask_to_rgb(
     g = zeros_like(mask).astype(uint8)
     b = zeros_like(mask).astype(uint8)
 
-    print("Mask shape:", mask.shape)
     for i in range(0, num_classes):
         idx = mask == i
-        print(f"Class {i}: idx shape={idx.shape}, idx.sum()={idx.sum()}")
         r[idx] = custom_colormap[i][0]
         g[idx] = custom_colormap[i][1]
         b[idx] = custom_colormap[i][2]

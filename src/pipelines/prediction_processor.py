@@ -3,6 +3,7 @@ from glob import glob
 from os import path
 from pathlib import Path
 from typing import List
+from shutil import rmtree
 
 import numpy as np
 import tensorflow as tf
@@ -12,6 +13,7 @@ from src.data.image_preprocessing import ImagePreprocessor
 from src.models.predict_model import Predictor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import decode_segmentation_mask_to_rgb
+from src.features.utils import generate_colormap
 
 
 class PredictionPipeline:
@@ -40,7 +42,6 @@ class PredictionPipeline:
         )
         tiles = self.__get_input_tiles(tiles_folder)
         self.__make_predictions(tiles)
-
         self.__clear_cache([tiles_folder])
 
     def __preprocess_images_and_get_path(self, targeted_tile_size: int) -> str:
@@ -51,14 +52,16 @@ class PredictionPipeline:
         return save_to
 
     def __make_predictions(self, tiles: List[str]):
+        num_classes, custom_colormap = self.__get_number_of_classes_and_colormap
         for tile in tiles:
             preprocessed_tile = self.get_image_for_prediction(tile)
             file_name = os.path.basename(tile)
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
-            # TODO: fix decoding
-            prediction = decode_segmentation_mask_to_rgb(prediction)
+            prediction = decode_segmentation_mask_to_rgb(
+                prediction, custom_colormap, num_classes
+            )
             self.__save_prediction(prediction, file_name)
 
     def __save_prediction(self, image, file_name):
@@ -74,6 +77,21 @@ class PredictionPipeline:
     def get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
 
+    @property
+    def __get_number_of_classes_and_colormap(self):
+        num_classes = self.model_build_parameters[3]
+        if num_classes == 5:
+            custom_colormap = (
+                [0, 0, 0],
+                [255, 0, 0],
+                [0, 255, 0],
+                [0, 0, 255],
+                [255, 255, 255],
+            )
+        else:
+            custom_colormap = generate_colormap(num_classes)
+        return num_classes, custom_colormap
+
     @staticmethod
     def __get_input_tiles(tiles_folder: str) -> List[str]:
         img_paths = glob(path.join(tiles_folder, "*.jpg"))
@@ -82,4 +100,4 @@ class PredictionPipeline:
     @staticmethod
     def __clear_cache(paths: List[str]):
         for path_to_remove in paths:
-            os.removedirs(path_to_remove)
+            rmtree(path_to_remove)
