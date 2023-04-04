@@ -9,15 +9,7 @@ from src.pipelines.prediction_processor import PredictionPipeline
 def main(
     model_revision: str = typer.Option(
         default="deeplabv3plus_v5.10.2",
-        help="Choose model revision used for predictions",
-    ),
-    model_revisions: Path = typer.Option(
-        get_absolute_path_to_project_location("models/models_revisions.yaml"),
-        help="Path to YAML file with model revision. "
-        "Use only when YAML is other than the project's default",
-        file_okay=True,
-        dir_okay=False,
-        show_default=False,
+        help="Choose model revision for predictions",
     ),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
