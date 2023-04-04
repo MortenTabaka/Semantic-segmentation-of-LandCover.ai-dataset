@@ -2,18 +2,19 @@ import os
 from glob import glob
 from os import path
 from pathlib import Path
-from typing import List
 from shutil import rmtree
+from typing import List
 
 import numpy as np
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 
 from src.data.image_preprocessing import ImagePreprocessor
-from src.models.predict_model import Predictor
+from src.data.image_postprocessing import ImagePostprocessor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import decode_segmentation_mask_to_rgb
 from src.features.utils import generate_colormap
+from src.models.predict_model import Predictor
 
 
 class PredictionPipeline:
@@ -42,6 +43,9 @@ class PredictionPipeline:
         )
         tiles = self.__get_input_tiles(tiles_folder)
         self.__make_predictions(tiles)
+        self.__concatenate_tiles(
+            os.path.join(self.output_folder, ".cache/prediction_tiles")
+        )
         self.__clear_cache([tiles_folder])
 
     def __preprocess_images_and_get_path(self, targeted_tile_size: int) -> str:
@@ -69,10 +73,9 @@ class PredictionPipeline:
         os.makedirs(save_to, exist_ok=True)
         file_path = os.path.join(save_to, file_name)
         image.save(file_path)
-        print("Image saved to:", file_path)
 
-    def __concatenate_tiles(self):
-        pass
+    def __concatenate_tiles(self, input_folder):
+        ImagePostprocessor(input_path=input_folder, output_path=self.output_folder)
 
     def get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
