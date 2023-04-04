@@ -110,6 +110,7 @@ class ImagePreprocessor:
 
             k = 0
             for y in range(0, img.shape[0], target_size):
+                j = 0
                 for x in range(0, img.shape[1], target_size):
                     img_tile = img[y : y + target_size, x : x + target_size]
 
@@ -118,11 +119,12 @@ class ImagePreprocessor:
                         and img_tile.shape[1] == target_size
                     ):
                         out_img_path = os.path.join(
-                            path_to_output_folder, "{}_{}.jpg".format(img_filename, k)
+                            path_to_output_folder, f"{img_filename}_{k}_{j}.jpg"
                         )
 
                         if not os.path.isfile(out_img_path):
                             cv2.imwrite(out_img_path, img_tile)
-                    k += 1
+                    j += 1
+                k += 1
 
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
