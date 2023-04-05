@@ -43,10 +43,11 @@ class PredictionPipeline:
         )
         tiles = self.__get_input_tiles(tiles_folder)
         self.__make_predictions(tiles)
-        self.__concatenate_tiles(
-            os.path.join(self.output_folder, ".cache/prediction_tiles")
-        )
-        self.__clear_cache([tiles_folder])
+        predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
+        # TODO: correctly concatenate tiles according to its position
+        # TODO: Fix tiff conversion
+        self.__concatenate_tiles(predicted_tiles)
+        self.__clear_cache([tiles_folder, predicted_tiles])
 
     def __preprocess_images_and_get_path(self, targeted_tile_size: int) -> str:
         save_to = path.join(self.input_folder, ".cache/tiles")
@@ -75,7 +76,9 @@ class PredictionPipeline:
         image.save(file_path)
 
     def __concatenate_tiles(self, input_folder):
-        ImagePostprocessor(input_path=input_folder, output_path=self.output_folder).concatenate_images()
+        ImagePostprocessor(
+            input_path=input_folder, output_path=self.output_folder
+        ).concatenate_images()
 
     def get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)

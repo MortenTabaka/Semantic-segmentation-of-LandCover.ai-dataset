@@ -14,6 +14,7 @@ import os
 import os.path
 from pathlib import Path
 from typing import Union
+import multiprocessing as mp
 
 import cv2
 
@@ -91,7 +92,7 @@ class ImagePreprocessor:
     ):
 
         img_paths = glob.glob(
-            os.path.join(self.path_to_folder_with_input_images, "*.tif")
+            os.path.join(self.path_to_folder_with_input_images, "*.tiff")
         )
         img_paths += glob.glob(
             os.path.join(self.path_to_folder_with_input_images, "*.jpg")
