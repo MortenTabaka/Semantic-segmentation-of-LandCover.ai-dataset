@@ -25,6 +25,7 @@ class PredictionPipeline:
         model_revision (str): The version of the model to use for prediction.
         input_folder (Path): The folder containing the input images.
         output_folder (Path): The folder where the predicted segmentation masks will be saved.
+        which_metric_best_weights_to_load (str): Weights to load.
 
     Attributes:
         input_folder (Path): The folder containing the input images.
@@ -38,12 +39,18 @@ class PredictionPipeline:
         process(): Processes the input images and saves the predicted segmentation masks to the output folder.
     """
 
-    def __init__(self, model_revision: str, input_folder: Path, output_folder: Path):
+    def __init__(
+        self,
+        model_revision: str,
+        input_folder: Path,
+        output_folder: Path,
+        which_metric_best_weights_to_load: str,
+    ):
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.revision_predictor = Predictor(model_revision)
         self.prediction_model = Predictor(
-            model_revision
+            model_revision, which_metric_best_weights_to_load
         ).get_prediction_model_of_revision
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
         self.image_features = ImageFeatures(

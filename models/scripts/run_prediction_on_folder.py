@@ -1,4 +1,5 @@
 from pathlib import Path
+from enum import Enum
 
 import typer
 
@@ -6,10 +7,20 @@ from src.features.utils import get_absolute_path_to_project_location
 from src.pipelines.prediction_processor import PredictionPipeline
 
 
+class TypeOfWeightsToLoad(str, Enum):
+    miou = "miou"
+    loss = "loss"
+
+
 def main(
     model_revision: str = typer.Option(
         default="deeplabv3plus_v5.10.2",
         help="Choose model revision for predictions",
+    ),
+    weights: TypeOfWeightsToLoad = typer.Option(
+        default=TypeOfWeightsToLoad.miou,
+        help="Pick which weights load",
+        show_choices=True
     ),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
@@ -33,6 +44,7 @@ def main(
         model_revision=model_revision,
         input_folder=input_folder,
         output_folder=output_folder,
+        which_metric_best_weights_to_load=weights
     ).process(clear_cache)
 
 
