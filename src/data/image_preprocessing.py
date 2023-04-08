@@ -120,7 +120,7 @@ class ImagePreprocessor:
                         and img_tile.shape[1] == target_size
                     ):
                         out_img_path = os.path.join(
-                            path_to_output_folder, f"{img_filename}_{k}_{j}.jpg"
+                            path_to_output_folder, f"{img_filename}_vertical{k}_horizontal{j}.jpg"
                         )
 
                         if not os.path.isfile(out_img_path):

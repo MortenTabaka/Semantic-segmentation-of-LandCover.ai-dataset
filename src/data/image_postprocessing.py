@@ -3,6 +3,7 @@ import os
 import os.path
 from typing import List, Union
 from pathlib import Path
+from re import match
 
 import cv2
 import numpy as np
@@ -41,7 +42,7 @@ class ImagePostprocessor:
                 k += 1
 
         # Get the base filename
-        base_filename = os.path.splitext(img_filenames[0])[0]
+        base_filename = os.path.splitext(img_filenames[0])[0].split("_vertical")[0]
         output_filename = os.path.join(self.output_path, base_filename + ".jpg")
         cv2.imwrite(output_filename, img)
 
