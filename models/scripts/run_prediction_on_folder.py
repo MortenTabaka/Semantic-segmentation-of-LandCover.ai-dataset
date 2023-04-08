@@ -11,13 +11,6 @@ def main(
         default="deeplabv3plus_v5.10.2",
         help="Choose model revision for predictions",
     ),
-    checkpoint_to_load: Path = typer.Option(
-        default=None,
-        help='Use to run predictor with chosen checkpoint weights. Default: None.',
-        file_okay=False,
-        dir_okay=True,
-        show_default=False,
-    ),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
         help='Default: "models/custom_data/input". '
@@ -40,7 +33,6 @@ def main(
         model_revision=model_revision,
         input_folder=input_folder,
         output_folder=output_folder,
-        path_to_local_checkpoint=checkpoint_to_load
     ).process(clear_cache)
 
 
