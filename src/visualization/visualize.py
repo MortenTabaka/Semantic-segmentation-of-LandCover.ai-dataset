@@ -15,6 +15,33 @@ COLORMAP = ([0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 255])
 
 
 class PredictionMasks:
+    """
+    A class for visualizing segmentation predictions of a model on a dataset.
+
+    Args:
+        dataset_object (Dataset): A Dataset object.
+        number_of_classes (int): The number of classes in the dataset.
+        model_revision (str): The revision of the segmentation model to use.
+
+    Attributes:
+        dataset (Dataset): The Dataset object.
+        num_classes (int): The number of classes in the dataset.
+        predictor (Predictor): A Predictor object.
+        prediction_model (tf.keras.Model): The prediction model.
+
+    Methods:
+        display_overlay_predictions_for_test_set(how_many_images, figure_size, colormap, randomly, export_to_file)
+            Displays overlay predictions for a number of images from the test set.
+        get_overlay(image, colored_mask)
+            Returns an overlay of an image and a colored mask.
+        get_miou_score_for_single_prediction(real_mask, predicted_mask)
+            Returns the mean IoU score for a single prediction.
+        decode_segmentation_mask(landcover_mask, custom_colormap, num_classes)
+            Transforms a segmentation mask to an RGB image.
+        plot_single_prediction(images, miou_score, figure_size, should_save_to_file)
+            Plots a single prediction and its mean IoU score.
+    """
+
     def __init__(
         self, dataset_object: Dataset, number_of_classes: int, model_revision: str
     ):

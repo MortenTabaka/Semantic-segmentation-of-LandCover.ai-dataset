@@ -13,6 +13,32 @@ from src.features.image_transformation import ImageTransformator
 class Dataset:
     """
     Provides functionality to load processed images and masks.
+
+    Args:
+        processed_images_path (str): Absolute path to processed images. By default, it is "./data/processed".
+        image_height (int): The height of the image.
+        image_width (int): The width of the image.
+        number_of_classes (int): The number of classes.
+        batch_size (int): The size of each batch of data.
+
+    Attributes:
+        processed_images_path (str): The absolute path to processed images.
+        image_features (ImageFeatures): An instance of the ImageFeatures class.
+        mask_features (MaskFeatures): An instance of the MaskFeatures class.
+        image_transformator (ImageTransformator): An instance of the ImageTransformator class.
+        batch_size (int): The size of each batch of data.
+        number_of_classes (int): The number of classes.
+        image_height (int): The height of the image.
+        image_width (int): The width of the image.
+
+    Methods:
+        generate_datasets(): Returns three datasets for training, validation, and testing.
+        get_shuffled_test_dataset(): Returns a shuffled dataset for testing.
+        generate_single_dataset(): Generates a single dataset.
+        get_class_balance(): Returns a dictionary containing the number of pixels in each class.
+        load_single_image_and_mask(): Loads a single image and mask.
+        load_single_transformed_image_and_mask(): Loads a single transformed image and mask.
+        paths_to_images_and_masks(): Returns the paths to the images and masks.
     """
 
     def __init__(
@@ -24,9 +50,7 @@ class Dataset:
         batch_size: int,
     ):
         """
-        Class for loading images and masks.
-        Args:
-            processed_images_path: absolute path to processed images. By default, it is ./data/processed
+        Initializes the Dataset class.
         """
         self.processed_images_path = processed_images_path[:-1] + processed_images_path[
             -1
@@ -40,6 +64,12 @@ class Dataset:
         self.image_width = image_width
 
     def generate_datasets(self):
+        """
+        Returns three datasets for training, validation, and testing.
+
+        Returns:
+            tuple: A tuple containing the training, validation, and testing datasets.
+        """
         (
             train_images,
             train_masks,
@@ -54,6 +84,12 @@ class Dataset:
         return train_dataset, val_dataset, test_dataset
 
     def get_shuffled_test_dataset(self):
+        """
+        Returns a shuffled dataset for testing.
+
+        Returns:
+            tf.data.Dataset: The shuffled testing dataset.
+        """
         test_images, test_masks = self.paths_to_images_and_masks()[-2:]
         test_dataset = self.generate_single_dataset(
             test_images, test_masks, shuffle=True
@@ -70,14 +106,18 @@ class Dataset:
         shuffle: bool = False,
     ) -> tf.data.Dataset:
         """
-        Returns
+        Generates a single dataset.
 
         Args:
-        image_list: list of paths to each image
-        mask_list: list of paths to corresponding masks of images (sorted)
-        data_transformation: decides whether images and masks will be randomly transformed
-        augmentation: decides whether dataset will be increased
-        augmentation_factor: Factor by which number of data images will be incremented.
+            images_paths (List[str]): A list of paths to each image.
+            masks_paths (List[str]): A list of paths to corresponding masks of images (sorted).
+            data_transformation (bool): Whether images and masks will be randomly transformed.
+            augmentation (bool): Whether the dataset will be increased.
+            augmentation_factor (int): The factor by which the number of data images will be incremented.
+            shuffle (bool): Whether to shuffle the dataset.
+
+        Returns:
+            tf.data.Dataset: The generated dataset.
         """
         dataset = tf.data.Dataset.from_tensor_slices((images_paths, masks_paths))
 
@@ -107,6 +147,13 @@ class Dataset:
         return dataset
 
     def get_class_balance(self) -> dict:
+        """
+        Returns a dictionary containing the number of pixels in each class.
+
+        Returns:
+            dict: A dictionary containing the number of pixels in each class.
+        """
+
         each_class_pixel_count = {}
 
         for class_num in range(self.number_of_classes):
