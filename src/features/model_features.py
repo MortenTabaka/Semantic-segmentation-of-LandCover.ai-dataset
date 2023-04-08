@@ -176,3 +176,11 @@ def decode_segmentation_mask_to_rgb(
     rgb = stack([r, g, b], axis=2)
     image = array_to_img(rgb)
     return image
+
+
+def dump_revision_yaml(to_dump):
+    yaml_filepath = get_absolute_path_to_project_location(
+        "models/models_revisions.yaml"
+    )
+    with open(yaml_filepath, "w") as f:
+        dump(to_dump, f, default_flow_style=False, sort_keys=False)

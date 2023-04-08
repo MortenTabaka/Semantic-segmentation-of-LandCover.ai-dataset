@@ -2,7 +2,7 @@ from typing import List, Union
 
 import tensorflow as tf
 
-from src.features.model_features import revision_a_model
+from src.features.model_features import dump_revision_yaml, revision_a_model, load_data_for_revision
 from src.models.architectures import (
     deeplabv3plus,
     modified_v1_deeplabv3plus,
@@ -129,6 +129,11 @@ class Model:
             final_learning_rate=final_learning_rate,
             metrics=self.metrics,
         )
+
+    def update_revision_with_training_history(self, history: tf.keras.callbacks.History):
+        current_revision = load_data_for_revision(f"{self.model_architecture}_v{self.revision}")
+        current_revision["history"] = history.history
+        dump_revision_yaml(current_revision)
 
     @property
     def get_compile_parameters(self):
