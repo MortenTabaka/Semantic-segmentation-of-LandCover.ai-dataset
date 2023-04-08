@@ -36,7 +36,7 @@ class Predictor:
     def get_prediction_model_of_revision(self):
         model_name = get_revision_model_architecture(self.model_key)
         model = build_deeplabv3plus(model_name, self.get_model_build_parameters)
-        model.load_weights(self.get_model_revision_weights)
+        model.load_weights(self.get_model_revision_weights).expect_partial()
         return model
 
     @property
