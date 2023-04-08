@@ -38,13 +38,19 @@ class PredictionPipeline:
         process(): Processes the input images and saves the predicted segmentation masks to the output folder.
     """
 
-    def __init__(self, model_revision: str, input_folder: Path, output_folder: Path):
+    def __init__(
+        self,
+        model_revision: str,
+        input_folder: Path,
+        output_folder: Path,
+        path_to_local_checkpoint: Path = None,
+    ):
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.revision_predictor = Predictor(model_revision)
         self.prediction_model = Predictor(
             model_revision
-        ).get_prediction_model_of_revision
+        ).get_prediction_model_of_revision(path_to_local_checkpoint)
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
         self.image_features = ImageFeatures(
             self.revision_predictor.get_required_input_shape_of_an_image[0],
