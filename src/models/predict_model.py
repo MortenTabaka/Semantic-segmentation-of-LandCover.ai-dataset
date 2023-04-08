@@ -12,18 +12,20 @@ from src.models.model_builder import build_deeplabv3plus
 
 
 class Predictor:
-    def __init__(self, model_key: str):
+    def __init__(self, model_key: str, which_metric_best_weights_to_load: str = "miou"):
         """
         Initializes a Predictor object.
 
         Args:
             model_key (str): Name of the revision from `models/models_revision.yaml`, e.g. `deeplabv3plus_v5.10.1`.
+            which_metric_best_weights_to_load (str): Model has saved weights for best miou and loss metrics.
         """
         self.model_key = model_key
         self.url_with_zipped_weights = (
             f"https://huggingface.co/MortenTabaka/LandcoverSemanticSegmentation"
             f"/resolve/main/Weights/{model_key}.zip"
         )
+        self.chosen_weights_with_best_metric = which_metric_best_weights_to_load
 
     def get_multiple_batches_predictions(self, multiple_batch):
         """
@@ -73,7 +75,14 @@ class Predictor:
             unzip=True,
         )
 
-        return os.path.join(*[weights_path, self.model_key, "checkpoint"])
+        return os.path.join(
+            *[
+                weights_path,
+                self.model_key,
+                f"best_{self.chosen_weights_with_best_metric}",
+                "checkpoint",
+            ]
+        )
 
     @property
     def get_required_input_shape_of_an_image(self) -> Tuple[int, int, int]:
