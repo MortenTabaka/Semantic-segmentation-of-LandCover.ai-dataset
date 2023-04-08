@@ -1,12 +1,14 @@
 import glob
 import os
 import os.path
-from typing import List, Union
 from pathlib import Path
 from re import match
+from typing import List, Union
 
 import cv2
 import numpy as np
+
+from src.data.image_preprocessing import ImagePreprocessor
 
 
 class ImagePostprocessor:
@@ -40,7 +42,6 @@ class ImagePostprocessor:
                     :,
                 ] = img_tiles[k]
                 k += 1
-
         # Get the base filename
         base_filename = os.path.splitext(img_filenames[0])[0].split("_vertical")[0]
         output_filename = os.path.join(self.output_path, base_filename + ".jpg")
@@ -50,9 +51,23 @@ class ImagePostprocessor:
         """
         Returns: List of filepaths to all TIF, JPG and PNG images.
         """
-        img_paths = glob.glob(os.path.join(self.input_path, "*.tif"))
+        img_paths = glob.glob(os.path.join(self.input_path, "*.tiff"))
         img_paths += glob.glob(os.path.join(self.input_path, "*.jpg"))
         img_paths += glob.glob(os.path.join(self.input_path, "*.png"))
         img_paths.sort()
 
         return img_paths
+
+    @staticmethod
+    def __get_all_base_names_from_list_of_tiles(file_names: List[str]) -> List[str]:
+        vertical = ImagePreprocessor.NAMING_CONVENTION_FOR_VERTICAL_TILE
+        horizontal = ImagePreprocessor.NAMING_CONVENTION_FOR_HORIZONTAL_TILE
+        second_part_of_name_for_first_tile = f"_{vertical}0_{horizontal}0"
+
+        all_base_names = []
+        for filename in file_names:
+            if second_part_of_name_for_first_tile in filename:
+                base_name = filename.split("_vertical0_horizontal0")[0]
+                all_base_names.append(base_name)
+
+        return all_base_names
