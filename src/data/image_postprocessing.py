@@ -2,7 +2,6 @@ import glob
 import os
 import os.path
 from pathlib import Path
-from re import match
 from typing import List, Union
 
 import cv2
@@ -12,6 +11,41 @@ from src.data.image_preprocessing import ImagePreprocessor
 
 
 class ImagePostprocessor:
+    """
+    Class for images postprocessing.
+
+    Args:
+        input_path: Union[str, Path]: Path to the directory containing the input image tiles.
+        output_path: Union[str, Path]: Path to the directory where the concatenated images will be saved.
+
+    Attributes:
+        input_path (str): Path to the directory containing the input image tiles.
+        output_path (str): Path to the directory where the concatenated images will be saved.
+
+    Methods:
+        concatenate_images(self):
+            Concatenates the image tiles in the input directory and saves the resulting images in the output directory.
+            Raises an error if no image tiles are found in the input directory.
+
+        get_all_filepaths_of_images_in_folder(self) -> List[str]:
+            Returns a list of filepaths to all TIF, JPG and PNG images in the input directory.
+
+    Private Methods:
+        __get_all_base_names_from_list_of_tiles(self, file_names: List[str]) -> List[str]:
+            Given a list of image tile filenames, returns a list of base filenames (without the tile index).
+            Example: ['image_0_0.jpg', 'image_0_1.jpg', 'image_1_0.jpg', 'image_1_1.jpg'] -> ['image']
+
+        __get_tiles_according_its_base_name(self, base_names: List[str], tiles: List[str]) -> List[List[str]]:
+            Given a list of base filenames and a list of image tile filenames, returns a list of lists of image tile filenames
+            grouped by base filename.
+            Example: ['image'] and ['image_0_0.jpg', 'image_0_1.jpg', 'image_1_0.jpg', 'image_1_1.jpg'] ->
+                     [['image_0_0.jpg', 'image_0_1.jpg', 'image_1_0.jpg', 'image_1_1.jpg']]
+
+        __get_count_of_vertical_and_horizontal_tiles(self, tiles: List[str]) -> Tuple[int, int]:
+            Given a list of image tile filenames, returns a tuple with the number of vertical and horizontal tiles.
+            Example: ['image_0_0.jpg', 'image_0_1.jpg', 'image_1_0.jpg', 'image_1_1.jpg'] -> (2, 2)
+    """
+
     def __init__(self, input_path: Union[str, Path], output_path: Union[str, Path]):
         self.input_path = input_path
         self.output_path = output_path
@@ -59,7 +93,7 @@ class ImagePostprocessor:
                     img_tile = cv2.imread(
                         os.path.join(
                             self.input_path,
-                            f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg"
+                            f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg",
                         )
                     )
                     img[
