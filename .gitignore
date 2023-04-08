@@ -79,6 +79,7 @@ target/
 /data/
 /notebooks/exploratory/results
 /models/saved_weights
+/models/custom_data
 
 # Mac OS-specific storage files
 .DS_Store

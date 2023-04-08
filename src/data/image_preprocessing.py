@@ -12,16 +12,40 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 import glob
 import os
 import os.path
+from pathlib import Path
+from typing import Union
+import multiprocessing as mp
 
 import cv2
 
 
 class ImagePreprocessor:
     """
-    Class for reading, processing, and writing data.
+    Class for reading, processing, and writing image data.
+
+    Attributes:
+        NAMING_CONVENTION_FOR_VERTICAL_TILE (str): naming convention for vertical tiles
+        NAMING_CONVENTION_FOR_HORIZONTAL_TILE (str): naming convention for horizontal tiles
+
+    Args:
+        path_to_folder_with_input_images (Union[Path, str]): path to the folder containing the input images
+
+    Methods:
+        split_dataset_images():
+            Split each original image and its corresponding mask into 512x512
+            tiles and shuffle them.
+
+        split_custom_images_before_prediction(target_size: int, path_to_output_folder: Union[Path, str]):
+            Split custom images into tiles before prediction.
+
+    Source:
+        LandCover.ai
     """
 
-    def __init__(self, path_to_folder_with_input_images: str):
+    NAMING_CONVENTION_FOR_VERTICAL_TILE = "vertical"
+    NAMING_CONVENTION_FOR_HORIZONTAL_TILE = "horizontal"
+
+    def __init__(self, path_to_folder_with_input_images: Union[Path, str]):
         self.path_to_folder_with_input_images = path_to_folder_with_input_images
 
     def split_dataset_images(self):
@@ -84,12 +108,12 @@ class ImagePreprocessor:
 
     def split_custom_images_before_prediction(
         self,
-        path_to_output_folder: str,
+        target_size: int,
+        path_to_output_folder: Union[Path, str],
     ):
-        TARGET_SIZE = 512
 
         img_paths = glob.glob(
-            os.path.join(self.path_to_folder_with_input_images, "*.tif")
+            os.path.join(self.path_to_folder_with_input_images, "*.tiff")
         )
         img_paths += glob.glob(
             os.path.join(self.path_to_folder_with_input_images, "*.jpg")
@@ -107,20 +131,24 @@ class ImagePreprocessor:
             img = cv2.imread(img_path)
 
             k = 0
-            for y in range(0, img.shape[0], TARGET_SIZE):
-                for x in range(0, img.shape[1], TARGET_SIZE):
-                    img_tile = img[y : y + TARGET_SIZE, x : x + TARGET_SIZE]
+            for y in range(0, img.shape[0], target_size):
+                j = 0
+                for x in range(0, img.shape[1], target_size):
+                    img_tile = img[y : y + target_size, x : x + target_size]
 
                     if (
-                        img_tile.shape[0] == TARGET_SIZE
-                        and img_tile.shape[1] == TARGET_SIZE
+                        img_tile.shape[0] == target_size
+                        and img_tile.shape[1] == target_size
                     ):
                         out_img_path = os.path.join(
-                            path_to_output_folder, "{}_{}.jpg".format(img_filename, k)
+                            path_to_output_folder,
+                            f"{img_filename}_{self.NAMING_CONVENTION_FOR_VERTICAL_TILE}{k}"
+                            f"_{self.NAMING_CONVENTION_FOR_HORIZONTAL_TILE}{j}.jpg",
                         )
 
                         if not os.path.isfile(out_img_path):
                             cv2.imwrite(out_img_path, img_tile)
-                    k += 1
+                    j += 1
+                k += 1
 
             print("Processed {} {}/{}".format(img_filename, i + 1, len(img_paths)))
