@@ -10,32 +10,49 @@ also accessible on [PapersWithCode](https://paperswithcode.com/paper/landcover-a
 **Please note that I am not the author or owner of this dataset, and I am using it under the terms of the license specified by the original author. 
 All credits for the dataset go to the original author and contributors.**
 
-## Sample results
+## Making Predictions on Custom Images
 
-### High mIoU
-![meanIoU_100 0_percent__4952](https://user-images.githubusercontent.com/29732555/201164572-ee6b56b6-b87f-4480-a52d-943678f5245b.png)
-![meanIoU_73 03_percent__3929](https://user-images.githubusercontent.com/29732555/201164620-34ecbb4c-b6d4-4385-ac3b-0a9540842589.png)
-![meanIoU_63 92_percent__5447](https://user-images.githubusercontent.com/29732555/201164668-920369ed-1c7c-45b6-96e0-6142ac71f1ba.png)
 
-### Low mIoU
-![meanIoU_6 12_percent__3183](https://user-images.githubusercontent.com/29732555/201164960-118c1efa-fb5b-496e-b8b6-2609c461a92f.png)
-![meanIoU_23 39_percent__5703](https://user-images.githubusercontent.com/29732555/201165001-045e3f7a-9dac-4bce-b0f2-e457130f6f3c.png)
+After installing the necessary dependencies, execute the following command to run the prediction script:
+```
+python3 models/scripts/run_prediction_on_folder.py
+```
+This script allows you to make predictions using the DeepLabv3+ model on a folder containing custom input images. You can use the following parameters to customize the prediction process:
 
+* model_revision: This optional parameter allows you to choose which model revision to use for making predictions. 
+The default is "deeplabv3plus_v5.10.2", but you can select a different revision if you have it installed.
+
+* input_folder: This optional parameter specifies the folder containing the input images that you want to make predictions on. 
+The default folder is `models/custom_data/input`. Accepted image formats are **JPG, PNG and TIFF**.
+
+* output_folder: This optional parameter specifies the folder where the output predictions will be saved. 
+The default folder is `models/custom_data/output`.
+
+To get more information on how to use the script, execute the following command:
+```
+python3 models/scripts/run_prediction_on_folder.py --help
+```
+
+## Sample result
+![prediction.png](reports%2Ffigures%2Fprediction.png)
+![orthophotomap.png](reports%2Ffigures%2Forthophotomap.png)
+
+Image source: https://www.geoportal.gov.pl/dane/ortofotomapa
 
 # Installation
-The project provides two ways of running the project. The first is environment installed via Anaconda 
-and the other is running a Docker container (recommended).
+There are two ways to run this project: installing the environment via Anaconda or running a Docker container (recommended).
 
-To be able to use dockerized version of Tensorflow, follow this official Nvidia's installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
+To use the dockerized version of Tensorflow, 
+follow the official Nvidia installation guide: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker 
 
 ## DockerHub Image for Linux
-Ready image is accessible on Docker Hub.
+The ready-to-use image is accessible on Docker Hub.
 
-### Pull image
+### Pull the image
 ```
 docker pull mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:latest
 ```
-### Run image in interactive mode
+### Run the image in interactive mode
 ```
 docker run --gpus all -it -p 8888:8888 mortentabaka/landcover_semantic_segmentation_with_deeplabv3plus:latest
 
@@ -48,18 +65,18 @@ docker run --gpus all -it -p 8888:8888 -v $PROJECT_PATH_LOCALLY:/app/ mortentaba
 ```
 
 ## Dockerfile - Tensorflow GPU
-Clone the repository
+Clone the repository:
 ```
 git clone git@github.com:MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset.git && cd Semantic-segmentation-of-LandCover.ai-dataset/
 ```
 
-Build docker image with project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
+Build the docker image with the project's [Dockerfile](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/Dockerfile):
 ```
 docker build -t landcover_semantic_segmentation .
 ```
-Official image was used as a base: https://hub.docker.com/layers/tensorflow/tensorflow/2.5.1-gpu-jupyter/images/sha256-5cdcd4446fc110817e5f6c5784eba6254258632036b426b9f194087e200f8a96?context=explore
+An official image was used as a base: https://hub.docker.com/layers/tensorflow/tensorflow/2.5.1-gpu-jupyter/images/sha256-5cdcd4446fc110817e5f6c5784eba6254258632036b426b9f194087e200f8a96?context=explore
 
-Run Jupyter Notebook with:
+Run the Jupyter Notebook with:
 ```
 docker run --gpus all -it --rm -p 8888:8888 -v $(pwd):/app landcover_semantic_segmentation
 ```
