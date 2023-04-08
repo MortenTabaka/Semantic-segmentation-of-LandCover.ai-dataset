@@ -21,8 +21,27 @@ import cv2
 
 class ImagePreprocessor:
     """
-    Class for reading, processing, and writing data.
+    Class for reading, processing, and writing image data.
+
+    Attributes:
+        NAMING_CONVENTION_FOR_VERTICAL_TILE (str): naming convention for vertical tiles
+        NAMING_CONVENTION_FOR_HORIZONTAL_TILE (str): naming convention for horizontal tiles
+
+    Args:
+        path_to_folder_with_input_images (Union[Path, str]): path to the folder containing the input images
+
+    Methods:
+        split_dataset_images():
+            Split each original image and its corresponding mask into 512x512
+            tiles and shuffle them.
+
+        split_custom_images_before_prediction(target_size: int, path_to_output_folder: Union[Path, str]):
+            Split custom images into tiles before prediction.
+
+    Source:
+        LandCover.ai
     """
+
     NAMING_CONVENTION_FOR_VERTICAL_TILE = "vertical"
     NAMING_CONVENTION_FOR_HORIZONTAL_TILE = "horizontal"
 
@@ -122,8 +141,9 @@ class ImagePreprocessor:
                         and img_tile.shape[1] == target_size
                     ):
                         out_img_path = os.path.join(
-                            path_to_output_folder, f"{img_filename}_{self.NAMING_CONVENTION_FOR_VERTICAL_TILE}{k}"
-                                                   f"_{self.NAMING_CONVENTION_FOR_HORIZONTAL_TILE}{j}.jpg"
+                            path_to_output_folder,
+                            f"{img_filename}_{self.NAMING_CONVENTION_FOR_VERTICAL_TILE}{k}"
+                            f"_{self.NAMING_CONVENTION_FOR_HORIZONTAL_TILE}{j}.jpg",
                         )
 
                         if not os.path.isfile(out_img_path):
