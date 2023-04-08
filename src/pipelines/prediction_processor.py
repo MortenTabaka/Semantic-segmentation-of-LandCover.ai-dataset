@@ -18,8 +18,6 @@ from src.models.predict_model import Predictor
 
 
 class PredictionPipeline:
-    OPTIMIZER = tf.keras.optimizers.Adam()
-
     def __init__(self, model_revision: str, input_folder: Path, output_folder: Path):
         self.input_folder = input_folder
         self.output_folder = output_folder
