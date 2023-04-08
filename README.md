@@ -34,6 +34,15 @@ python3 models/scripts/run_prediction_on_folder.py --help
 ```
 
 ## Sample result
+<ul>
+  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #000;"></div><span style="margin-left: 10px;">Background</span></li>
+  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #f00;"></div><span style="margin-left: 10px;">Buildings</span></li>
+  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #0f0;"></div><span style="margin-left: 10px;">Woodland</span></li>
+  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #00f;"></div><span style="margin-left: 10px;">Water</span></li>
+  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #fff;"></div><span style="margin-left: 10px;">Roads</span></li>
+</ul>
+
+
 ![prediction.png](reports%2Ffigures%2Fprediction.png)
 ![orthophotomap.png](reports%2Ffigures%2Forthophotomap.png)
 
