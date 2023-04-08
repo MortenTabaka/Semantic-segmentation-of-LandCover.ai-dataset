@@ -14,14 +14,14 @@ def main(
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
         help='Default: "models/custom_data/input". '
-        "Folder with images for which predictions should be made.",
+        "Folder with input images (JPG/PNG/TIFF)",
         file_okay=False,
         dir_okay=True,
         show_default=False,
     ),
     output_folder: Path = typer.Option(
         default=get_absolute_path_to_project_location("models/custom_data/output"),
-        help='Default: "models/custom_data/output". Folder with predicted masks.',
+        help='Default: "models/custom_data/output". Output predictions will be saved here.',
         file_okay=False,
         dir_okay=True,
         show_default=False,
