@@ -34,13 +34,11 @@ python3 models/scripts/run_prediction_on_folder.py --help
 ```
 
 ## Sample result
-<ul>
-  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #000;"></div><span style="margin-left: 10px;">Background</span></li>
-  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #f00;"></div><span style="margin-left: 10px;">Buildings</span></li>
-  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #0f0;"></div><span style="margin-left: 10px;">Woodland</span></li>
-  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #00f;"></div><span style="margin-left: 10px;">Water</span></li>
-  <li style="display: flex; align-items: center;"><div style="width: 20px; height: 20px; background-color: #fff;"></div><span style="margin-left: 10px;">Roads</span></li>
-</ul>
+- ![#000000](https://via.placeholder.com/15/000000/000000?text=+) `Background`
+- ![#FF0000](https://via.placeholder.com/15/FF0000/000000?text=+) `Buildings`
+- ![#008000](https://via.placeholder.com/15/008000/000000?text=+) `Woodland`
+- ![#0000FF](https://via.placeholder.com/15/0000FF/000000?text=+) `Water`
+- ![#FFFFFF](https://via.placeholder.com/15/FFFFFF/000000?text=+) `Roads`
 
 
 ![prediction.png](reports%2Ffigures%2Fprediction.png)
