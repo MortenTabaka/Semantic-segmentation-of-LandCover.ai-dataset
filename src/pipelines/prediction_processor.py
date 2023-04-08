@@ -18,6 +18,26 @@ from src.models.predict_model import Predictor
 
 
 class PredictionPipeline:
+    """
+    A class for predicting segmentation masks using a trained deep learning model.
+
+    Parameters:
+        model_revision (str): The version of the model to use for prediction.
+        input_folder (Path): The folder containing the input images.
+        output_folder (Path): The folder where the predicted segmentation masks will be saved.
+
+    Attributes:
+        input_folder (Path): The folder containing the input images.
+        output_folder (Path): The folder where the predicted segmentation masks will be saved.
+        revision_predictor (Predictor): An instance of the Predictor class that uses the specified model_revision.
+        prediction_model (Model): The prediction model of the specified model_revision.
+        model_build_parameters (dict): A dictionary of the model build parameters used for training the model.
+        image_features (ImageFeatures): An instance of the ImageFeatures class used for loading and preprocessing images.
+
+    Methods:
+        process(): Processes the input images and saves the predicted segmentation masks to the output folder.
+    """
+
     def __init__(self, model_revision: str, input_folder: Path, output_folder: Path):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -43,7 +63,6 @@ class PredictionPipeline:
         self.__make_predictions(tiles)
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
         # TODO: correctly concatenate tiles according to its position
-        # TODO: Fix tiff conversion
         self.__concatenate_tiles(predicted_tiles)
         self.__clear_cache([tiles_folder, predicted_tiles])
 
@@ -57,7 +76,7 @@ class PredictionPipeline:
     def __make_predictions(self, tiles: List[str]):
         num_classes, custom_colormap = self.__get_number_of_classes_and_colormap
         for tile in tiles:
-            preprocessed_tile = self.get_image_for_prediction(tile)
+            preprocessed_tile = self.__get_image_for_prediction(tile)
             file_name = os.path.basename(tile)
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
@@ -78,7 +97,7 @@ class PredictionPipeline:
             input_path=input_folder, output_path=self.output_folder
         ).concatenate_images()
 
-    def get_image_for_prediction(self, filepath: str):
+    def __get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
 
     @property
