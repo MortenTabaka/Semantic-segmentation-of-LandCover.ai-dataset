@@ -26,6 +26,7 @@ def main(
         dir_okay=True,
         show_default=False,
     ),
+    clear_cache: bool = typer.Option(True),
 ) -> None:
     """
     Run the prediction pipeline.
@@ -48,7 +49,7 @@ def main(
         model_revision=model_revision,
         input_folder=input_folder,
         output_folder=output_folder,
-    ).process()
+    ).process(clear_cache)
 
 
 if __name__ == "__main__":

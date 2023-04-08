@@ -51,7 +51,7 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[1],
         )
 
-    def process(self):
+    def process(self, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
         InteractiveSession(config=config)
@@ -62,9 +62,9 @@ class PredictionPipeline:
         tiles = self.__get_input_tiles(tiles_folder)
         self.__make_predictions(tiles)
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
-        # TODO: correctly concatenate tiles according to its position
         self.__concatenate_tiles(predicted_tiles)
-        self.__clear_cache([tiles_folder, predicted_tiles])
+        if clear_cache:
+            self.__clear_cache()
 
     def __preprocess_images_and_get_path(self, targeted_tile_size: int) -> str:
         save_to = path.join(self.input_folder, ".cache/tiles")
@@ -120,7 +120,11 @@ class PredictionPipeline:
         img_paths = glob(path.join(tiles_folder, "*.jpg"))
         return img_paths
 
-    @staticmethod
-    def __clear_cache(paths: List[str]):
+    def __clear_cache(self, paths=None):
+        if paths is None:
+            paths = [
+                os.path.join(self.input_folder, ".cache"),
+                os.path.join(self.output_folder, ".cache"),
+            ]
         for path_to_remove in paths:
             rmtree(path_to_remove)
