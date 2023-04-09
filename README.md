@@ -12,7 +12,6 @@ All credits for the dataset go to the original author and contributors.**
 
 ## Making Predictions on Custom Images
 
-
 After installing the necessary dependencies, execute the following command to run the prediction script:
 ```
 python3 models/scripts/run_prediction_on_folder.py
@@ -34,6 +33,11 @@ python3 models/scripts/run_prediction_on_folder.py --help
 ```
 
 ## Sample result
+The image used in this sample is a high-resolution TIFF orthophotomap covering an area of approximately 3.5 km². The image has a resolution of 25453x13176, and it is not part of the project dataset. Similar images for Poland regions can be obtained free of charge from the Head Office of Geodesy and Cartography through their [service](https://www.geoportal.gov.pl/dane/ortofotomapa).
+
+To facilitate analysis, the image is split into tiles, and predictions are made on each tile. The outputs are then concatenated to the original size to produce the final result.
+
+### Legend
 - ![#000000](https://via.placeholder.com/15/000000/000000?text=+) `Background`
 - ![#FF0000](https://via.placeholder.com/15/FF0000/000000?text=+) `Buildings`
 - ![#008000](https://via.placeholder.com/15/008000/000000?text=+) `Woodland`
@@ -43,8 +47,6 @@ python3 models/scripts/run_prediction_on_folder.py --help
 
 ![prediction.png](reports%2Ffigures%2Fprediction.png)
 ![orthophotomap.png](reports%2Ffigures%2Forthophotomap.png)
-
-Image source: https://www.geoportal.gov.pl/dane/ortofotomapa
 
 # Installation
 There are two ways to run this project: installing the environment via Anaconda or running a Docker container (recommended).
