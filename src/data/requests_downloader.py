@@ -53,9 +53,12 @@ class UrlDownloader:
     @staticmethod
     def unzip_file(zip_path: str, extract_path: str):
         # Open the zip file for reading
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            # Extract all files to the specified directory
-            zip_ref.extractall(extract_path)
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                # Extract all files to the specified directory
+                zip_ref.extractall(extract_path)
+        except zipfile.BadZipFile:
+            print("Zip file probably does not exist. Checking for existing files.")
 
     @staticmethod
     def get_project_root() -> str:

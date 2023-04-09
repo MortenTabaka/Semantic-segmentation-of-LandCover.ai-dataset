@@ -2,7 +2,11 @@ from typing import List, Union
 
 import tensorflow as tf
 
-from src.features.model_features import dump_revision_yaml, revision_a_model, load_data_for_revision
+from src.features.model_features import (
+    update_yaml_revision,
+    revision_a_model,
+    load_data_for_revision,
+)
 from src.models.architectures import (
     deeplabv3plus,
     modified_v1_deeplabv3plus,
@@ -130,10 +134,37 @@ class Model:
             metrics=self.metrics,
         )
 
-    def update_revision_with_training_history(self, history: tf.keras.callbacks.History):
-        current_revision = load_data_for_revision(f"{self.model_architecture}_v{self.revision}")
-        current_revision["history"] = history.history
-        dump_revision_yaml(current_revision)
+    def update_revision_with_history_and_evaluation(
+        self, history: tf.keras.callbacks.History, evaluation_on_test_set: List[float]
+    ):
+        """
+        Updates the revision history with the training and evaluation results obtained by the model.
+
+        Args:
+            history: A `tf.keras.callbacks.History` object that contains the training history of the model.
+            evaluation_on_test_set: A list of float values containing the model evaluation results on a test dataset.
+
+        Returns:
+            None
+
+        This method extracts the training metrics from the `history` object and combines them with the `evaluation_on_test_set`
+        results to update the revision history of the model. The new entries will be saved as YAML files in the appropriate
+        location with a filename based on the model architecture and the revision number.
+        """
+
+        score = history.history.copy()
+        # Get all keys without 'val_'
+        keys_without_val = [key for key in score.keys() if not key.startswith("val_")]
+        # Add 'test_' to the beginning of each key
+        keys_with_test = ["test_" + key for key in keys_without_val]
+
+        new_data = {
+            key: [evaluation_on_test_set[i]] for i, key in enumerate(keys_with_test)
+        }
+        score.update(new_data)
+        score = {"metrics_scores": score}
+
+        update_yaml_revision(f"{self.model_architecture}_v{self.revision}", score)
 
     @property
     def get_compile_parameters(self):

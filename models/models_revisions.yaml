@@ -58,3 +58,52 @@ deeplabv3plus_v10.0.1:
     metrics:
     - accuracy
     - <src.features.metrics.CustomMeanIoU object at 0x7fcd8410c588>
+deeplabv3plus_v11.0.1:
+  model_name: deeplabv3plus
+  revision: 11.0.1
+  dataset_parameters:
+    input_image_height: 512
+    input_image_width: 512
+    number_of_classes: 5
+    batch_size: 8
+  model_build_parameters:
+    pretrained_weights: cityscapes
+    second_input: null
+    input_shape:
+      input_image_height: 512
+      input_image_width: 512
+      channels: 3
+    num_classes: 5
+    backbone: xception
+    output_stride: 16
+    alpha: 1.0
+    activation: softmax
+  model_compile_parameters:
+    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7fd64417c490>
+    loss_function:
+      object: <bound method SemanticSegmentationLoss.log_cosh_dice_loss of <src.features.loss_functions.SemanticSegmentationLoss
+        object at 0x7fd64417c430>>
+      initial_learning_rate: 0.001
+      final_learning_rate: 0.0001
+    metrics:
+    - accuracy
+    - <src.features.metrics.CustomMeanIoU object at 0x7fd64c63e220>
+  metrics_scores:
+    loss:
+    - 0.006092613097280264
+    accuracy:
+    - 0.9039693474769592
+    mIoU:
+    - 0.4929506778717041
+    val_loss:
+    - 0.011224585585296154
+    val_accuracy:
+    - 0.8747334480285645
+    val_mIoU:
+    - 0.42890825867652893
+    test_loss:
+    - 0.011014814488589764
+    test_accuracy:
+    - 0.8716736435890198
+    test_mIoU:
+    - 0.44352978467941284
