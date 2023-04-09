@@ -137,3 +137,103 @@ deeplabv3plus_v12.0.1:
     metrics:
     - accuracy
     - <src.features.metrics.CustomMeanIoU object at 0x7f62e017ea90>
+deeplabv3plus_v12.1.1:
+  model_name: deeplabv3plus
+  revision: 12.1.1
+  dataset_parameters:
+    input_image_height: 512
+    input_image_width: 512
+    number_of_classes: 5
+    batch_size: 8
+  model_build_parameters:
+    pretrained_weights: cityscapes
+    second_input: null
+    input_shape:
+      input_image_height: 512
+      input_image_width: 512
+      channels: 3
+    num_classes: 5
+    backbone: xception
+    output_stride: 16
+    alpha: 1.0
+    activation: softmax
+  model_compile_parameters:
+    optimizer: <tensorflow.python.keras.optimizer_v2.adam.Adam object at 0x7fbdf8673a30>
+    loss_function:
+      object: <bound method SemanticSegmentationLoss.basnet_hybrid_loss of <src.features.loss_functions.SemanticSegmentationLoss
+        object at 0x7fbdf8673f10>>
+      initial_learning_rate: 0.005
+      final_learning_rate: null
+    metrics:
+    - accuracy
+    - <src.features.metrics.CustomMeanIoU object at 0x7fbe1c659580>
+  history_and_evaluation:
+    loss:
+    - 0.893105685710907
+    - 0.7731820940971375
+    - 0.632534921169281
+    - 0.5076855421066284
+    - 0.43058332800865173
+    - 0.37186551094055176
+    - 0.32428067922592163
+    - 0.28995466232299805
+    accuracy:
+    - 0.739052414894104
+    - 0.7835270762443542
+    - 0.8342221975326538
+    - 0.870703935623169
+    - 0.8915104269981384
+    - 0.9079511165618896
+    - 0.9206518530845642
+    - 0.9297395348548889
+    mIoU:
+    - 0.2750715911388397
+    - 0.33152368664741516
+    - 0.43089085817337036
+    - 0.5192099213600159
+    - 0.5810223817825317
+    - 0.628042459487915
+    - 0.6663795709609985
+    - 0.693867564201355
+    val_loss:
+    - 0.7037246227264404
+    - 0.5621010661125183
+    - 0.5564318895339966
+    - 0.5417349338531494
+    - 0.5246396064758301
+    - 0.5276296138763428
+    - 0.5404360294342041
+    - 0.5412373542785645
+    val_accuracy:
+    - 0.7965981364250183
+    - 0.8518159985542297
+    - 0.8638916015625
+    - 0.8632866740226746
+    - 0.8687572479248047
+    - 0.8697471022605896
+    - 0.865138828754425
+    - 0.8659769296646118
+    val_mIoU:
+    - 0.28303393721580505
+    - 0.3937259912490845
+    - 0.5468068718910217
+    - 0.5735112428665161
+    - 0.5930857062339783
+    - 0.5997530221939087
+    - 0.5935394763946533
+    - 0.5961015224456787
+    training_set:
+      best_loss: 0.28995466232299805
+      best_accuracy: 0.9297395348548889
+      best_mIoU: 0.693867564201355
+    validation_set:
+      best_val_loss: 0.5246396064758301
+      best_val_accuracy: 0.8697471022605896
+      best_val_mIoU: 0.5997530221939087
+    testing_set:
+      test_loss:
+      - 0.5434367060661316
+      test_accuracy:
+      - 0.8641740679740906
+      test_mIoU:
+      - 0.5976591110229492
