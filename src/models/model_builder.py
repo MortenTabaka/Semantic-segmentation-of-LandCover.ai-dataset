@@ -206,6 +206,10 @@ class Model:
         score = {"history_and_evaluation": score}
         update_yaml_revision(f"{self.model_architecture}_v{self.revision}", score)
 
+    def update_revision_with_comment(self, comment: str) -> None:
+        comment = {"comment": comment}
+        update_yaml_revision(f"{self.model_architecture}_v{self.revision}", comment)
+
     @property
     def get_compile_parameters(self):
         return [self.optimizer, self.loss_function, self.metrics]
