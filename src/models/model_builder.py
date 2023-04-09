@@ -150,20 +150,60 @@ class Model:
         This method extracts the training metrics from the `history` object and combines them with the `evaluation_on_test_set`
         results to update the revision history of the model. The new entries will be saved as YAML files in the appropriate
         location with a filename based on the model architecture and the revision number.
+
+        The following keys will be added to the revision history:
+
+        - best_training_scores: A dictionary containing the best scores achieved on the training set for each metric.
+          The keys in this dictionary will be formatted as "best_{metric_name}", where {metric_name} is the name of the metric.
+          If the metric is a loss metric, then the minimum score will be recorded. Otherwise, the maximum score will be recorded.
+
+        - best_val_scores: A dictionary containing the best scores achieved on the validation set for each metric.
+          The keys in this dictionary will be formatted as "best_{metric_name}", where {metric_name} is the name of the metric.
+          If the metric is a loss metric, then the minimum score will be recorded. Otherwise, the maximum score will be recorded.
+
+        - evaluation_to_add: A dictionary containing the evaluation scores achieved on the test set for each metric.
+          The keys in this dictionary will be formatted as "test_{metric_name}", where {metric_name} is the name of the metric.
+
+        All of these dictionaries will be nested under a key called "history_and_evaluation" in the YAML file.
         """
 
         score = history.history.copy()
-        # Get all keys without 'val_'
-        keys_without_val = [key for key in score.keys() if not key.startswith("val_")]
+
+        keys_without_val = [
+            key
+            for key in score.keys()
+            if not key.startswith("val_") and "lr" not in key
+        ]
         # Add 'test_' to the beginning of each key
         keys_with_test = ["test_" + key for key in keys_without_val]
 
-        new_data = {
-            key: [evaluation_on_test_set[i]] for i, key in enumerate(keys_with_test)
-        }
-        score.update(new_data)
-        score = {"metrics_scores": score}
+        keys_with_val = [
+            key for key in score.keys() if key.startswith("val_") and "lr" not in key
+        ]
 
+        best_training_scores = {
+            "training_set": {
+                f"best_{key}": min(score[key]) if "loss" in key else max(score[key])
+                for i, key in enumerate(keys_without_val)
+            }
+        }
+
+        best_val_scores = {
+            "validation_set": {
+                f"best_{key}": min(score[key]) if "loss" in key else max(score[key])
+                for i, key in enumerate(keys_with_val)
+            }
+        }
+
+        evaluation_to_add = {
+            "testing_set": {
+                key: [evaluation_on_test_set[i]] for i, key in enumerate(keys_with_test)
+            }
+        }
+
+        for item in [best_training_scores, best_val_scores, evaluation_to_add]:
+            score.update(item)
+        score = {"history_and_evaluation": score}
         update_yaml_revision(f"{self.model_architecture}_v{self.revision}", score)
 
     @property
