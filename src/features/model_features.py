@@ -75,19 +75,7 @@ def revision_a_model(
         with open(yaml_filepath, "w") as f:
             f.write("")
 
-    with open(yaml_filepath, "r") as f:
-        existing_models_revisions = safe_load(f)
-
-    if existing_models_revisions is None:
-        existing_models_revisions = {}
-
-    if model_key in existing_models_revisions:
-        existing_models_revisions[model_key].update(config_dict)
-    else:
-        existing_models_revisions[model_key] = config_dict
-
-    with open(yaml_filepath, "w") as f:
-        dump(existing_models_revisions, f, default_flow_style=False, sort_keys=False)
+    update_yaml_revision(model_key, config_dict)
 
     return model_key
 
@@ -178,9 +166,20 @@ def decode_segmentation_mask_to_rgb(
     return image
 
 
-def dump_revision_yaml(to_dump):
+def update_yaml_revision(model_revision: str, to_add: dict):
     yaml_filepath = get_absolute_path_to_project_location(
         "models/models_revisions.yaml"
     )
+    with open(yaml_filepath, "r") as f:
+        existing_models_revisions = safe_load(f)
+
+    if existing_models_revisions is None:
+        existing_models_revisions = {}
+
+    if model_revision in existing_models_revisions:
+        existing_models_revisions[model_revision].update(to_add)
+    else:
+        existing_models_revisions[model_revision] = to_add
+
     with open(yaml_filepath, "w") as f:
-        dump(to_dump, f, default_flow_style=False, sort_keys=False)
+        dump(existing_models_revisions, f, default_flow_style=False, sort_keys=False)
