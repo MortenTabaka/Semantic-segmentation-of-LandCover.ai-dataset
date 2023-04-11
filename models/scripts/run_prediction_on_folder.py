@@ -12,10 +12,17 @@ class TypeOfWeightsToLoad(str, Enum):
     loss = "loss"
 
 
+class AvailableRevisions(str, Enum):
+    version_5_10_2 = "deeplabv3plus_v5.10.2"
+    version_10_0_1 = "deeplabv3plus_v10.0.1"
+    version_12_1_2 = "deeplabv3plus_v12.1.2"
+
+
 def main(
-    model_revision: str = typer.Option(
-        default="deeplabv3plus_v5.10.2",
-        help="Choose model revision for predictions",
+    model_revision: AvailableRevisions = typer.Option(
+        default=AvailableRevisions.version_5_10_2,
+        help="Choose model revision for predictions.",
+        show_choices=True
     ),
     weights: TypeOfWeightsToLoad = typer.Option(
         default=TypeOfWeightsToLoad.miou,

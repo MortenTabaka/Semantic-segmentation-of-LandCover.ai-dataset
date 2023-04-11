@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
-from keras.losses import binary_crossentropy
+from keras.losses import binary_crossentropy, BinaryCrossentropy
 
 from src.features.data_features import MaskFeatures
 
@@ -17,8 +17,32 @@ class SemanticSegmentationLoss(object):
         Focal Tversky loss
         log-cosh dice loss
 
-    Shruti Jadon, SemSegLoss: A python package of loss functions for semantic segmentation, 2021.
+    All credits go to (not including soft_dice_loss) Shruti Jadon.
+
+    SemSegLoss: A python package of loss functions for semantic segmentation, 2021.
     https://github.com/shruti-jadon/Semantic-Segmentation-Loss-Functions
+
+    @inproceedings{jadon2020survey,
+        title={A survey of loss functions for semantic segmentation},
+        author={Jadon, Shruti},
+        booktitle={2020 IEEE Conference on Computational Intelligence in Bioinformatics and Computational Biology (CIBCB)},
+        pages={1--7},
+        year={2020},
+        organization={IEEE}
+    }
+    @article{JADON2021100078,
+        title = {SemSegLoss: A python package of loss functions for semantic segmentation},
+        journal = {Software Impacts},
+        volume = {9},
+        pages = {100078},
+        year = {2021},
+        issn = {2665-9638},
+        doi = {https://doi.org/10.1016/j.simpa.2021.100078},
+        url = {https://www.sciencedirect.com/science/article/pii/S2665963821000269},
+        author = {Shruti Jadon},
+        keywords = {Deep Learning, Image segmentation, Medical imaging, Loss functions},
+        abstract = {Image Segmentation has been an active field of research as it has a wide range of applications, ranging from automated disease detection to self-driving cars. In recent years, various research papers proposed different loss functions used in case of biased data, sparse segmentation, and unbalanced dataset. In this paper, we introduce SemSegLoss, a python package consisting of some of the well-known loss functions widely used for image segmentation. It is developed with the intent to help researchers in the development of novel loss functions and perform an extensive set of experiments on model architectures for various applications. The ease-of-use and flexibility of the presented package have allowed reducing the development time and increased evaluation strategies of machine learning models for semantic segmentation. Furthermore, different applications that use image segmentation can use SemSegLoss because of the generality of its functions. This wide range of applications will lead to the development and growth of AI across all industries.}
+    }
     """
 
     def __init__(
@@ -164,6 +188,39 @@ class SemanticSegmentationLoss(object):
         x = self.dice_loss(y_true, y_pred)
         return tf.math.log((tf.exp(x) + tf.exp(-x)) / 2.0)
 
+    def jacard_loss(self, y_true, y_pred):
+        """
+         Intersection-Over-Union (IoU), also known as the Jaccard loss
+        """
+        return 1 - self.jacard_similarity(y_true, y_pred)
+
+    def unet3p_hybrid_loss(self, y_true, y_pred):
+        """
+        Hybrid loss proposed in UNET 3+ (https://arxiv.org/ftp/arxiv/papers/2004/2004.08790.pdf)
+        Hybrid loss for segmentation in three-level hierarchy – pixel, patch and map-level,
+        which is able to capture both large-scale and fine structures with clear boundaries.
+        """
+        focal_loss = self.focal_loss(y_true, y_pred)
+        ms_ssim_loss = self.ssim_loss(y_true, y_pred)
+        jacard_loss = self.jacard_loss(y_true, y_pred)
+
+        return focal_loss + ms_ssim_loss + jacard_loss
+
+    def basnet_hybrid_loss(self, y_true, y_pred):
+        """
+        Hybrid loss proposed in BASNET (https://arxiv.org/pdf/2101.04704.pdf)
+        The hybrid loss is a combination of the binary cross entropy, structural similarity
+        and intersection-over-union losses, which guide the network to learn
+        three-level (i.e., pixel-, patch- and map- level) hierarchy representations.
+        """
+        bce_loss = BinaryCrossentropy(from_logits=False)
+        bce_loss = bce_loss(y_true, y_pred)
+
+        ms_ssim_loss = self.ssim_loss(y_true, y_pred)
+        jacard_loss = self.jacard_loss(y_true, y_pred)
+
+        return bce_loss + ms_ssim_loss + jacard_loss
+
     def soft_dice_loss(self, y_true, y_pred):
         """
         Soft dice loss calculation for arbitrary batch size, number of classes, and number of spatial dimensions.
@@ -195,3 +252,22 @@ class SemanticSegmentationLoss(object):
     @staticmethod
     def sigmoid(x):
         return 1 / (1 + K.exp(-x))
+
+    @staticmethod
+    def jacard_similarity(y_true, y_pred):
+        """
+         Intersection-Over-Union (IoU), also known as the Jaccard Index
+        """
+        y_true_f = K.flatten(y_true)
+        y_pred_f = K.flatten(y_pred)
+
+        intersection = K.sum(y_true_f * y_pred_f)
+        union = K.sum((y_true_f + y_pred_f) - (y_true_f * y_pred_f))
+        return intersection / union
+
+    @staticmethod
+    def ssim_loss(y_true, y_pred):
+        """
+        Structural Similarity Index (SSIM) loss
+        """
+        return 1 - tf.image.ssim(y_true, y_pred, max_val=1)

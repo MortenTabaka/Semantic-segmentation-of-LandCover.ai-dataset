@@ -17,13 +17,10 @@ class HistoryUtilities:
         """
         Utilities for saving history or loading it from file.
         """
-        pass
+        self.file_name = "history.json"
 
     def dump_model_history_to_file(
-        self,
-        tensorflow_model_history: tf.keras.callbacks.History,
-        folder_path: str,
-        file_name: str,
+        self, tensorflow_model_history: tf.keras.callbacks.History, folder_path: str
     ):
         """
         Saves model history generated during training.
@@ -34,21 +31,15 @@ class HistoryUtilities:
         """
         self.create_folders([folder_path])
 
-        if folder_path[-1] != "/":
-            folder_path += "/"
-
         history = tensorflow_model_history.history
-        dump(history, open(folder_path + file_name, "w"))
+        dump(history, open(os.path.join(folder_path, self.file_name), "w"))
+
+    def load_model_history_from_folder_path(self, folder_path: str) -> dict:
+        return json.load(open(os.path.join(folder_path, self.file_name), "r"))
 
     @staticmethod
     def load_model_history_from_filepath(filepath) -> dict:
         return json.load(open(filepath, "r"))
-
-    @staticmethod
-    def load_model_history_from_folder_path(folder_path: str, file_name: str) -> dict:
-        if folder_path[-1] != "/":
-            folder_path += "/"
-        return json.load(open(folder_path + file_name, "r"))
 
     @staticmethod
     def create_folders(paths: List[str]):
