@@ -19,7 +19,7 @@ python3 models/scripts/run_prediction_on_folder.py
 This script allows you to make predictions using the DeepLabv3+ model on a folder containing custom input images. You can use the following parameters to customize the prediction process:
 
 * model_revision: This optional parameter allows you to choose which model revision to use for making predictions. 
-The default is "deeplabv3plus_v5.10.2", but you can select a different revision if you have it installed.
+The default is "deeplabv3plus_v5.10.2", but you can select a different revision from list of availabe ones (`--help`).
 
 * input_folder: This optional parameter specifies the folder containing the input images that you want to make predictions on. 
 The default folder is `models/custom_data/input`. Accepted image formats are **JPG, PNG and TIFF**.
