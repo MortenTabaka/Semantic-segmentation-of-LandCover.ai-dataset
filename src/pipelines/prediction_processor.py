@@ -7,10 +7,12 @@ from typing import List
 
 import numpy as np
 import tensorflow as tf
+from skimage.io import imread
+from skimage.segmentation import slic
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 
-from src.data.image_preprocessing import ImagePreprocessor
 from src.data.image_postprocessing import ImagePostprocessor
+from src.data.image_preprocessing import ImagePreprocessor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import decode_segmentation_mask_to_rgb
 from src.features.utils import generate_colormap
