@@ -60,7 +60,9 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[1],
         )
 
-    def process(self, clear_cache: bool = True):
+    def process(
+        self, clear_cache: bool = True, superpixels_postprocessing: bool = True
+    ):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
         InteractiveSession(config=config)
@@ -68,10 +70,13 @@ class PredictionPipeline:
         tiles_folder = self.__preprocess_images_and_get_path(
             self.revision_predictor.get_required_input_shape_of_an_image[0]
         )
+
         tiles = self.__get_input_tiles(tiles_folder)
-        self.__make_predictions(tiles)
+        self.__make_predictions(tiles, superpixels_postprocessing)
+
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
         self.__concatenate_tiles(predicted_tiles)
+
         if clear_cache:
             self.__clear_cache()
 
@@ -82,7 +87,9 @@ class PredictionPipeline:
         )
         return save_to
 
-    def __make_predictions(self, tiles: List[str]):
+    def __make_predictions(
+        self, tiles: List[str], superpixels_postprocessing: bool = True
+    ):
         num_classes, custom_colormap = self.__get_number_of_classes_and_colormap
         for tile in tiles:
             preprocessed_tile = self.__get_image_for_prediction(tile)
@@ -90,6 +97,16 @@ class PredictionPipeline:
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
+
+            if superpixels_postprocessing:
+                segments = self.__get_superpixel_segments(tile)
+                num_of_segments = self.__get_number_of_segments(segments)
+                prediction = (
+                    self.__get_updated_prediction_with_postprocessor_superpixels(
+                        prediction, segments, num_of_segments
+                    )
+                )
+
             prediction = decode_segmentation_mask_to_rgb(
                 prediction, custom_colormap, num_classes
             )
@@ -118,6 +135,47 @@ class PredictionPipeline:
         for path_to_remove in paths:
             rmtree(path_to_remove)
 
+    def __get_superpixel_segments(
+        self, image: str, num_superpixels: int = 300, compactness: int = 20
+    ) -> tf.Tensor:
+        """
+        Generates superpixel segments for an input image using the Simple Linear
+        Iterative Clustering (SLIC) algorithm.
+
+        Args:
+            image (str): File path or URL of the input image.
+            num_superpixels (int, optional): Number of desired superpixels.
+                Defaults to 300.
+            compactness (int, optional): Compactness parameter for the SLIC
+                algorithm. A higher value results in more compact and square-shaped
+                superpixels, while a lower value results in more irregularly shaped
+                superpixels. Defaults to 20.
+
+        Returns:
+            tf.Tensor: A tensor representing the superpixel segments, with shape
+            (1, H, W), where H is the image height and W is the image width. The
+            tensor contains integer values representing the segment labels (superpixel
+            indices) assigned to each pixel in the image.
+
+        Example:
+            # Create an instance of the SuperpixelSegmenter class
+            segmenter = SuperpixelSegmenter()
+
+            # Get superpixel segments for an input image
+            image_path = '/path/to/image.jpg'
+            num_superpixels = 300
+            compactness = 20
+            segments = segmenter.get_superpixel_segments(image_path, num_superpixels, compactness)
+        """
+        image = imread(image)
+        segments = slic(image, n_segments=num_superpixels, compactness=compactness)
+        segments = tf.convert_to_tensor(segments)
+        segments = tf.reshape(
+            segments,
+            (1, self.image_features.image_height, self.image_features.image_width),
+        )
+        return segments
+
     @property
     def __get_number_of_classes_and_colormap(self):
         num_classes = self.model_build_parameters[3]
@@ -134,15 +192,101 @@ class PredictionPipeline:
         return num_classes, custom_colormap
 
     @staticmethod
+    def __get_number_of_segments(superpixel_segments: tf.Tensor) -> int:
+        """
+        Calculates the number of segments in a superpixel segmentation map.
+
+        Args:
+            superpixel_segments (tf.Tensor): A tensor representing the superpixel
+                segments, with shape (1, H, W), where H is the image height and W is
+                the image width. The tensor contains integer values representing the
+                segment labels (superpixel indices) assigned to each pixel in the image.
+
+        Returns:
+            tf.Tensor: A tensor representing the number of segments in the superpixel
+            segmentation map.
+
+        Example:
+            # Get superpixel segments for an input image
+            segmenter = SuperpixelSegmenter()
+            image_path = '/path/to/image.jpg'
+            num_superpixels = 300
+            compactness = 20
+            segments = segmenter.get_superpixel_segments(image_path, num_superpixels, compactness)
+
+            # Get the number of segments in the superpixel segmentation map
+            num_segments = SuperpixelSegmenter.get_number_of_segments(segments)
+        """
+        max_value = tf.reduce_max(superpixel_segments, keepdims=False, axis=(1, 2))
+        max_value = max_value.numpy()[0]
+        return max_value + 1
+
+    @staticmethod
+    def __get_updated_prediction_with_postprocessor_superpixels(
+        not_decoded_predicted_tile: tf.Tensor,
+        superpixel_segments: tf.Tensor,
+        num_of_segments: int,
+    ):
+        """
+        Update the prediction for each superpixel segment in a not-decoded predicted tile.
+
+        Args:
+            not_decoded_predicted_tile (tf.Tensor): A tensor representing the not-decoded
+                predicted tile, with shape (1, H, W), where H is the tile height and W is
+                the tile width. The tensor contains integer values representing the predicted
+                classes for each pixel in the tile.
+            superpixel_segments (tf.Tensor): A tensor representing the superpixel segments,
+                with shape (1, H, W), where H is the tile height and W is the tile width.
+                The tensor contains integer values representing the segment labels (superpixel
+                indices) assigned to each pixel in the tile.
+            num_of_segments (int): The number of segments in the superpixel segmentation map.
+
+        Returns:
+            tf.Tensor: A tensor representing the updated not-decoded predicted tile, with
+            shape (1, H, W), where H is the tile height and W is the tile width. The tensor
+            contains integer values representing the updated predicted classes for each pixel
+            in the tile, after considering the most frequent class within each superpixel segment.
+
+        Example:
+            # Get superpixel segments for an input tile
+            segmenter = SuperpixelSegmenter()
+            tile = load_tile('/path/to/tile.jpg')
+            num_superpixels = 300
+            compactness = 20
+            segments = segmenter.get_superpixel_segments(tile, num_superpixels, compactness)
+
+            # Update the not-decoded predicted tile with superpixel segments
+            not_decoded_predicted_tile = ...  # Get the not-decoded predicted tile
+            num_segments = SuperpixelSegmenter.get_number_of_segments(segments)
+            updated_predicted_tile = SuperpixelSegmenter.__get_updated_prediction_with_postprocessor_superpixels(
+                not_decoded_predicted_tile, segments, num_segments
+            )
+        """
+        for segment_num in range(num_of_segments):
+            # get indices of single segment
+            indices = tf.where(tf.equal(superpixel_segments, segment_num)).numpy()
+            # extract the same part from prediction
+            tile_extracted_part = tf.gather_nd(not_decoded_predicted_tile, indices)
+            tile_extracted_part = tf.cast(tile_extracted_part, dtype=tf.int32)
+            # count number of classes occurrences in extracted prediction
+            counts = tf.math.bincount(tile_extracted_part)
+            # Find the index of the most often repeated value
+            most_frequent_value_index = tf.math.argmax(counts)
+            # Get the most often repeated value
+            most_frequent_class_in_tile_segment = most_frequent_value_index.numpy()
+
+            # Create a tensor of ones with the shape of indices
+            ones = tf.ones((tf.shape(indices)[0],), dtype=tf.int64)
+            # Multiply the ones tensor by max_value
+            updates = ones * most_frequent_class_in_tile_segment
+            # Update the not_decoded_prediction tensor
+            not_decoded_predicted_tile = tf.tensor_scatter_nd_update(
+                not_decoded_predicted_tile, indices, updates
+            )
+
+        return not_decoded_predicted_tile
+
+    @staticmethod
     def __get_input_tiles(tiles_folder: str) -> List[str]:
         img_paths = glob(path.join(tiles_folder, "*.jpg"))
         return img_paths
-
-    def __clear_cache(self, paths=None):
-        if paths is None:
-            paths = [
-                os.path.join(self.input_folder, ".cache"),
-                os.path.join(self.output_folder, ".cache"),
-            ]
-        for path_to_remove in paths:
-            rmtree(path_to_remove)
