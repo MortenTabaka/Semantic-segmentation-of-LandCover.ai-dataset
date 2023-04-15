@@ -109,6 +109,15 @@ class PredictionPipeline:
     def __get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
 
+    def __clear_cache(self, paths=None):
+        if paths is None:
+            paths = [
+                os.path.join(self.input_folder, ".cache"),
+                os.path.join(self.output_folder, ".cache"),
+            ]
+        for path_to_remove in paths:
+            rmtree(path_to_remove)
+
     @property
     def __get_number_of_classes_and_colormap(self):
         num_classes = self.model_build_parameters[3]
