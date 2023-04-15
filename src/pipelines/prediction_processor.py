@@ -4,6 +4,7 @@ from os import path
 from pathlib import Path
 from shutil import rmtree
 from typing import List
+from tqdm import tqdm
 
 import numpy as np
 import tensorflow as tf
@@ -47,9 +48,9 @@ class PredictionPipeline:
         input_folder: Path,
         output_folder: Path,
         which_metric_best_weights_to_load: str,
-        superpixels_postprocessing,
+        tiles_superpixel_postprocessing,
         number_of_superpixels: int = 300,
-        compactness: int = 10,
+        compactness: float = 10,
     ):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -62,7 +63,7 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[0],
             self.revision_predictor.get_required_input_shape_of_an_image[1],
         )
-        self.superpixels_postprocessing = superpixels_postprocessing
+        self.tiles_superpixel_postprocessing = tiles_superpixel_postprocessing
         self.params_of_superpixels_postprocessing = (number_of_superpixels, compactness)
 
     def process(
@@ -96,14 +97,14 @@ class PredictionPipeline:
         self, tiles: List[str]
     ):
         num_classes, custom_colormap = self.__get_number_of_classes_and_colormap
-        for tile in tiles:
+        for tile in tqdm(tiles, desc='Processing tiles', unit='tile'):
             preprocessed_tile = self.__get_image_for_prediction(tile)
             file_name = os.path.basename(tile)
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
 
-            if self.superpixels_postprocessing:
+            if self.tiles_superpixel_postprocessing:
                 segments = self.__get_superpixel_segments(tile)
                 num_of_segments = self.__get_number_of_segments(segments)
                 prediction = (
@@ -163,7 +164,7 @@ class PredictionPipeline:
             indices) assigned to each pixel in the image.
         """
         image = imread(image)
-        segments = slic(image, *self.params_of_superpixels_postprocessing)
+        segments = slic(image, *self.params_of_superpixels_postprocessing, start_label=0)
         segments = tf.convert_to_tensor(segments)
         segments = tf.reshape(
             segments,
