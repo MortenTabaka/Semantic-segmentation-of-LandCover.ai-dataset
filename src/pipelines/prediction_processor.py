@@ -96,23 +96,28 @@ class PredictionPipeline:
         for tile in tqdm(tiles, desc="Processing tiles", unit="tile"):
             preprocessed_tile = self.__get_image_for_prediction(tile)
             file_name = os.path.basename(tile)
+
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
 
             if self.tiles_superpixel_postprocessing:
-                segments = ImagePostprocessor.get_superpixel_segments(
-                    tile, self.params_for_slic_postprocessing
-                )
-                num_of_segments = ImagePostprocessor.get_number_of_segments(segments)
-                prediction = ImagePostprocessor.get_updated_prediction_with_postprocessor_superpixels(
-                    prediction, segments, num_of_segments, self.superpixel_threshold
-                )
+                prediction = self.__get_superpixel_post_processed_tile_prediction(tile, prediction)
 
-            prediction = decode_segmentation_mask_to_rgb(
+            decoded_prediction = decode_segmentation_mask_to_rgb(
                 prediction, custom_colormap, num_classes
             )
-            self.__save_prediction(prediction, file_name)
+            self.__save_prediction(decoded_prediction, file_name)
+
+    def __get_superpixel_post_processed_tile_prediction(self, tile: str, prediction: tf.Tensor) -> tf.Tensor:
+        segments = ImagePostprocessor.get_superpixel_segments(
+            tile, self.params_for_slic_postprocessing
+        )
+        num_of_segments = ImagePostprocessor.get_number_of_segments(segments)
+        prediction = ImagePostprocessor.get_updated_prediction_with_postprocessor_superpixels(
+            prediction, segments, num_of_segments, self.superpixel_threshold
+        )
+        return prediction
 
     def __save_prediction(self, image, file_name):
         save_to = path.join(self.output_folder, ".cache/prediction_tiles")
