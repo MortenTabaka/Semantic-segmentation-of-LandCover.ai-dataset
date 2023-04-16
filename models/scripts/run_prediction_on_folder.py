@@ -29,9 +29,10 @@ def main(
         help="Pick which weights load",
         show_choices=True,
     ),
-    tiles_superpixel_postprocessing: bool = typer.Option(False),
-    number_of_superpixels: int = typer.Option(300),
-    compactness: float = typer.Option(10),
+    tiles_superpixel_postprocessing: bool = typer.Option(True),
+    number_of_superpixels: int = typer.Option(200, min=0),
+    compactness: float = typer.Option(10, min=0),
+    superpixel_threshold: float = typer.Option(0.7, min=0, max=1),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
         help='Default: "models/custom_data/input". '
@@ -58,6 +59,7 @@ def main(
         tiles_superpixel_postprocessing=tiles_superpixel_postprocessing,
         number_of_superpixels=number_of_superpixels,
         compactness=compactness,
+        superpixel_threshold=superpixel_threshold,
     ).process(clear_cache)
 
 

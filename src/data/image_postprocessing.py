@@ -3,6 +3,7 @@ import os
 import os.path
 from pathlib import Path
 from typing import List, Union
+from tqdm import tqdm
 
 import cv2
 import numpy as np
@@ -59,6 +60,7 @@ class ImagePostprocessor:
     def concatenate_images(self):
         img_filenames = sorted(os.listdir(self.input_path))
         base_names = self.__get_all_base_names_from_list_of_tiles(img_filenames)
+        print(base_names)
         separated_tiles_according_to_base_name = (
             self.__get_tiles_according_its_base_name(base_names, img_filenames)
         )
@@ -88,7 +90,11 @@ class ImagePostprocessor:
             num_of_tiles = len(filenames)
 
             k = 0
-            for v in range(vertical_multiplicative):
+            for v in tqdm(
+                range(vertical_multiplicative),
+                desc="Concatenating tiles",
+                unit="vertical",
+            ):
                 for h in range(horizontal_multiplicative):
                     if k >= num_of_tiles:
                         break
@@ -107,6 +113,7 @@ class ImagePostprocessor:
                     k += 1
             output_filename = os.path.join(self.output_path, base_name + ".jpg")
             cv2.imwrite(output_filename, img)
+            return img
 
     def get_all_filepaths_of_images_in_folder(self) -> List[str]:
         """
@@ -221,6 +228,7 @@ class ImagePostprocessor:
         not_decoded_predicted_tile: tf.Tensor,
         superpixel_segments: tf.Tensor,
         num_of_segments: int,
+        threshold: float,
     ):
         """
         Update the prediction for each superpixel segment in a not-decoded predicted tile.
@@ -235,6 +243,10 @@ class ImagePostprocessor:
                 The tensor contains integer values representing the segment labels (superpixel
                 indices) assigned to each pixel in the tile.
             num_of_segments (int): The number of segments in the superpixel segmentation map.
+            threshold (float): The threshold value for updating the prediction within each superpixel
+                segment. If the ratio of the most frequent predicted class count to the total number
+                of pixels in the segment is equal to or greater than the threshold, the prediction for
+                that segment is updated to the most frequent class.
 
         Returns:
             tf.Tensor: A tensor representing the updated not-decoded predicted tile, with
@@ -252,16 +264,24 @@ class ImagePostprocessor:
             counts = tf.math.bincount(tile_extracted_part)
             # Find the index of the most often repeated value
             most_frequent_value_index = tf.math.argmax(counts)
-            # Get the most often repeated value
-            most_frequent_class_in_tile_segment = most_frequent_value_index.numpy()
 
-            # Create a tensor of ones with the shape of indices
-            ones = tf.ones((tf.shape(indices)[0],), dtype=tf.int64)
-            # Multiply the ones tensor by max_value
-            updates = ones * most_frequent_class_in_tile_segment
-            # Update the not_decoded_prediction tensor
-            not_decoded_predicted_tile = tf.tensor_scatter_nd_update(
-                not_decoded_predicted_tile, indices, updates
-            )
+            # Get ratio
+            number_of_all_pixels_in_segment = tf.reduce_sum(counts)
+            most_frequent_count = counts[most_frequent_value_index].numpy()
+            ratio = most_frequent_count / number_of_all_pixels_in_segment
+
+            road_class_pixel_count = counts[-1]
+
+            if ratio >= threshold:
+                # Get the most often repeated value
+                most_frequent_class_in_tile_segment = most_frequent_value_index.numpy()
+                # Create a tensor of ones with the shape of indices
+                ones = tf.ones((tf.shape(indices)[0],), dtype=tf.int64)
+                # Multiply the ones tensor by max_value
+                updates = ones * most_frequent_class_in_tile_segment
+                # Update the not_decoded_prediction tensor
+                not_decoded_predicted_tile = tf.tensor_scatter_nd_update(
+                    not_decoded_predicted_tile, indices, updates
+                )
 
         return not_decoded_predicted_tile

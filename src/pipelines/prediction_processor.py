@@ -46,9 +46,10 @@ class PredictionPipeline:
         input_folder: Path,
         output_folder: Path,
         which_metric_best_weights_to_load: str,
-        tiles_superpixel_postprocessing,
-        number_of_superpixels: int = 300,
-        compactness: float = 10,
+        tiles_superpixel_postprocessing: bool,
+        number_of_superpixels: int,
+        compactness: float,
+        superpixel_threshold: float,
     ):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -62,11 +63,10 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[1],
         )
         self.tiles_superpixel_postprocessing = tiles_superpixel_postprocessing
-        self.params_of_superpixels_postprocessing = (number_of_superpixels, compactness)
+        self.params_for_slic_postprocessing = (number_of_superpixels, compactness)
+        self.superpixel_threshold = superpixel_threshold
 
-    def process(
-        self, clear_cache: bool = True, superpixels_postprocessing: bool = True
-    ):
+    def process(self, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
         InteractiveSession(config=config)
@@ -102,11 +102,11 @@ class PredictionPipeline:
 
             if self.tiles_superpixel_postprocessing:
                 segments = ImagePostprocessor.get_superpixel_segments(
-                    tile, self.params_of_superpixels_postprocessing
+                    tile, self.params_for_slic_postprocessing
                 )
                 num_of_segments = ImagePostprocessor.get_number_of_segments(segments)
                 prediction = ImagePostprocessor.get_updated_prediction_with_postprocessor_superpixels(
-                    prediction, segments, num_of_segments
+                    prediction, segments, num_of_segments, self.superpixel_threshold
                 )
 
             prediction = decode_segmentation_mask_to_rgb(
