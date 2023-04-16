@@ -179,7 +179,7 @@ class SlicSuperPixels:
 
     def get_updated_prediction_with_postprocessor_superpixels(
         self,
-        not_decoded_predicted_tile: tf.Tensor,
+        not_decoded_prediction: tf.Tensor,
         threshold: float,
         should_class_balance: bool = False,
     ):
@@ -187,7 +187,7 @@ class SlicSuperPixels:
         Update the prediction for each superpixel segment in a not-decoded predicted tile.
 
         Args:
-            not_decoded_predicted_tile (tf.Tensor): A tensor representing the not-decoded
+            not_decoded_prediction (tf.Tensor): A tensor representing the not-decoded
                 predicted tile, with shape (1, H, W), where H is the tile height and W is
                 the tile width. The tensor contains integer values representing the predicted
                 classes for each pixel in the tile.
@@ -211,7 +211,7 @@ class SlicSuperPixels:
             # get indices of single segment
             indices = tf.where(tf.equal(superpixel_segments, segment_num)).numpy()
             # extract the same part from prediction
-            tile_extracted_part = tf.gather_nd(not_decoded_predicted_tile, indices)
+            tile_extracted_part = tf.gather_nd(not_decoded_prediction, indices)
             tile_extracted_part = tf.cast(tile_extracted_part, dtype=tf.int32)
             # count number of classes occurrences in extracted prediction
             counts = tf.math.bincount(tile_extracted_part)
@@ -239,10 +239,10 @@ class SlicSuperPixels:
                 # Multiply the ones tensor by max_value
                 updates = ones * most_frequent_class_in_tile_segment
                 # Update the not_decoded_prediction tensor
-                not_decoded_predicted_tile = tf.tensor_scatter_nd_update(
-                    not_decoded_predicted_tile, indices, updates
+                not_decoded_prediction = tf.tensor_scatter_nd_update(
+                    not_decoded_prediction, indices, updates
                 )
-        return not_decoded_predicted_tile
+        return not_decoded_prediction
 
     def get_superpixel_segments(self) -> tf.Tensor:
         """
@@ -257,7 +257,8 @@ class SlicSuperPixels:
         """
 
         segments = slic(
-            self.raw_image, **self.params_of_superpixels_postprocessing,
+            self.raw_image,
+            **self.params_of_superpixels_postprocessing,
         )
         segments = tf.convert_to_tensor(segments)
         segments = tf.reshape(
