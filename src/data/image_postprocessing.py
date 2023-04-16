@@ -57,7 +57,7 @@ class ImagePostprocessor:
         self.__vertical = ImagePreprocessor.NAMING_CONVENTION_FOR_VERTICAL_TILE
         self.__horizontal = ImagePreprocessor.NAMING_CONVENTION_FOR_HORIZONTAL_TILE
 
-    def concatenate_images(self):
+    def concatenate_all_tiles(self):
         img_filenames = sorted(os.listdir(self.input_path))
         base_names = self.__get_all_base_names_from_list_of_tiles(img_filenames)
         print(base_names)
@@ -68,52 +68,55 @@ class ImagePostprocessor:
         for base_name, filenames in zip(
             base_names, separated_tiles_according_to_base_name
         ):
-            filenames.sort()
+            cv2.imwrite(*self.get_concatenated_filename_and_image(base_name, filenames))
 
-            img_tile = cv2.imread(os.path.join(self.input_path, filenames[0]))
-            img_shape = img_tile.shape
+    def get_concatenated_filename_and_image(
+        self, base_name: str, tiles_filenames: List[str]
+    ) -> np.array:
+        tiles_filenames.sort()
+        img_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
+        img_shape = img_tile.shape
 
+        (
+            vertical_multiplicative,
+            horizontal_multiplicative,
+        ) = self.get_count_of_vertical_and_horizontal_tiles(tiles_filenames)
+
+        img = np.zeros(
             (
-                vertical_multiplicative,
-                horizontal_multiplicative,
-            ) = self.__get_count_of_vertical_and_horizontal_tiles(filenames)
+                vertical_multiplicative * img_shape[0],
+                horizontal_multiplicative * img_shape[1],
+                img_shape[2],
+            ),
+            dtype=np.uint8,
+        )
 
-            img = np.zeros(
-                (
-                    vertical_multiplicative * img_shape[0],
-                    horizontal_multiplicative * img_shape[1],
-                    img_shape[2],
-                ),
-                dtype=np.uint8,
-            )
+        num_of_tiles = len(tiles_filenames)
 
-            num_of_tiles = len(filenames)
+        k = 0
+        for v in tqdm(
+            range(vertical_multiplicative),
+            desc="Concatenating tiles",
+            unit="vertical",
+        ):
+            for h in range(horizontal_multiplicative):
+                if k >= num_of_tiles:
+                    break
 
-            k = 0
-            for v in tqdm(
-                range(vertical_multiplicative),
-                desc="Concatenating tiles",
-                unit="vertical",
-            ):
-                for h in range(horizontal_multiplicative):
-                    if k >= num_of_tiles:
-                        break
-
-                    img_tile = cv2.imread(
-                        os.path.join(
-                            self.input_path,
-                            f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg",
-                        )
+                img_tile = cv2.imread(
+                    os.path.join(
+                        self.input_path,
+                        f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg",
                     )
-                    img[
-                        v * img_shape[0] : (v + 1) * img_shape[0],
-                        h * img_shape[1] : (h + 1) * img_shape[1],
-                        :,
-                    ] = img_tile
-                    k += 1
-            output_filename = os.path.join(self.output_path, base_name + ".jpg")
-            cv2.imwrite(output_filename, img)
-            return img
+                )
+                img[
+                    v * img_shape[0] : (v + 1) * img_shape[0],
+                    h * img_shape[1] : (h + 1) * img_shape[1],
+                    :,
+                ] = img_tile
+                k += 1
+        output_filename = os.path.join(self.output_path, base_name + ".jpg")
+        return output_filename, img
 
     def get_all_filepaths_of_images_in_folder(self) -> List[str]:
         """
@@ -156,7 +159,7 @@ class ImagePostprocessor:
 
         return split_tiles_according_to_base_name
 
-    def __get_count_of_vertical_and_horizontal_tiles(self, tiles: List[str]):
+    def get_count_of_vertical_and_horizontal_tiles(self, tiles: List[str]):
         vertical = []
         horizontal = []
 
