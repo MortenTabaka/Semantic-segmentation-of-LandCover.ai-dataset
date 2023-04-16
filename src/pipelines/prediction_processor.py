@@ -160,20 +160,54 @@ class PredictionPipeline:
 
     @property
     def get_slic_parameters(self):
+        """
+        Source: https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.slic
+        Params:
+            n_segments – The (approximate) number of labels in the segmented output image.
+            compactness – Balances color proximity and space proximity.
+                Higher values give more weight to space proximity, making superpixel shapes more square/cubic.
+                In SLICO mode, this is the initial compactness. This parameter depends strongly on image contrast and
+                on the shapes of objects in the image. We recommend exploring possible values on a log scale,
+                e.g., 0.01, 0.1, 1, 10, 100, before refining around a chosen value.
+            max_iter – Maximum number of iterations of k-means.
+            sigma – Width of Gaussian smoothing kernel for pre-processing for each dimension of the image.
+                The same sigma is applied to each dimension in case of a scalar value. Zero means no smoothing.
+                Note, that sigma is automatically scaled if it is scalar and a manual voxel spacing is provided
+                (see Notes section).
+            spacing – The voxel spacing along each image dimension. By default, slic assumes uniform spacing
+                (same voxel resolution along z, y and x).
+                This parameter controls the weights of the distances along z, y, and x during k-means clustering.
+            multichannel – Whether the last axis of the image is to be interpreted as multiple channels
+                or another spatial dimension.
+            convert2lab – Whether the input should be converted to Lab colorspace prior to segmentation.
+                The input image must be RGB. Highly recommended. This option defaults to True
+                when multichannel=True and image.shape[-1] == 3.
+            enforce_connectivity – Whether the generated segments are connected or not
+            min_size_factor – Proportion of the minimum segment size to be removed with respect to the supposed segment
+                size `depth*width*height/n_segments`
+            max_size_factor – Proportion of the maximum connected segment size. A value of 3 works in most of the cases.
+            slic_zero – Run SLIC-zero, the zero-parameter mode of SLIC. [2]_
+            start_label – The labels' index start. Should be 0 or 1.
+            mask – If provided, superpixels are computed only where mask is True, and seed points are
+                homogeneously distributed over the mask using a K-means clustering strategy
+
+                Returns: dict
+
+        """
         return {
-            'n_segments': self.number_of_superpixels,
-            'compactness': self.compactness,
-            'max_iter': 10,
-            'sigma': 0,
-            'spacing': None,
-            'multichannel': True,
-            'convert2lab': None,
-            'enforce_connectivity': True,
-            'min_size_factor': 0.5,
-            'max_size_factor': 3,
-            'slic_zero': False,
-            'start_label': 0,
-            'mask': None
+            "n_segments": self.number_of_superpixels,
+            "compactness": self.compactness,
+            "max_iter": 10,
+            "sigma": 0,
+            "spacing": None,
+            "multichannel": True,
+            "convert2lab": None,
+            "enforce_connectivity": True,
+            "min_size_factor": 0.5,
+            "max_size_factor": 3,
+            "slic_zero": False,
+            "start_label": 0,
+            "mask": None,
         }
 
     @property
