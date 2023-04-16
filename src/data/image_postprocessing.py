@@ -2,13 +2,12 @@ import glob
 import os
 import os.path
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Tuple
 from tqdm import tqdm
 
 import cv2
 import numpy as np
 import tensorflow as tf
-from skimage.io import imread
 from skimage.segmentation import slic
 
 from src.data.image_preprocessing import ImagePreprocessor
@@ -172,57 +171,15 @@ class ImagePostprocessor:
 
         return max(vertical) + 1, max(horizontal) + 1
 
-    @staticmethod
-    def get_superpixel_segments(
-        image: str, params_of_superpixels_postprocessing
-    ) -> tf.Tensor:
-        """
-        Generates superpixel segments for an input image using the Simple Linear
-        Iterative Clustering (SLIC) algorithm.
 
-        Args:
-            params_of_superpixels_postprocessing:
-            image (str): File path or URL of the input image.
+class SlicSuperPixels:
+    def __init__(self, raw_image: tf.Tensor, slic_parameters):
+        self.raw_image = raw_image
+        self.params_of_superpixels_postprocessing = slic_parameters
 
-        Returns:
-            tf.Tensor: A tensor representing the superpixel segments, with shape
-            (1, H, W), where H is the image height and W is the image width. The
-            tensor contains integer values representing the segment labels (superpixel
-            indices) assigned to each pixel in the image.
-        """
-        image = imread(image)
-        segments = slic(image, *params_of_superpixels_postprocessing, start_label=0)
-        segments = tf.convert_to_tensor(segments)
-        segments = tf.reshape(
-            segments,
-            (1, segments.shape[0], segments.shape[1]),
-        )
-        return segments
-
-    @staticmethod
-    def get_number_of_segments(superpixel_segments: tf.Tensor) -> int:
-        """
-        Calculates the number of segments in a superpixel segmentation map.
-
-        Args:
-            superpixel_segments (tf.Tensor): A tensor representing the superpixel
-                segments, with shape (1, H, W), where H is the image height and W is
-                the image width. The tensor contains integer values representing the
-                segment labels (superpixel indices) assigned to each pixel in the image.
-
-        Returns:
-            tf.Tensor: A tensor representing the number of segments in the superpixel
-            segmentation map.
-        """
-        max_value = tf.reduce_max(superpixel_segments, keepdims=False, axis=(1, 2))
-        max_value = max_value.numpy()[0]
-        return max_value + 1
-
-    @staticmethod
     def get_updated_prediction_with_postprocessor_superpixels(
+        self,
         not_decoded_predicted_tile: tf.Tensor,
-        superpixel_segments: tf.Tensor,
-        num_of_segments: int,
         threshold: float,
         should_class_balance: bool = False,
     ):
@@ -234,15 +191,11 @@ class ImagePostprocessor:
                 predicted tile, with shape (1, H, W), where H is the tile height and W is
                 the tile width. The tensor contains integer values representing the predicted
                 classes for each pixel in the tile.
-            superpixel_segments (tf.Tensor): A tensor representing the superpixel segments,
-                with shape (1, H, W), where H is the tile height and W is the tile width.
-                The tensor contains integer values representing the segment labels (superpixel
-                indices) assigned to each pixel in the tile.
-            num_of_segments (int): The number of segments in the superpixel segmentation map.
             threshold (float): The threshold value for updating the prediction within each superpixel
                 segment. If the ratio of the most frequent predicted class count to the total number
                 of pixels in the segment is equal to or greater than the threshold, the prediction for
                 that segment is updated to the most frequent class.
+            should_class_balance (bool): Decide if class balance should be used
 
         Returns:
             tf.Tensor: A tensor representing the updated not-decoded predicted tile, with
@@ -250,7 +203,10 @@ class ImagePostprocessor:
             contains integer values representing the updated predicted classes for each pixel
             in the tile, after considering the most frequent class within each superpixel segment.
         """
+        superpixel_segments = self.get_superpixel_segments()
+        num_of_segments = self.get_number_of_segments(superpixel_segments)
         class_balance = get_normalized_class_balance_of_the_landcover_dataset()
+
         for segment_num in range(num_of_segments):
             # get indices of single segment
             indices = tf.where(tf.equal(superpixel_segments, segment_num)).numpy()
@@ -286,5 +242,45 @@ class ImagePostprocessor:
                 not_decoded_predicted_tile = tf.tensor_scatter_nd_update(
                     not_decoded_predicted_tile, indices, updates
                 )
-
         return not_decoded_predicted_tile
+
+    def get_superpixel_segments(self) -> tf.Tensor:
+        """
+        Generates superpixel segments for an input image using the Simple Linear
+        Iterative Clustering (SLIC) algorithm.
+
+        Returns:
+            tf.Tensor: A tensor representing the superpixel segments, with shape
+            (1, H, W), where H is the image height and W is the image width. The
+            tensor contains integer values representing the segment labels (superpixel
+            indices) assigned to each pixel in the image.
+        """
+
+        segments = slic(
+            self.raw_image, **self.params_of_superpixels_postprocessing,
+        )
+        segments = tf.convert_to_tensor(segments)
+        segments = tf.reshape(
+            segments,
+            (1, segments.shape[0], segments.shape[1]),
+        )
+        return segments
+
+    @staticmethod
+    def get_number_of_segments(superpixel_segments: tf.Tensor) -> int:
+        """
+        Calculates the number of segments in a superpixel segmentation map.
+
+        Args:
+            superpixel_segments (tf.Tensor): A tensor representing the superpixel
+                segments, with shape (1, H, W), where H is the image height and W is
+                the image width. The tensor contains integer values representing the
+                segment labels (superpixel indices) assigned to each pixel in the image.
+
+        Returns:
+            tf.Tensor: A tensor representing the number of segments in the superpixel
+            segmentation map.
+        """
+        max_value = tf.reduce_max(superpixel_segments, keepdims=False, axis=(1, 2))
+        max_value = max_value.numpy()[0]
+        return max_value + 1

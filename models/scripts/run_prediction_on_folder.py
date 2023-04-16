@@ -33,6 +33,8 @@ def main(
     number_of_superpixels: int = typer.Option(200, min=0),
     compactness: float = typer.Option(10, min=0),
     superpixel_threshold: float = typer.Option(0.7, min=0, max=1),
+    postprocess_boundaries: bool = typer.Option(True),
+    clear_cache: bool = typer.Option(True),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
         help='Default: "models/custom_data/input". '
@@ -48,9 +50,7 @@ def main(
         dir_okay=True,
         show_default=False,
     ),
-    clear_cache: bool = typer.Option(True),
 ) -> None:
-
     PredictionPipeline(
         model_revision=model_revision,
         input_folder=input_folder,
@@ -60,7 +60,7 @@ def main(
         number_of_superpixels=number_of_superpixels,
         compactness=compactness,
         superpixel_threshold=superpixel_threshold,
-    ).process(clear_cache)
+    ).process(postprocess_boundaries, clear_cache)
 
 
 if __name__ == "__main__":

@@ -7,10 +7,11 @@ from typing import List
 from tqdm import tqdm
 
 import numpy as np
+from skimage.io import imread
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 
-from src.data.image_postprocessing import ImagePostprocessor
+from src.data.image_postprocessing import ImagePostprocessor, SlicSuperPixels
 from src.data.image_preprocessing import ImagePreprocessor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import decode_segmentation_mask_to_rgb
@@ -47,9 +48,9 @@ class PredictionPipeline:
         output_folder: Path,
         which_metric_best_weights_to_load: str,
         tiles_superpixel_postprocessing: bool,
-        number_of_superpixels: int,
-        compactness: float,
-        superpixel_threshold: float,
+        number_of_superpixels: int = None,
+        compactness: float = None,
+        superpixel_threshold: float = None,
     ):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -63,10 +64,11 @@ class PredictionPipeline:
             self.revision_predictor.get_required_input_shape_of_an_image[1],
         )
         self.tiles_superpixel_postprocessing = tiles_superpixel_postprocessing
-        self.params_for_slic_postprocessing = (number_of_superpixels, compactness)
+        self.number_of_superpixels = number_of_superpixels
+        self.compactness = compactness
         self.superpixel_threshold = superpixel_threshold
 
-    def process(self, clear_cache: bool = True):
+    def process(self, postprocess_boundaries: bool, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
         InteractiveSession(config=config)
@@ -80,6 +82,9 @@ class PredictionPipeline:
 
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
         self.__concatenate_tiles(predicted_tiles)
+
+        if postprocess_boundaries:
+            self.__post_process_tiles_boundaries_in_image()
 
         if clear_cache:
             self.__clear_cache()
@@ -102,20 +107,23 @@ class PredictionPipeline:
             )
 
             if self.tiles_superpixel_postprocessing:
-                prediction = self.__get_superpixel_post_processed_tile_prediction(tile, prediction)
+                prediction = self.__get_superpixel_post_processed_tile_prediction(
+                    tile, prediction
+                )
 
             decoded_prediction = decode_segmentation_mask_to_rgb(
                 prediction, custom_colormap, num_classes
             )
             self.__save_prediction(decoded_prediction, file_name)
 
-    def __get_superpixel_post_processed_tile_prediction(self, tile: str, prediction: tf.Tensor) -> tf.Tensor:
-        segments = ImagePostprocessor.get_superpixel_segments(
-            tile, self.params_for_slic_postprocessing
-        )
-        num_of_segments = ImagePostprocessor.get_number_of_segments(segments)
-        prediction = ImagePostprocessor.get_updated_prediction_with_postprocessor_superpixels(
-            prediction, segments, num_of_segments, self.superpixel_threshold
+    def __get_superpixel_post_processed_tile_prediction(
+        self, tile: str, prediction: tf.Tensor
+    ) -> tf.Tensor:
+        image = imread(tile)
+        prediction = SlicSuperPixels(
+            image, self.get_slic_parameters
+        ).get_updated_prediction_with_postprocessor_superpixels(
+            prediction, self.superpixel_threshold
         )
         return prediction
 
@@ -133,6 +141,14 @@ class PredictionPipeline:
     def __get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
 
+    def __post_process_tiles_boundaries_in_image(self):
+        """
+        Post-process resulting map to improve boundaries between concatenated tiles.
+        Returns:
+
+        """
+        pass
+
     def __clear_cache(self, paths=None):
         if paths is None:
             paths = [
@@ -141,6 +157,24 @@ class PredictionPipeline:
             ]
         for path_to_remove in paths:
             rmtree(path_to_remove)
+
+    @property
+    def get_slic_parameters(self):
+        return {
+            'n_segments': self.number_of_superpixels,
+            'compactness': self.compactness,
+            'max_iter': 10,
+            'sigma': 0,
+            'spacing': None,
+            'multichannel': True,
+            'convert2lab': None,
+            'enforce_connectivity': True,
+            'min_size_factor': 0.5,
+            'max_size_factor': 3,
+            'slic_zero': False,
+            'start_label': 0,
+            'mask': None
+        }
 
     @property
     def __get_number_of_classes_and_colormap(self):
