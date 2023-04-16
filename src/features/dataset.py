@@ -245,3 +245,7 @@ class Dataset:
     @staticmethod
     def get_ordered_class_names() -> List[str]:
         return ["background", "buildings", "woodland", "water", "roads"]
+
+
+def get_normalized_class_balance_of_the_landcover_dataset() -> List[float]:
+    return [1.0000, 0.0151, 0.5683, 0.1079, 0.0281]

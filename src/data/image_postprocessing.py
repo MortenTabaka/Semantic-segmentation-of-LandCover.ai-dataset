@@ -12,6 +12,7 @@ from skimage.io import imread
 from skimage.segmentation import slic
 
 from src.data.image_preprocessing import ImagePreprocessor
+from src.features.dataset import get_normalized_class_balance_of_the_landcover_dataset
 
 
 class ImagePostprocessor:
@@ -229,6 +230,7 @@ class ImagePostprocessor:
         superpixel_segments: tf.Tensor,
         num_of_segments: int,
         threshold: float,
+        should_class_balance: bool = False,
     ):
         """
         Update the prediction for each superpixel segment in a not-decoded predicted tile.
@@ -254,6 +256,7 @@ class ImagePostprocessor:
             contains integer values representing the updated predicted classes for each pixel
             in the tile, after considering the most frequent class within each superpixel segment.
         """
+        class_balance = get_normalized_class_balance_of_the_landcover_dataset()
         for segment_num in range(num_of_segments):
             # get indices of single segment
             indices = tf.where(tf.equal(superpixel_segments, segment_num)).numpy()
@@ -262,6 +265,12 @@ class ImagePostprocessor:
             tile_extracted_part = tf.cast(tile_extracted_part, dtype=tf.int32)
             # count number of classes occurrences in extracted prediction
             counts = tf.math.bincount(tile_extracted_part)
+
+            if should_class_balance:
+                counts = tf.cast(counts, dtype=tf.float32)
+                num_classes = len(counts)
+                counts = counts / class_balance[num_classes - 1]
+
             # Find the index of the most often repeated value
             most_frequent_value_index = tf.math.argmax(counts)
 
