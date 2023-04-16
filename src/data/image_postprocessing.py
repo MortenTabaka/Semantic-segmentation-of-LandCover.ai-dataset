@@ -183,12 +183,6 @@ class ImagePostprocessor:
         Args:
             params_of_superpixels_postprocessing:
             image (str): File path or URL of the input image.
-            num_superpixels (int, optional): Number of desired superpixels.
-                Defaults to 300.
-            compactness (int, optional): Compactness parameter for the SLIC
-                algorithm. A higher value results in more compact and square-shaped
-                superpixels, while a lower value results in more irregularly shaped
-                superpixels. Defaults to 20.
 
         Returns:
             tf.Tensor: A tensor representing the superpixel segments, with shape
