@@ -175,7 +175,7 @@ class ImagePostprocessor:
         return max(vertical) + 1, max(horizontal) + 1
 
 
-class SlicSuperPixels:
+class SuperpixelsProcessor:
     def __init__(self, raw_image: tf.Tensor, slic_parameters):
         self.raw_image = raw_image
         self.params_of_superpixels_postprocessing = slic_parameters
