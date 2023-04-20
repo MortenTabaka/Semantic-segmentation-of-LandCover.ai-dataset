@@ -3,7 +3,7 @@ from glob import glob
 from os import path
 from pathlib import Path
 from shutil import rmtree
-from typing import List
+from typing import List, Union
 from tqdm import tqdm
 
 import numpy as np
@@ -11,7 +11,7 @@ from skimage.io import imread
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 
-from src.data.image_postprocessing import ImagePostprocessor, SlicSuperPixels
+from src.data.image_postprocessing import ImagePostprocessor, SuperpixelsProcessor
 from src.data.image_preprocessing import ImagePreprocessor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import decode_segmentation_mask_to_rgb
@@ -59,9 +59,15 @@ class PredictionPipeline:
             model_revision, which_metric_best_weights_to_load
         ).get_prediction_model_of_revision
         self.model_build_parameters = self.revision_predictor.get_model_build_parameters
+        self.raw_image_height = (
+            self.revision_predictor.get_required_input_shape_of_an_image[0]
+        )
+        self.raw_image_width = (
+            self.revision_predictor.get_required_input_shape_of_an_image[1]
+        )
         self.image_features = ImageFeatures(
-            self.revision_predictor.get_required_input_shape_of_an_image[0],
-            self.revision_predictor.get_required_input_shape_of_an_image[1],
+            self.raw_image_height,
+            self.raw_image_width,
         )
         self.tiles_superpixel_postprocessing = tiles_superpixel_postprocessing
         self.number_of_superpixels = number_of_superpixels
@@ -81,10 +87,13 @@ class PredictionPipeline:
         self.__make_predictions(tiles)
 
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
+
         self.__concatenate_tiles(predicted_tiles)
 
         if postprocess_boundaries:
-            self.__post_process_tiles_boundaries_in_image()
+            for image in self.__get_full_size_images:
+                loaded_image = imread(image)
+                SuperpixelsProcessor(loaded_image, self.get_slic_parameters)
 
         if clear_cache:
             self.__clear_cache()
@@ -120,7 +129,7 @@ class PredictionPipeline:
         self, tile: str, prediction: tf.Tensor
     ) -> tf.Tensor:
         image = imread(tile)
-        prediction = SlicSuperPixels(
+        prediction = SuperpixelsProcessor(
             image, self.get_slic_parameters
         ).get_updated_prediction_with_postprocessor_superpixels(
             prediction, self.superpixel_threshold
@@ -136,18 +145,40 @@ class PredictionPipeline:
     def __concatenate_tiles(self, input_folder):
         ImagePostprocessor(
             input_path=input_folder, output_path=self.output_folder
-        ).concatenate_images()
+        ).concatenate_all_tiles()
 
     def __get_image_for_prediction(self, filepath: str):
         return self.image_features.load_image_from_drive(filepath)
 
-    def __post_process_tiles_boundaries_in_image(self):
-        """
-        Post-process resulting map to improve boundaries between concatenated tiles.
-        Returns:
+    def postprocess_tiles_borders_in_concatenated_prediction(
+        self,
+        raw_image,
+        decoded_image,
+        tile_height: int,
+        tile_width: int,
+        output: Union[str, Path],
+        border_pixel_range: int = 100,
+    ):
+        vertical_borders = int(self.raw_image_height / tile_height) - 1
+        horizontal_borders = self.raw_image_width / tile_width - 1
 
-        """
-        pass
+        # TODO: Repeat for horizontal
+        for vertical_num in range(vertical_borders):
+            top = (vertical_num + 1) * tile_height + border_pixel_range
+            bottom = (vertical_num + 1) * tile_height - border_pixel_range
+            raw_border_area = raw_image[bottom:top, :]
+            decoded_border_image = decoded_image[bottom:top, :]
+            # TODO: Encode or decode or save not decoded(may be the best)
+            not_decoded = decoded_border_image
+            decoded_border_image = (
+                SuperpixelsProcessor(raw_border_area, self.get_slic_parameters).
+                get_updated_prediction_with_postprocessor_superpixels(
+                    not_decoded, 0.3
+                    )
+            )
+            decoded_image[bottom:top, :] = decoded_border_image
+
+        decoded_image.save(self.output_folder)
 
     def __clear_cache(self, paths=None):
         if paths is None:
@@ -224,6 +255,10 @@ class PredictionPipeline:
         else:
             custom_colormap = generate_colormap(num_classes)
         return num_classes, custom_colormap
+
+    @property
+    def __get_full_size_images(self) -> List[str]:
+        return glob(path.join(self.output_folder, "*.jpg"))
 
     @staticmethod
     def __get_input_tiles(tiles_folder: str) -> List[str]:
