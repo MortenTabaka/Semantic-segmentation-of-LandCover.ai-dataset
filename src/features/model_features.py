@@ -1,8 +1,9 @@
 import os
 from typing import Dict, List, Tuple, Union
 
-from numpy import array, stack, uint8, zeros_like
-from tensorflow import keras
+from numpy import array, stack, uint8, zeros_like, logical_and
+from tensorflow import keras, convert_to_tensor
+from tensorflow import uint8 as tf_uint8
 from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
 
@@ -164,6 +165,27 @@ def decode_segmentation_mask_to_rgb(
     rgb = stack([r, g, b], axis=2)
     image = array_to_img(rgb)
     return image
+
+
+def encode_segmentation_mask_to_logits(
+    rgb_mask, custom_colormap: List[int]
+):
+    # Extract the R, G, B channels
+    r = rgb_mask[:, :, 0]
+    g = rgb_mask[:, :, 1]
+    b = rgb_mask[:, :, 2]
+
+    # Determine the class labels using the custom color map
+    num_classes = len(custom_colormap)
+    mask = zeros_like(r)
+    for i in range(num_classes):
+        idx = logical_and(
+            r == custom_colormap[i][0],
+            logical_and(g == custom_colormap[i][1], b == custom_colormap[i][2]),
+        )
+        mask[idx] = i
+
+    return convert_to_tensor(mask, dtype=tf_uint8)
 
 
 def update_yaml_revision(model_revision: str, to_add: dict):
