@@ -35,7 +35,7 @@ class PredictionPipeline:
         revision_predictor (Predictor): An instance of the Predictor class that uses the specified model_revision.
         prediction_model (Model): The prediction model of the specified model_revision.
         model_build_parameters (dict): A dictionary of the model build parameters used for training the model.
-        image_features (ImageFeatures): An instance of the ImageFeatures class used for loading and preprocessing images.
+        image_features (ImageFeatures): An instance of the ImageFeatures class used for loading and preprocessing images
 
     Methods:
         process(): Processes the input images and saves the predicted segmentation masks to the output folder.
@@ -87,7 +87,6 @@ class PredictionPipeline:
         self.__make_predictions(tiles)
 
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
-
         self.__concatenate_tiles(predicted_tiles)
 
         if postprocess_boundaries:
@@ -106,7 +105,6 @@ class PredictionPipeline:
         return save_to
 
     def __make_predictions(self, tiles: List[str]):
-        num_classes, custom_colormap = self.__get_number_of_classes_and_colormap
         for tile in tqdm(tiles, desc="Processing tiles", unit="tile"):
             preprocessed_tile = self.__get_image_for_prediction(tile)
             file_name = os.path.basename(tile)
@@ -121,7 +119,7 @@ class PredictionPipeline:
                 )
 
             decoded_prediction = decode_segmentation_mask_to_rgb(
-                prediction, custom_colormap, num_classes
+                prediction, *self.__get_number_of_classes_and_colormap
             )
             self.__save_prediction(decoded_prediction, file_name)
 
@@ -254,7 +252,7 @@ class PredictionPipeline:
             )
         else:
             custom_colormap = generate_colormap(num_classes)
-        return num_classes, custom_colormap
+        return custom_colormap, num_classes
 
     @property
     def __get_full_size_images(self) -> List[str]:

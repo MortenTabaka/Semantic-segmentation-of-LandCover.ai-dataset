@@ -136,7 +136,7 @@ def load_data_for_revision(model_key):
 
 
 def decode_segmentation_mask_to_rgb(
-    mask, custom_colormap, num_classes: int = 5
+    mask, custom_colormap: List[int], num_classes: int = 5
 ) -> array:
     """
     Transforms Landcover dataset's masks to RGB image.
