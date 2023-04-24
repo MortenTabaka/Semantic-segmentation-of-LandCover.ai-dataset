@@ -7,7 +7,7 @@ from typing import List, Union
 from tqdm import tqdm
 
 import numpy as np
-from cv2 import imread
+from cv2 import imread, imwrite
 import tensorflow as tf
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 
@@ -161,41 +161,67 @@ class PredictionPipeline:
         self,
         raw_image,
         decoded_mask,
-        border_pixel_range: int = 100,
+        border_pixel_range: int = 75,
     ):
-        vertical_borders = int(decoded_mask.shape[0] / self.tile_height) - 1
-        horizontal_borders = int(decoded_mask.shape[1] / self.tile_width) - 1
+        # get exact shape as prediction since it may be smaller
+        raw_image = raw_image[: decoded_mask.shape[0], : decoded_mask.shape[1], :]
+        num_vertical_borders = int(decoded_mask.shape[0] / self.tile_height) - 1
+        num_horizontal_borders = int(decoded_mask.shape[1] / self.tile_width) - 1
 
-        for vertical_num in range(vertical_borders):
-            top = (vertical_num + 1) * self.tile_height + border_pixel_range
-            bottom = (vertical_num + 1) * self.tile_height - border_pixel_range
+        decoded_mask = self.__process_single_oriented_borders(
+            raw_image,
+            decoded_mask,
+            "vertical",
+            num_vertical_borders,
+            border_pixel_range,
+        )
 
-            raw_border_area = raw_image[bottom:top, :]
-            decoded_border_mask = decoded_mask[bottom:top, :]
-            not_decoded = encode_segmentation_mask_to_logits(
+        decoded_mask = self.__process_single_oriented_borders(
+            raw_image,
+            decoded_mask,
+            "horizontal",
+            num_horizontal_borders,
+            border_pixel_range,
+        )
+
+        filename = os.path.join(self.output_folder, "test.jpg")
+        imwrite(filename, decoded_mask)
+
+    def __process_single_oriented_borders(
+        self,
+        raw_image,
+        decoded_mask,
+        orientation: str,
+        num_borders: int,
+        border_pixel_range: int,
+    ):
+
+        for border in range(num_borders):
+            top_or_right = (border + 1) * self.tile_height + border_pixel_range
+            bottom_or_left = (border + 1) * self.tile_height - border_pixel_range
+
+            raw_border_area, decoded_border_mask = self.__get_border_area(
+                raw_image, decoded_mask, orientation, top_or_right, bottom_or_left
+            )
+
+            encoded_border_mask = encode_segmentation_mask_to_logits(
                 decoded_border_mask, self.__get_colormap_and_number_of_classes[0]
             )
-            print(not_decoded)
-            post_post_processed_border = SuperpixelsProcessor(
+            post_processed_border = SuperpixelsProcessor(
                 raw_border_area, self.get_slic_parameters
-            ).get_updated_prediction_with_postprocessor_superpixels(not_decoded, 0.3)
-            decoded_border_mask[bottom:top, :] = post_post_processed_border
-
-        for horizontal_num in range(horizontal_borders):
-            right = (horizontal_num + 1) * self.tile_height + border_pixel_range
-            left = (horizontal_num + 1) * self.tile_height - border_pixel_range
-
-            raw_border_area = raw_image[:, left:right]
-            decoded_border_mask = decoded_mask[:, left:right]
-            not_decoded = encode_segmentation_mask_to_logits(
-                decoded_border_mask, self.__get_colormap_and_number_of_classes[0]
+            ).get_updated_prediction_with_postprocessor_superpixels(
+                encoded_border_mask, 0.3
             )
-            post_post_processed_border = SuperpixelsProcessor(
-                raw_border_area, self.get_slic_parameters
-            ).get_updated_prediction_with_postprocessor_superpixels(not_decoded, 0.3)
-            decoded_border_mask[:, left:right] = post_post_processed_border
-
-        decoded_mask.save(self.output_folder)
+            post_processed_border = decode_segmentation_mask_to_rgb(
+                post_processed_border, *self.__get_colormap_and_number_of_classes
+            )
+            if orientation == "horizontal":
+                decoded_mask[bottom_or_left:top_or_right, :] = post_processed_border
+            elif orientation == "vertical":
+                decoded_mask[:, bottom_or_left:top_or_right] = post_processed_border
+            else:
+                raise ValueError("Pick correct which border to process.")
+        return decoded_mask
 
     def __clear_cache(self, paths=None):
         if paths is None:
@@ -289,3 +315,24 @@ class PredictionPipeline:
     def __get_input_tiles(tiles_folder: str) -> List[str]:
         img_paths = glob(path.join(tiles_folder, "*.jpg"))
         return img_paths
+
+    @staticmethod
+    def __get_border_area(
+        raw_image,
+        decoded_mask,
+        orientation: str,
+        top_or_right: int,
+        bottom_or_left: int,
+    ):
+        if orientation == "horizontal":
+            return (
+                raw_image[bottom_or_left:top_or_right, :],
+                decoded_mask[bottom_or_left:top_or_right, :],
+            )
+        elif orientation == "vertical":
+            return (
+                raw_image[:, bottom_or_left:top_or_right],
+                decoded_mask[:, bottom_or_left:top_or_right],
+            )
+        else:
+            raise ValueError("Pick correct which border to process.")

@@ -2,7 +2,7 @@ import os
 from typing import Dict, List, Tuple, Union
 
 from numpy import array, stack, uint8, zeros_like, logical_and
-from tensorflow import keras, convert_to_tensor
+from tensorflow import keras, convert_to_tensor, Tensor, expand_dims
 from tensorflow import uint8 as tf_uint8
 from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
@@ -167,9 +167,7 @@ def decode_segmentation_mask_to_rgb(
     return image
 
 
-def encode_segmentation_mask_to_logits(
-    rgb_mask, custom_colormap: List[int]
-):
+def encode_segmentation_mask_to_logits(rgb_mask, custom_colormap: List[int]) -> Tensor:
     # Extract the R, G, B channels
     r = rgb_mask[:, :, 0]
     g = rgb_mask[:, :, 1]
@@ -185,7 +183,9 @@ def encode_segmentation_mask_to_logits(
         )
         mask[idx] = i
 
-    return convert_to_tensor(mask, dtype=tf_uint8)
+    mask_tensor = convert_to_tensor(mask, dtype=tf_uint8)
+    mask_tensor = expand_dims(mask_tensor, axis=0)
+    return mask_tensor
 
 
 def update_yaml_revision(model_revision: str, to_add: dict):
