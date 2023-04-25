@@ -165,8 +165,8 @@ class PredictionPipeline:
     ):
         # get exact shape as prediction since it may be smaller
         raw_image = raw_image[: decoded_mask.shape[0], : decoded_mask.shape[1], :]
-        num_vertical_borders = int(decoded_mask.shape[0] / self.tile_height) - 1
-        num_horizontal_borders = int(decoded_mask.shape[1] / self.tile_width) - 1
+        num_vertical_borders = int(decoded_mask.shape[1] / self.tile_height) - 1
+        num_horizontal_borders = int(decoded_mask.shape[0] / self.tile_width) - 1
 
         decoded_mask = self.__process_single_oriented_borders(
             raw_image,
