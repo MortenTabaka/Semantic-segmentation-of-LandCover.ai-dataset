@@ -121,6 +121,7 @@ class PredictionPipeline:
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
+            self.__save_prediction_tensor_in_numpy_file(prediction, file_name)
 
             if self.tiles_superpixel_postprocessing:
                 prediction = self.__get_superpixel_post_processed_tile_prediction(
@@ -148,6 +149,13 @@ class PredictionPipeline:
         os.makedirs(save_to, exist_ok=True)
         file_path = os.path.join(save_to, file_name)
         image.save(file_path)
+
+    def __save_prediction_tensor_in_numpy_file(self, prediction: tf.Tensor, file_name: str):
+        save_to = path.join(self.output_folder, ".cache/logits_prediction_tensors")
+        os.makedirs(save_to, exist_ok=True)
+        file_name = file_name.replace(".jpg", ".npy")
+        file_path = os.path.join(save_to, file_name)
+        np.save(file_path, prediction.numpy())
 
     def __concatenate_tiles(self, input_folder):
         ImagePostprocessor(
