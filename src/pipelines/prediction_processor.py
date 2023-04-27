@@ -131,7 +131,7 @@ class PredictionPipeline:
             decoded_prediction = decode_segmentation_mask_to_rgb(
                 prediction, *self.__get_colormap_and_number_of_classes
             )
-            self.__save_prediction(decoded_prediction, file_name)
+            self.__save_prediction_as_decoded_image(decoded_prediction, file_name)
 
     def __get_superpixel_post_processed_tile_prediction(
         self, tile: str, prediction: tf.Tensor
@@ -144,13 +144,15 @@ class PredictionPipeline:
         )
         return prediction
 
-    def __save_prediction(self, image, file_name):
+    def __save_prediction_as_decoded_image(self, image, file_name):
         save_to = path.join(self.output_folder, ".cache/prediction_tiles")
         os.makedirs(save_to, exist_ok=True)
         file_path = os.path.join(save_to, file_name)
         image.save(file_path)
 
-    def __save_prediction_tensor_in_numpy_file(self, prediction: tf.Tensor, file_name: str):
+    def __save_prediction_tensor_in_numpy_file(
+        self, prediction: tf.Tensor, file_name: str
+    ):
         save_to = path.join(self.output_folder, ".cache/logits_prediction_tensors")
         os.makedirs(save_to, exist_ok=True)
         file_name = file_name.replace(".jpg", ".npy")
@@ -202,7 +204,7 @@ class PredictionPipeline:
     def __process_single_oriented_borders(
         self,
         raw_image,
-        decoded_mask,
+        raw_prediction: tf.Tensor,
         orientation: str,
         num_borders: int,
         border_pixel_range: int,
@@ -213,27 +215,24 @@ class PredictionPipeline:
             bottom_or_left = (border + 1) * self.tile_height - border_pixel_range
 
             raw_border_area, decoded_border_mask = self.__get_border_area(
-                raw_image, decoded_mask, orientation, top_or_right, bottom_or_left
+                raw_image, raw_prediction, orientation, top_or_right, bottom_or_left
             )
 
-            encoded_border_mask = encode_segmentation_mask_to_logits(
-                decoded_border_mask, self.__get_colormap_and_number_of_classes[0]
-            )
             post_processed_border = SuperpixelsProcessor(
                 raw_border_area, self.get_slic_parameters
             ).get_updated_prediction_with_postprocessor_superpixels(
-                encoded_border_mask, 0.3
+                raw_prediction, 0.3
             )
             post_processed_border = decode_segmentation_mask_to_rgb(
                 post_processed_border, *self.__get_colormap_and_number_of_classes
             )
             if orientation == "horizontal":
-                decoded_mask[bottom_or_left:top_or_right, :] = post_processed_border
+                raw_prediction[bottom_or_left:top_or_right, :] = post_processed_border
             elif orientation == "vertical":
-                decoded_mask[:, bottom_or_left:top_or_right] = post_processed_border
+                raw_prediction[:, bottom_or_left:top_or_right] = post_processed_border
             else:
                 raise ValueError("Pick correct which border to process.")
-        return decoded_mask
+        return raw_prediction
 
     def __clear_cache(self, paths=None):
         if paths is None:
