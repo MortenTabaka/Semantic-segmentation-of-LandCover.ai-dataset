@@ -169,12 +169,16 @@ class PredictionPipeline:
         self,
         raw_image,
         decoded_mask,
-        border_pixel_range: int = 75,
+        border_pixel_range: int = 50,
     ):
+
+        width = tf.shape(decoded_mask)[1]
+        height = tf.shape(decoded_mask)[0]
+
         # get exact shape as prediction since it may be smaller
-        raw_image = raw_image[: decoded_mask.shape[0], : decoded_mask.shape[1], :]
-        num_vertical_borders = int(decoded_mask.shape[1] / self.tile_height) - 1
-        num_horizontal_borders = int(decoded_mask.shape[0] / self.tile_width) - 1
+        raw_image = raw_image[:height, :width, :]
+        num_vertical_borders = int(width / self.tile_height) - 1
+        num_horizontal_borders = int(height / self.tile_width) - 1
 
         decoded_mask = self.__process_single_oriented_borders(
             raw_image,
