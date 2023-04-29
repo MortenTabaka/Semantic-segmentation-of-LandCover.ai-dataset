@@ -1,17 +1,23 @@
 import glob
 import os
 import os.path
+from enum import Enum
 from pathlib import Path
-from typing import List, Union, Tuple
-from tqdm import tqdm
+from typing import List, Union
 
 import cv2
 import numpy as np
 import tensorflow as tf
 from skimage.segmentation import slic
+from tqdm import tqdm
 
 from src.data.image_preprocessing import ImagePreprocessor
 from src.features.dataset import get_normalized_class_balance_of_the_landcover_dataset
+
+
+class InputData(Enum):
+    IMAGE = [".jpg", ".png", ".tiff", ".tif"]
+    NUMPY_TENSOR = [".npy"]
 
 
 class ImagePostprocessor:
