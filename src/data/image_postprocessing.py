@@ -56,9 +56,15 @@ class ImagePostprocessor:
             Example: ['image_0_0.jpg', 'image_0_1.jpg', 'image_1_0.jpg', 'image_1_1.jpg'] -> (2, 2)
     """
 
-    def __init__(self, input_path: Union[str, Path], output_path: Union[str, Path]):
+    def __init__(
+        self,
+        input_path: Union[str, Path],
+        output_path: Union[str, Path],
+        data_mode: InputData = InputData.IMAGE,
+    ):
         self.input_path = input_path
         self.output_path = output_path
+        self.data_mode = data_mode
 
         self.__vertical = ImagePreprocessor.NAMING_CONVENTION_FOR_VERTICAL_TILE
         self.__horizontal = ImagePreprocessor.NAMING_CONVENTION_FOR_HORIZONTAL_TILE
@@ -126,14 +132,21 @@ class ImagePostprocessor:
 
     def get_all_filepaths_of_images_in_folder(self) -> List[str]:
         """
-        Returns: List of filepaths to all TIF, JPG and PNG images.
+        Returns: List of filepaths to all acceptable formats.
+        It may be either an image or a numpy file.
         """
-        img_paths = glob.glob(os.path.join(self.input_path, "*.tiff"))
-        img_paths += glob.glob(os.path.join(self.input_path, "*.jpg"))
-        img_paths += glob.glob(os.path.join(self.input_path, "*.png"))
-        img_paths.sort()
+        if self.data_mode == InputData.IMAGE:
+            tiles = glob.glob(os.path.join(self.input_path, "*.tif"))
+            tiles += glob.glob(os.path.join(self.input_path, "*.tiff"))
+            tiles += glob.glob(os.path.join(self.input_path, "*.jpg"))
+            tiles += glob.glob(os.path.join(self.input_path, "*.png"))
+        elif self.data_mode == InputData.NUMPY_TENSOR:
+            tiles = glob.glob(os.path.join(self.input_path, "*.npy"))
+        else:
+            raise ValueError(f"Invalid input file type.")
 
-        return img_paths
+        tiles.sort()
+        return tiles
 
     def __get_all_base_names_from_list_of_tiles(
         self, file_names: List[str]
