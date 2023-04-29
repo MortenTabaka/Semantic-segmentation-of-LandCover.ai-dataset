@@ -15,7 +15,7 @@ from src.data.image_preprocessing import ImagePreprocessor
 from src.features.dataset import get_normalized_class_balance_of_the_landcover_dataset
 
 
-class InputData(Enum):
+class DataMode(Enum):
     IMAGE = [".jpg", ".png", ".tiff", ".tif"]
     NUMPY_TENSOR = [".npy"]
 
@@ -60,7 +60,7 @@ class ImagePostprocessor:
         self,
         input_path: Union[str, Path],
         output_path: Union[str, Path],
-        data_mode: InputData = InputData.IMAGE,
+        data_mode: DataMode = DataMode.IMAGE,
     ):
         self.input_path = input_path
         self.output_path = output_path
@@ -135,12 +135,12 @@ class ImagePostprocessor:
         Returns: List of filepaths to all acceptable formats.
         It may be either an image or a numpy file.
         """
-        if self.data_mode == InputData.IMAGE:
+        if self.data_mode == DataMode.IMAGE:
             tiles = glob.glob(os.path.join(self.input_path, "*.tif"))
             tiles += glob.glob(os.path.join(self.input_path, "*.tiff"))
             tiles += glob.glob(os.path.join(self.input_path, "*.jpg"))
             tiles += glob.glob(os.path.join(self.input_path, "*.png"))
-        elif self.data_mode == InputData.NUMPY_TENSOR:
+        elif self.data_mode == DataMode.NUMPY_TENSOR:
             tiles = glob.glob(os.path.join(self.input_path, "*.npy"))
         else:
             raise ValueError(f"Invalid input file type.")
