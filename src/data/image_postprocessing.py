@@ -86,8 +86,8 @@ class ImagePostprocessor:
         self, base_name: str, tiles_filenames: List[str]
     ) -> np.array:
         tiles_filenames.sort()
-        img_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
-        img_shape = img_tile.shape
+        single_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
+        tile_shape = single_tile.shape
 
         (
             vertical_multiplicative,
@@ -96,9 +96,9 @@ class ImagePostprocessor:
 
         full_sized_tensor = np.zeros(
             (
-                vertical_multiplicative * img_shape[0],
-                horizontal_multiplicative * img_shape[1],
-                img_shape[2],
+                vertical_multiplicative * tile_shape[0],
+                horizontal_multiplicative * tile_shape[1],
+                tile_shape[2],
             ),
             dtype=np.uint8,
         )
@@ -115,19 +115,21 @@ class ImagePostprocessor:
                 if k >= num_of_tiles:
                     break
 
-                img_tile = self.read_from_disk(
+                single_tile = self.read_from_disk(
                     os.path.join(
                         self.input_path,
-                        f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg",
+                        f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}{self.data_mode.value[0]}",
                     )
                 )
                 full_sized_tensor[
-                    v * img_shape[0] : (v + 1) * img_shape[0],
-                    h * img_shape[1] : (h + 1) * img_shape[1],
+                    v * tile_shape[0] : (v + 1) * tile_shape[0],
+                    h * tile_shape[1] : (h + 1) * tile_shape[1],
                     :,
-                ] = img_tile
+                ] = single_tile
                 k += 1
-        output_filename = os.path.join(self.output_path, base_name + ".jpg")
+        output_filename = os.path.join(
+            self.output_path, f"{base_name}{self.data_mode.value[0]}"
+        )
         return output_filename, full_sized_tensor
 
     def get_all_filepaths_of_images_in_folder(self) -> List[str]:
