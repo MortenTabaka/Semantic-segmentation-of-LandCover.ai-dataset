@@ -94,7 +94,7 @@ class ImagePostprocessor:
             horizontal_multiplicative,
         ) = self.get_count_of_vertical_and_horizontal_tiles(tiles_filenames)
 
-        img = np.zeros(
+        full_sized_tensor = np.zeros(
             (
                 vertical_multiplicative * img_shape[0],
                 horizontal_multiplicative * img_shape[1],
@@ -115,20 +115,20 @@ class ImagePostprocessor:
                 if k >= num_of_tiles:
                     break
 
-                img_tile = cv2.imread(
+                img_tile = self.read_from_disk(
                     os.path.join(
                         self.input_path,
                         f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}.jpg",
                     )
                 )
-                img[
+                full_sized_tensor[
                     v * img_shape[0] : (v + 1) * img_shape[0],
                     h * img_shape[1] : (h + 1) * img_shape[1],
                     :,
                 ] = img_tile
                 k += 1
         output_filename = os.path.join(self.output_path, base_name + ".jpg")
-        return output_filename, img
+        return output_filename, full_sized_tensor
 
     def get_all_filepaths_of_images_in_folder(self) -> List[str]:
         """
@@ -192,6 +192,14 @@ class ImagePostprocessor:
             horizontal.append(num_horizontal_tiles)
 
         return max(vertical) + 1, max(horizontal) + 1
+
+    def read_from_disk(self, filename_absolute: Union[str, Path]):
+        if self.data_mode == DataMode.IMAGE:
+            return cv2.imread(filename_absolute)
+        elif self.data_mode == DataMode.NUMPY_TENSOR:
+            return np.load(filename_absolute)
+        else:
+            raise ValueError("Not supported data mode.")
 
 
 class SuperpixelsProcessor:
