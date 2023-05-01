@@ -5,6 +5,7 @@ from pathlib import Path
 from shutil import rmtree
 from typing import List, Union
 
+import PIL.Image
 import numpy as np
 import tensorflow as tf
 from cv2 import imread, imwrite
@@ -186,8 +187,8 @@ class PredictionPipeline:
         border_pixel_range: int = 50,
     ):
 
-        width = tf.shape(raw_mask)[1]
-        height = tf.shape(raw_mask)[0]
+        height = tf.shape(raw_mask)[1]
+        width = tf.shape(raw_mask)[2]
 
         # get exact shape as prediction since it may be smaller
         raw_image = raw_image[:height, :width, :]
@@ -211,8 +212,11 @@ class PredictionPipeline:
         )
 
         # TODO: Remove creating this test file
+        decoded_prediction = decode_segmentation_mask_to_rgb(
+            raw_mask, *self.__get_colormap_and_number_of_classes
+        )
         filename = os.path.join(self.output_folder, "test.jpg")
-        imwrite(filename, raw_mask)
+        decoded_prediction.save(filename)
 
     def __process_single_oriented_borders(
         self,
@@ -226,18 +230,22 @@ class PredictionPipeline:
         for border in range(num_borders):
             top_or_right = (border + 1) * self.tile_height + border_pixel_range
             bottom_or_left = (border + 1) * self.tile_height - border_pixel_range
-
-            raw_border_area, decoded_border_mask = self.__get_border_area(
+            raw_border_area, raw_border_prediction = self.__get_border_area(
                 raw_image, raw_prediction, orientation, top_or_right, bottom_or_left
             )
-
             post_processed_border = SuperpixelsProcessor(
                 raw_border_area, self.get_slic_parameters
-            ).get_updated_prediction_with_postprocessor_superpixels(raw_prediction, 0.3)
-            if orientation == "vertical":
-                raw_prediction[bottom_or_left:top_or_right, :] = post_processed_border
-            elif orientation == "horizontal":
-                raw_prediction[:, bottom_or_left:top_or_right] = post_processed_border
+            ).get_updated_prediction_with_postprocessor_superpixels(
+                raw_border_prediction, threshold=0.4
+            )
+            if orientation == "horizontal":
+                raw_prediction[
+                    :, bottom_or_left:top_or_right, :
+                ] = post_processed_border
+            elif orientation == "vertical":
+                raw_prediction[
+                    :, :, bottom_or_left:top_or_right
+                ] = post_processed_border
             else:
                 raise ValueError("Pick correct which border to process.")
         return raw_prediction
@@ -334,7 +342,7 @@ class PredictionPipeline:
     @staticmethod
     def __get_border_area(
         raw_image,
-        decoded_mask,
+        raw_mask,
         orientation: str,
         top_or_right: int,
         bottom_or_left: int,
@@ -342,12 +350,12 @@ class PredictionPipeline:
         if orientation == "horizontal":
             return (
                 raw_image[bottom_or_left:top_or_right, :],
-                decoded_mask[bottom_or_left:top_or_right, :],
+                raw_mask[:, bottom_or_left:top_or_right, :],
             )
         elif orientation == "vertical":
             return (
                 raw_image[:, bottom_or_left:top_or_right],
-                decoded_mask[:, bottom_or_left:top_or_right],
+                raw_mask[:, :, bottom_or_left:top_or_right],
             )
         else:
             raise ValueError("Pick correct which border to process.")

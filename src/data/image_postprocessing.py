@@ -72,7 +72,6 @@ class ImagePostprocessor:
     def concatenate_all_tiles(self):
         img_filenames = sorted(os.listdir(self.input_path))
         base_names = self.__get_all_base_names_from_list_of_tiles(img_filenames)
-        print(base_names)
         separated_tiles_according_to_base_name = (
             self.__get_tiles_according_its_base_name(base_names, img_filenames)
         )
@@ -122,7 +121,6 @@ class ImagePostprocessor:
                 ),
                 dtype=np.uint8,
             )
-            print(np.shape(full_sized_tensor))
         else:
             raise ValueError("Not supported data mode.")
 
@@ -318,8 +316,6 @@ class SuperpixelsProcessor:
             tensor contains integer values representing the segment labels (superpixel
             indices) assigned to each pixel in the image.
         """
-        # print(f"self.raw_image = {self.raw_image}")
-        # print(f"type = {type(self.raw_image)}")
         segments = slic(
             self.raw_image,
             **self.params_of_superpixels_postprocessing,
