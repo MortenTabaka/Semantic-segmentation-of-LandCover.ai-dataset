@@ -3,9 +3,9 @@ from typing import List, Union
 import tensorflow as tf
 
 from src.features.model_features import (
-    update_yaml_revision,
-    revision_a_model,
     load_data_for_revision,
+    revision_a_model,
+    update_yaml_revision,
 )
 from src.models.architectures import (
     deeplabv3plus,

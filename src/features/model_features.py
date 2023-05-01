@@ -1,8 +1,8 @@
 import os
 from typing import Dict, List, Tuple, Union
 
-from numpy import array, stack, uint8, zeros_like, logical_and
-from tensorflow import keras, convert_to_tensor, Tensor, expand_dims
+from numpy import array, logical_and, stack, uint8, zeros_like
+from tensorflow import Tensor, convert_to_tensor, expand_dims, keras
 from tensorflow import uint8 as tf_uint8
 from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
