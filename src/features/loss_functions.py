@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
-from keras.losses import binary_crossentropy, BinaryCrossentropy
+from keras.losses import BinaryCrossentropy, binary_crossentropy
 
 from src.features.data_features import MaskFeatures
 
@@ -190,7 +190,7 @@ class SemanticSegmentationLoss(object):
 
     def jacard_loss(self, y_true, y_pred):
         """
-         Intersection-Over-Union (IoU), also known as the Jaccard loss
+        Intersection-Over-Union (IoU), also known as the Jaccard loss
         """
         return 1 - self.jacard_similarity(y_true, y_pred)
 
@@ -256,7 +256,7 @@ class SemanticSegmentationLoss(object):
     @staticmethod
     def jacard_similarity(y_true, y_pred):
         """
-         Intersection-Over-Union (IoU), also known as the Jaccard Index
+        Intersection-Over-Union (IoU), also known as the Jaccard Index
         """
         y_true_f = K.flatten(y_true)
         y_pred_f = K.flatten(y_pred)

@@ -10,11 +10,11 @@ https://ericbassett.tech/cookiecutter-data-science-crash-course/
 """
 
 import glob
+import multiprocessing as mp
 import os
 import os.path
 from pathlib import Path
 from typing import Union
-import multiprocessing as mp
 
 import cv2
 

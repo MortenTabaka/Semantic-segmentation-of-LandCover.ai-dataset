@@ -10,3 +10,4 @@ tqdm
 requests
 PyYAML
 typer
+scikit-image

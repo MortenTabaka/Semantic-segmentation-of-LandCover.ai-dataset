@@ -1,8 +1,9 @@
 import os
 from typing import Dict, List, Tuple, Union
 
-from numpy import array, stack, uint8, zeros_like
-from tensorflow import keras
+from numpy import array, logical_and, stack, uint8, zeros_like
+from tensorflow import Tensor, convert_to_tensor, expand_dims, keras
+from tensorflow import uint8 as tf_uint8
 from tensorflow.keras.preprocessing.image import array_to_img
 from yaml import dump, safe_load
 
@@ -136,7 +137,7 @@ def load_data_for_revision(model_key):
 
 
 def decode_segmentation_mask_to_rgb(
-    mask, custom_colormap, num_classes: int = 5
+    mask, custom_colormap: List[int], num_classes: int = 5
 ) -> array:
     """
     Transforms Landcover dataset's masks to RGB image.
@@ -164,6 +165,27 @@ def decode_segmentation_mask_to_rgb(
     rgb = stack([r, g, b], axis=2)
     image = array_to_img(rgb)
     return image
+
+
+def encode_segmentation_mask_to_logits(rgb_mask, custom_colormap: List[int]) -> Tensor:
+    # Extract the R, G, B channels
+    r = rgb_mask[:, :, 0]
+    g = rgb_mask[:, :, 1]
+    b = rgb_mask[:, :, 2]
+
+    # Determine the class labels using the custom color map
+    num_classes = len(custom_colormap)
+    mask = zeros_like(r)
+    for i in range(num_classes):
+        idx = logical_and(
+            r == custom_colormap[i][0],
+            logical_and(g == custom_colormap[i][1], b == custom_colormap[i][2]),
+        )
+        mask[idx] = i
+
+    mask_tensor = convert_to_tensor(mask, dtype=tf_uint8)
+    mask_tensor = expand_dims(mask_tensor, axis=0)
+    return mask_tensor
 
 
 def update_yaml_revision(model_revision: str, to_add: dict):
