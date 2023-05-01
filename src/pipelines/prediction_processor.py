@@ -58,11 +58,12 @@ class PredictionPipeline:
         number_of_superpixels: int = None,
         compactness: float = None,
         superpixel_threshold: float = None,
+        border_sp: bool = True,
         border_sp_count: int = None,
         border_compactness: float = None,
         border_sp_thresh: float = None,
         border_sp_class_balance: bool = False,
-        border_sp_pixel_range: int = 50
+        border_sp_pixel_range: int = 50,
     ):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -86,13 +87,14 @@ class PredictionPipeline:
         self.compactness = compactness
         self.superpixel_threshold = superpixel_threshold
 
+        self.border_sp = border_sp
         self.border_compactness = border_compactness
         self.border_sp_count = border_sp_count
         self.border_sp_thresh = border_sp_thresh
         self.border_sp_class_balance = border_sp_class_balance
         self.border_sp_pixel_range = border_sp_pixel_range
 
-    def process(self, postprocess_boundaries: bool, clear_cache: bool = True):
+    def process(self, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
         InteractiveSession(config=config)
@@ -107,21 +109,21 @@ class PredictionPipeline:
         predicted_tiles = os.path.join(self.output_folder, ".cache/prediction_tiles")
         self.__concatenate_tiles(predicted_tiles)
 
-        if postprocess_boundaries:
+        if self.border_sp:
             ImagePostprocessor(
-                os.path.join(self.output_folder, ".cache/logits_prediction_tensors"),
+                os.path.join(self.output_folder, ".cache/prediction_numpy_tensors"),
                 self.output_folder,
                 DataMode.NUMPY_TENSOR,
             ).concatenate_all_tiles()
 
-            for raw_image, raw_mask in zip(
+            for raw_image_filepath, raw_mask_filepath in zip(
                 self.__get_full_size_raw_images,
                 sorted(glob(path.join(self.output_folder, "*.npy"))),
             ):
-                raw_image = imread(raw_image)
-                raw_mask = np.load(raw_mask)
+                raw_image = imread(raw_image_filepath)
+                raw_mask = np.load(raw_mask_filepath)
                 self.__postprocess_tiles_borders_in_concatenated_prediction(
-                    raw_image, raw_mask
+                    raw_image, raw_mask, os.path.basename(raw_image_filepath)
                 )
 
         if clear_cache:
@@ -175,7 +177,7 @@ class PredictionPipeline:
     def __save_prediction_tensor_in_numpy_file(
         self, prediction: tf.Tensor, file_name: str
     ):
-        save_to = path.join(self.output_folder, ".cache/logits_prediction_tensors")
+        save_to = path.join(self.output_folder, ".cache/prediction_numpy_tensors")
         os.makedirs(save_to, exist_ok=True)
         file_name = file_name.replace(".jpg", ".npy")
         file_path = os.path.join(save_to, file_name)
@@ -192,9 +194,7 @@ class PredictionPipeline:
         return self.image_features.load_image_from_drive(filepath)
 
     def __postprocess_tiles_borders_in_concatenated_prediction(
-        self,
-        raw_image,
-        raw_mask,
+        self, raw_image, raw_mask, base_name: str
     ):
 
         height = tf.shape(raw_mask)[1]
@@ -221,12 +221,13 @@ class PredictionPipeline:
             self.border_sp_pixel_range,
         )
 
-        # TODO: Remove creating this test file
         decoded_prediction = decode_segmentation_mask_to_rgb(
             raw_mask, *self.__get_colormap_and_number_of_classes
         )
-        filename = os.path.join(self.output_folder, "test.jpg")
-        decoded_prediction.save(filename)
+
+        filename = self.__generate_filename_with_sp_params(base_name)
+        filepath = os.path.join(self.output_folder, filename)
+        decoded_prediction.save(filepath)
 
     def __process_single_oriented_borders(
         self,
@@ -271,6 +272,27 @@ class PredictionPipeline:
             ]
         for path_to_remove in paths:
             rmtree(path_to_remove)
+
+    def __generate_filename_with_sp_params(self, base_name: str):
+        filename = f"{base_name}".replace(".jpg", "")
+        if self.tiles_superpixel_postprocessing:
+            filename += (
+                f"__SpTiles_spCount{self.number_of_superpixels}_spThresh{self.superpixel_threshold}"
+                f"__spCompactness{self.compactness}"
+            )
+        else:
+            filename = f"{filename}_NoTilesSuperPixelsProcessing"
+
+        if self.border_sp:
+            filename += (
+                f"__SpBorders_spBorderCount{self.border_sp_count}_spBorderThresh{self.border_sp_thresh}"
+                f"_spBorderCompactness{self.border_compactness}_spBorderCB{self.border_sp_class_balance}"
+                f"_spBorderRange{self.border_sp_pixel_range}"
+            )
+        else:
+            filename = f"{filename}__NoBordersSuperPixelsProcessing"
+
+        return f"{filename}.jpg"
 
     @property
     def get_slic_parameters(self):

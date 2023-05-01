@@ -33,7 +33,9 @@ def main(
     sp_count: int = typer.Option(200, min=0),
     sp_compactness: float = typer.Option(10, min=0),
     sp_thresh: float = typer.Option(0.7, min=0, max=1),
-    postprocess_boundaries: bool = typer.Option(True),
+    border_sp: bool = typer.Option(
+        True, help="If should post-process tile boundaries with SuperPixels algorithm"
+    ),
     border_sp_count: int = typer.Option(
         50, min=0, help="Will be multiplied by number of borders in single strip"
     ),
@@ -71,12 +73,13 @@ def main(
         number_of_superpixels=sp_count,
         compactness=sp_compactness,
         superpixel_threshold=sp_thresh,
+        border_sp=border_sp,
         border_sp_count=border_sp_count,
         border_compactness=border_compactness,
         border_sp_thresh=border_sp_thresh,
         border_sp_class_balance=border_sp_class_balance,
         border_sp_pixel_range=border_sp_pixel_range,
-    ).process(postprocess_boundaries, clear_cache)
+    ).process(clear_cache)
 
 
 if __name__ == "__main__":
