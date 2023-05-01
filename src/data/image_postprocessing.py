@@ -80,14 +80,26 @@ class ImagePostprocessor:
         for base_name, filenames in zip(
             base_names, separated_tiles_according_to_base_name
         ):
-            cv2.imwrite(*self.get_concatenated_filename_and_image(base_name, filenames))
+            output_filename, full_sized_tensor = self.get_concatenated_filename_and_image(base_name, filenames)
+            if self.data_mode == DataMode.IMAGE:
+                cv2.imwrite(output_filename, full_sized_tensor)
+            elif self.data_mode == DataMode.NUMPY_TENSOR:
+                np.save(output_filename, full_sized_tensor)
+            else:
+                raise ValueError("Not supported data mode.")
 
     def get_concatenated_filename_and_image(
         self, base_name: str, tiles_filenames: List[str]
     ) -> np.array:
         tiles_filenames.sort()
-        single_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
-        tile_shape = single_tile.shape
+        if self.data_mode == DataMode.IMAGE:
+            single_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
+            tile_shape = single_tile.shape
+        elif self.data_mode == DataMode.NUMPY_TENSOR:
+            single_tile = np.load(os.path.join(self.input_path, tiles_filenames[0]))
+            tile_shape = np.shape(single_tile)
+        else:
+            raise ValueError("Not supported data mode.")
 
         (
             vertical_multiplicative,

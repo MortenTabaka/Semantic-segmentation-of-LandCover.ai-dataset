@@ -4,19 +4,22 @@ from os import path
 from pathlib import Path
 from shutil import rmtree
 from typing import List, Union
-from tqdm import tqdm
 
 import numpy as np
-from cv2 import imread, imwrite
 import tensorflow as tf
+from cv2 import imread, imwrite
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
+from tqdm import tqdm
 
-from src.data.image_postprocessing import ImagePostprocessor, SuperpixelsProcessor
+from src.data.image_postprocessing import (
+    ImagePostprocessor,
+    SuperpixelsProcessor,
+    DataMode,
+)
 from src.data.image_preprocessing import ImagePreprocessor
 from src.features.data_features import ImageFeatures
 from src.features.model_features import (
     decode_segmentation_mask_to_rgb,
-    encode_segmentation_mask_to_logits,
 )
 from src.features.utils import generate_colormap
 from src.models.predict_model import Predictor
@@ -93,14 +96,20 @@ class PredictionPipeline:
         self.__concatenate_tiles(predicted_tiles)
 
         if postprocess_boundaries:
-            for raw_image, mask in zip(
+            ImagePostprocessor(
+                os.path.join(self.output_folder, ".cache/logits_prediction_tensors"),
+                self.output_folder,
+                DataMode.NUMPY_TENSOR,
+            ).concatenate_all_tiles()
+
+            for raw_image, raw_mask in zip(
                 self.__get_full_size_raw_images,
-                self.__get_full_size_masks,
+                sorted(glob(path.join(self.output_folder, "*.npy"))),
             ):
                 raw_image = imread(raw_image)
-                mask = imread(mask)
+                raw_mask = np.load(raw_mask)
                 self.__postprocess_tiles_borders_in_concatenated_prediction(
-                    raw_image, mask
+                    raw_image, raw_mask
                 )
 
         if clear_cache:
@@ -121,12 +130,13 @@ class PredictionPipeline:
             prediction = tf.argmax(
                 self.prediction_model.predict(np.array([preprocessed_tile])), axis=-1
             )
-            self.__save_prediction_tensor_in_numpy_file(prediction, file_name)
 
             if self.tiles_superpixel_postprocessing:
                 prediction = self.__get_superpixel_post_processed_tile_prediction(
                     tile, prediction
                 )
+
+            self.__save_prediction_tensor_in_numpy_file(prediction, file_name)
 
             decoded_prediction = decode_segmentation_mask_to_rgb(
                 prediction, *self.__get_colormap_and_number_of_classes
@@ -170,36 +180,37 @@ class PredictionPipeline:
     def __postprocess_tiles_borders_in_concatenated_prediction(
         self,
         raw_image,
-        decoded_mask,
+        raw_mask,
         border_pixel_range: int = 50,
     ):
 
-        width = tf.shape(decoded_mask)[1]
-        height = tf.shape(decoded_mask)[0]
+        width = tf.shape(raw_mask)[1]
+        height = tf.shape(raw_mask)[0]
 
         # get exact shape as prediction since it may be smaller
         raw_image = raw_image[:height, :width, :]
         num_vertical_borders = int(width / self.tile_height) - 1
         num_horizontal_borders = int(height / self.tile_width) - 1
 
-        decoded_mask = self.__process_single_oriented_borders(
+        raw_mask = self.__process_single_oriented_borders(
             raw_image,
-            decoded_mask,
+            raw_mask,
             "vertical",
             num_vertical_borders,
             border_pixel_range,
         )
 
-        decoded_mask = self.__process_single_oriented_borders(
+        raw_mask = self.__process_single_oriented_borders(
             raw_image,
-            decoded_mask,
+            raw_mask,
             "horizontal",
             num_horizontal_borders,
             border_pixel_range,
         )
 
+        # TODO: Remove creating this test file
         filename = os.path.join(self.output_folder, "test.jpg")
-        imwrite(filename, decoded_mask)
+        imwrite(filename, raw_mask)
 
     def __process_single_oriented_borders(
         self,
@@ -220,9 +231,7 @@ class PredictionPipeline:
 
             post_processed_border = SuperpixelsProcessor(
                 raw_border_area, self.get_slic_parameters
-            ).get_updated_prediction_with_postprocessor_superpixels(
-                raw_prediction, 0.3
-            )
+            ).get_updated_prediction_with_postprocessor_superpixels(raw_prediction, 0.3)
             post_processed_border = decode_segmentation_mask_to_rgb(
                 post_processed_border, *self.__get_colormap_and_number_of_classes
             )
@@ -309,10 +318,6 @@ class PredictionPipeline:
         else:
             custom_colormap = generate_colormap(num_classes)
         return custom_colormap, num_classes
-
-    @property
-    def __get_full_size_masks(self) -> List[str]:
-        return sorted(glob(path.join(self.output_folder, "*.jpg")))
 
     @property
     def __get_full_size_raw_images(self) -> List[str]:
