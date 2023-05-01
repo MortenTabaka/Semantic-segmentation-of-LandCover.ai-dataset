@@ -1,5 +1,5 @@
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 
 import typer
 
@@ -29,11 +29,22 @@ def main(
         help="Pick which weights load",
         show_choices=True,
     ),
-    superpixel_postprocessing: bool = typer.Option(False),
-    number_of_superpixels: int = typer.Option(200, min=0),
-    compactness: float = typer.Option(10, min=0),
-    superpixel_threshold: float = typer.Option(0.7, min=0, max=1),
+    sp_post_processing: bool = typer.Option(False),
+    sp_count: int = typer.Option(200, min=0),
+    sp_compactness: float = typer.Option(10, min=0),
+    sp_thresh: float = typer.Option(0.7, min=0, max=1),
     postprocess_boundaries: bool = typer.Option(True),
+    border_sp_count: int = typer.Option(
+        50, min=0, help="Will be multiplied by number of borders in single strip"
+    ),
+    border_compactness: float = typer.Option(10, min=0),
+    border_sp_thresh: float = typer.Option(0.3, min=0, max=1),
+    border_sp_class_balance: bool = typer.Option(False),
+    border_sp_pixel_range: int = typer.Option(
+        50,
+        min=1,
+        help="Strip width in single direction. Stripe width will be double of the value.",
+    ),
     clear_cache: bool = typer.Option(True),
     input_folder: Path = typer.Option(
         get_absolute_path_to_project_location("models/custom_data/input"),
@@ -56,10 +67,15 @@ def main(
         input_folder=input_folder,
         output_folder=output_folder,
         which_metric_best_weights_to_load=weights,
-        tiles_superpixel_postprocessing=superpixel_postprocessing,
-        number_of_superpixels=number_of_superpixels,
-        compactness=compactness,
-        superpixel_threshold=superpixel_threshold,
+        tiles_superpixel_postprocessing=sp_post_processing,
+        number_of_superpixels=sp_count,
+        compactness=sp_compactness,
+        superpixel_threshold=sp_thresh,
+        border_sp_count=border_sp_count,
+        border_compactness=border_compactness,
+        border_sp_thresh=border_sp_thresh,
+        border_sp_class_balance=border_sp_class_balance,
+        border_sp_pixel_range=border_sp_pixel_range,
     ).process(postprocess_boundaries, clear_cache)
 
 

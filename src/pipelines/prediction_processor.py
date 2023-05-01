@@ -58,6 +58,11 @@ class PredictionPipeline:
         number_of_superpixels: int = None,
         compactness: float = None,
         superpixel_threshold: float = None,
+        border_sp_count: int = None,
+        border_compactness: float = None,
+        border_sp_thresh: float = None,
+        border_sp_class_balance: bool = False,
+        border_sp_pixel_range: int = 50
     ):
         self.input_folder = input_folder
         self.output_folder = output_folder
@@ -80,6 +85,12 @@ class PredictionPipeline:
         self.number_of_superpixels = number_of_superpixels
         self.compactness = compactness
         self.superpixel_threshold = superpixel_threshold
+
+        self.border_compactness = border_compactness
+        self.border_sp_count = border_sp_count
+        self.border_sp_thresh = border_sp_thresh
+        self.border_sp_class_balance = border_sp_class_balance
+        self.border_sp_pixel_range = border_sp_pixel_range
 
     def process(self, postprocess_boundaries: bool, clear_cache: bool = True):
         config = ConfigProto()
@@ -184,7 +195,6 @@ class PredictionPipeline:
         self,
         raw_image,
         raw_mask,
-        border_pixel_range: int = 50,
     ):
 
         height = tf.shape(raw_mask)[1]
@@ -200,7 +210,7 @@ class PredictionPipeline:
             raw_mask,
             "vertical",
             num_vertical_borders,
-            border_pixel_range,
+            self.border_sp_pixel_range,
         )
 
         raw_mask = self.__process_single_oriented_borders(
@@ -208,7 +218,7 @@ class PredictionPipeline:
             raw_mask,
             "horizontal",
             num_horizontal_borders,
-            border_pixel_range,
+            self.border_sp_pixel_range,
         )
 
         # TODO: Remove creating this test file
@@ -226,6 +236,7 @@ class PredictionPipeline:
         num_borders: int,
         border_pixel_range: int,
     ):
+        slic_params_for_border = self.get_border_slic_parameters(num_borders)
 
         for border in range(num_borders):
             top_or_right = (border + 1) * self.tile_height + border_pixel_range
@@ -234,9 +245,11 @@ class PredictionPipeline:
                 raw_image, raw_prediction, orientation, top_or_right, bottom_or_left
             )
             post_processed_border = SuperpixelsProcessor(
-                raw_border_area, self.get_slic_parameters
+                raw_border_area, slic_params_for_border
             ).get_updated_prediction_with_postprocessor_superpixels(
-                raw_border_prediction, threshold=0.4
+                raw_border_prediction,
+                threshold=self.border_sp_thresh,
+                should_class_balance=self.border_sp_class_balance,
             )
             if orientation == "horizontal":
                 raw_prediction[
@@ -298,6 +311,23 @@ class PredictionPipeline:
         return {
             "n_segments": self.number_of_superpixels,
             "compactness": self.compactness,
+            "max_iter": 10,
+            "sigma": 0,
+            "spacing": None,
+            "multichannel": True,
+            "convert2lab": None,
+            "enforce_connectivity": True,
+            "min_size_factor": 0.5,
+            "max_size_factor": 3,
+            "slic_zero": False,
+            "start_label": 0,
+            "mask": None,
+        }
+
+    def get_border_slic_parameters(self, number_of_tiles: int) -> dict:
+        return {
+            "n_segments": self.border_sp_count * number_of_tiles,
+            "compactness": self.border_compactness,
             "max_iter": 10,
             "sigma": 0,
             "spacing": None,
