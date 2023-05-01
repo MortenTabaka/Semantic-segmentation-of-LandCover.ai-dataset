@@ -171,7 +171,9 @@ class PredictionPipeline:
 
     def __concatenate_tiles(self, input_folder):
         ImagePostprocessor(
-            input_path=input_folder, output_path=self.output_folder
+            input_path=input_folder,
+            output_path=self.output_folder,
+            data_mode=DataMode.IMAGE,
         ).concatenate_all_tiles()
 
     def __get_image_for_prediction(self, filepath: str):
@@ -232,12 +234,9 @@ class PredictionPipeline:
             post_processed_border = SuperpixelsProcessor(
                 raw_border_area, self.get_slic_parameters
             ).get_updated_prediction_with_postprocessor_superpixels(raw_prediction, 0.3)
-            post_processed_border = decode_segmentation_mask_to_rgb(
-                post_processed_border, *self.__get_colormap_and_number_of_classes
-            )
-            if orientation == "horizontal":
+            if orientation == "vertical":
                 raw_prediction[bottom_or_left:top_or_right, :] = post_processed_border
-            elif orientation == "vertical":
+            elif orientation == "horizontal":
                 raw_prediction[:, bottom_or_left:top_or_right] = post_processed_border
             else:
                 raise ValueError("Pick correct which border to process.")

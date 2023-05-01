@@ -80,7 +80,10 @@ class ImagePostprocessor:
         for base_name, filenames in zip(
             base_names, separated_tiles_according_to_base_name
         ):
-            output_filename, full_sized_tensor = self.get_concatenated_filename_and_image(base_name, filenames)
+            (
+                output_filename,
+                full_sized_tensor,
+            ) = self.get_concatenated_filename_and_image(base_name, filenames)
             if self.data_mode == DataMode.IMAGE:
                 cv2.imwrite(output_filename, full_sized_tensor)
             elif self.data_mode == DataMode.NUMPY_TENSOR:
@@ -92,28 +95,36 @@ class ImagePostprocessor:
         self, base_name: str, tiles_filenames: List[str]
     ) -> np.array:
         tiles_filenames.sort()
-        if self.data_mode == DataMode.IMAGE:
-            single_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
-            tile_shape = single_tile.shape
-        elif self.data_mode == DataMode.NUMPY_TENSOR:
-            single_tile = np.load(os.path.join(self.input_path, tiles_filenames[0]))
-            tile_shape = np.shape(single_tile)
-        else:
-            raise ValueError("Not supported data mode.")
-
         (
             vertical_multiplicative,
             horizontal_multiplicative,
         ) = self.get_count_of_vertical_and_horizontal_tiles(tiles_filenames)
 
-        full_sized_tensor = np.zeros(
-            (
-                vertical_multiplicative * tile_shape[0],
-                horizontal_multiplicative * tile_shape[1],
-                tile_shape[2],
-            ),
-            dtype=np.uint8,
-        )
+        if self.data_mode == DataMode.IMAGE:
+            single_tile = cv2.imread(os.path.join(self.input_path, tiles_filenames[0]))
+            tile_shape = single_tile.shape
+            full_sized_tensor = np.zeros(
+                (
+                    vertical_multiplicative * tile_shape[0],
+                    horizontal_multiplicative * tile_shape[1],
+                    tile_shape[2],
+                ),
+                dtype=np.uint8,
+            )
+        elif self.data_mode == DataMode.NUMPY_TENSOR:
+            single_tile = np.load(os.path.join(self.input_path, tiles_filenames[0]))
+            tile_shape = np.shape(single_tile)
+            full_sized_tensor = np.zeros(
+                (
+                    tile_shape[0],
+                    vertical_multiplicative * tile_shape[1],
+                    horizontal_multiplicative * tile_shape[2],
+                ),
+                dtype=np.uint8,
+            )
+            print(np.shape(full_sized_tensor))
+        else:
+            raise ValueError("Not supported data mode.")
 
         num_of_tiles = len(tiles_filenames)
 
@@ -133,11 +144,19 @@ class ImagePostprocessor:
                         f"{base_name}_{self.__vertical}{v}_{self.__horizontal}{h}{self.data_mode.value[0]}",
                     )
                 )
-                full_sized_tensor[
-                    v * tile_shape[0] : (v + 1) * tile_shape[0],
-                    h * tile_shape[1] : (h + 1) * tile_shape[1],
+                if self.data_mode == DataMode.IMAGE:
+                    full_sized_tensor[
+                        v * tile_shape[0] : (v + 1) * tile_shape[0],
+                        h * tile_shape[1] : (h + 1) * tile_shape[1],
+                        :,
+                    ] = single_tile
+                elif self.data_mode == DataMode.NUMPY_TENSOR:
+                    full_sized_tensor[
                     :,
-                ] = single_tile
+                    v * tile_shape[1]: (v + 1) * tile_shape[1],
+                    h * tile_shape[2]: (h + 1) * tile_shape[2],
+                    ] = single_tile
+
                 k += 1
         output_filename = os.path.join(
             self.output_path, f"{base_name}{self.data_mode.value[0]}"
