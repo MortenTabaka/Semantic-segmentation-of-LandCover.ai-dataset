@@ -227,7 +227,7 @@ class PredictionPipeline:
 
         filename = self.__generate_filename_with_sp_params(base_name)
         filepath = os.path.join(self.output_folder, filename)
-        decoded_prediction.save(filepath)
+        decoded_prediction.save(filepath, quality=100)
 
     def __process_single_oriented_borders(
         self,
@@ -277,22 +277,23 @@ class PredictionPipeline:
         filename = f"{base_name}".replace(".jpg", "")
         if self.tiles_superpixel_postprocessing:
             filename += (
-                f"__SpTiles_spCount{self.number_of_superpixels}_spThresh{self.superpixel_threshold}"
-                f"__spCompactness{self.compactness}"
+                f"--SpTiles_spCount{self.number_of_superpixels}-spThresh{self.superpixel_threshold}"
+                f"--spCompactness{self.compactness}"
             )
         else:
-            filename = f"{filename}_NoTilesSuperPixelsProcessing"
+            filename = f"{filename}-NoTilesSuperPixelsProcessing"
 
         if self.border_sp:
             filename += (
-                f"__SpBorders_spBorderCount{self.border_sp_count}_spBorderThresh{self.border_sp_thresh}"
-                f"_spBorderCompactness{self.border_compactness}_spBorderCB{self.border_sp_class_balance}"
-                f"_spBorderRange{self.border_sp_pixel_range}"
+                f"--SpBorders_spBorderCount{self.border_sp_count}-spBorderThresh{self.border_sp_thresh}"
+                f"-spBorderCompactness{self.border_compactness}-spBorderCB{self.border_sp_class_balance}"
+                f"-spBorderRange{self.border_sp_pixel_range}"
             )
         else:
-            filename = f"{filename}__NoBordersSuperPixelsProcessing"
+            filename = f"{filename}--NoBordersSuperPixelsProcessing"
 
-        return f"{filename}.jpg"
+        filename = f"{filename}".replace(".", "_")
+        return f"{filename}.tiff"
 
     @property
     def get_slic_parameters(self):
