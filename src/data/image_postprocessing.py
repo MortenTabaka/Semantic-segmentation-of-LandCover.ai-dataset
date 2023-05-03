@@ -150,9 +150,9 @@ class ImagePostprocessor:
                     ] = single_tile
                 elif self.data_mode == DataMode.NUMPY_TENSOR:
                     full_sized_tensor[
-                    :,
-                    v * tile_shape[1]: (v + 1) * tile_shape[1],
-                    h * tile_shape[2]: (h + 1) * tile_shape[2],
+                        :,
+                        v * tile_shape[1] : (v + 1) * tile_shape[1],
+                        h * tile_shape[2] : (h + 1) * tile_shape[2],
                     ] = single_tile
 
                 k += 1
@@ -280,7 +280,7 @@ class SuperpixelsProcessor:
             if should_class_balance:
                 counts = tf.cast(counts, dtype=tf.float32)
                 num_classes = len(counts)
-                counts = counts / class_balance[num_classes - 1]
+                counts = [counts[i] / class_balance[i] for i in range(num_classes)]
 
             # Find the index of the most often repeated value
             most_frequent_value_index = tf.math.argmax(counts)
@@ -289,8 +289,6 @@ class SuperpixelsProcessor:
             number_of_all_pixels_in_segment = tf.reduce_sum(counts)
             most_frequent_count = counts[most_frequent_value_index].numpy()
             ratio = most_frequent_count / number_of_all_pixels_in_segment
-
-            road_class_pixel_count = counts[-1]
 
             if ratio >= threshold:
                 # Get the most often repeated value
