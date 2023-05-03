@@ -294,7 +294,7 @@ class SuperpixelsProcessor:
                 # Get the most often repeated value
                 most_frequent_class_in_tile_segment = most_frequent_value_index.numpy()
                 # Create a tensor of ones with the shape of indices
-                ones = tf.ones((tf.shape(indices)[0],), dtype=tf.uint8)
+                ones = tf.ones((tf.shape(indices)[0],), dtype=tf.int64)
                 # Multiply the ones tensor by max_value
                 updates = ones * most_frequent_class_in_tile_segment
                 # Update the not_decoded_prediction tensor
