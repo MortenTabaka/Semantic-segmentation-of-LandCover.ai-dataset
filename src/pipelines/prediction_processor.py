@@ -58,6 +58,7 @@ class PredictionPipeline:
         number_of_superpixels: int = None,
         compactness: float = None,
         superpixel_threshold: float = None,
+        sp_class_balance: bool = False,
         border_sp: bool = True,
         border_sp_count: int = None,
         border_compactness: float = None,
@@ -86,6 +87,7 @@ class PredictionPipeline:
         self.number_of_superpixels = number_of_superpixels
         self.compactness = compactness
         self.superpixel_threshold = superpixel_threshold
+        self.sp_class_balance = sp_class_balance
 
         self.border_sp = border_sp
         self.border_compactness = border_compactness
@@ -164,7 +166,7 @@ class PredictionPipeline:
         prediction = SuperpixelsProcessor(
             image, self.get_slic_parameters
         ).get_updated_prediction_with_postprocessor_superpixels(
-            prediction, self.superpixel_threshold
+            prediction, self.superpixel_threshold, self.sp_class_balance
         )
         return prediction
 
@@ -278,7 +280,7 @@ class PredictionPipeline:
         if self.tiles_superpixel_postprocessing:
             filename += (
                 f"--SpTiles_spCount{self.number_of_superpixels}-spThresh{self.superpixel_threshold}"
-                f"--spCompactness{self.compactness}"
+                f"--spCompactness{self.compactness}--spCB{self.sp_class_balance}"
             )
         else:
             filename = f"{filename}-NoTilesSuperPixelsProcessing"
