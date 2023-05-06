@@ -3,12 +3,12 @@ import os
 import os.path
 from enum import Enum
 from pathlib import Path
-from typing import List, Union
+from typing import Any, List, Union, Tuple
 
 import cv2
 import numpy as np
 import tensorflow as tf
-from skimage.segmentation import slic
+from skimage.segmentation import mark_boundaries, slic
 from tqdm import tqdm
 
 from src.data.image_preprocessing import ImagePreprocessor
@@ -243,7 +243,7 @@ class SuperpixelsProcessor:
         not_decoded_prediction: tf.Tensor,
         threshold: float,
         should_class_balance: bool = False,
-    ):
+    ) -> Tuple[tf.Tensor, Any]:
         """
         Update the prediction for each superpixel segment in a not-decoded predicted tile.
 
@@ -264,7 +264,7 @@ class SuperpixelsProcessor:
             contains integer values representing the updated predicted classes for each pixel
             in the tile, after considering the most frequent class within each superpixel segment.
         """
-        superpixel_segments = self.get_superpixel_segments()
+        superpixel_segments, raw_segments = self.get_superpixel_segments()
         num_of_segments = self.get_number_of_segments(superpixel_segments)
         class_balance = get_normalized_class_balance_of_the_landcover_dataset()
 
@@ -301,9 +301,14 @@ class SuperpixelsProcessor:
                 not_decoded_prediction = tf.tensor_scatter_nd_update(
                     not_decoded_prediction, indices, updates
                 )
-        return not_decoded_prediction
 
-    def get_superpixel_segments(self) -> tf.Tensor:
+        raw_image_with_marked_boundaries = mark_boundaries(
+            self.raw_image, raw_segments, color=(0, 1, 1)
+        )
+
+        return not_decoded_prediction, raw_image_with_marked_boundaries
+
+    def get_superpixel_segments(self) -> Tuple:
         """
         Generates superpixel segments for an input image using the Simple Linear
         Iterative Clustering (SLIC) algorithm.
@@ -314,16 +319,16 @@ class SuperpixelsProcessor:
             tensor contains integer values representing the segment labels (superpixel
             indices) assigned to each pixel in the image.
         """
-        segments = slic(
+        raw_segments = slic(
             self.raw_image,
             **self.params_of_superpixels_postprocessing,
         )
-        segments = tf.convert_to_tensor(segments)
+        segments = tf.convert_to_tensor(raw_segments)
         segments = tf.reshape(
             segments,
             (1, segments.shape[0], segments.shape[1]),
         )
-        return segments
+        return segments, raw_segments
 
     @staticmethod
     def get_number_of_segments(superpixel_segments: tf.Tensor) -> int:
