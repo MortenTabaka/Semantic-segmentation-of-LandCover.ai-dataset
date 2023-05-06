@@ -5,11 +5,11 @@ from pathlib import Path
 from shutil import rmtree
 from typing import List, Union
 
-from PIL import Image
 import numpy as np
 import tensorflow as tf
-from cv2 import imread, imwrite
+from cv2 import addWeighted, imread, imwrite
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
+from tensorflow_addons.image import blend
 from tqdm import tqdm
 
 from src.data.image_postprocessing import (
@@ -124,8 +124,23 @@ class PredictionPipeline:
             ):
                 raw_image = imread(raw_image_filepath)
                 raw_mask = np.load(raw_mask_filepath)
-                self.__postprocess_tiles_borders_in_concatenated_prediction(
+                (
+                    decoded_prediction,
+                    raw_image_with_boundaries,
+                ) = self.__postprocess_tiles_borders_in_concatenated_prediction(
                     raw_image, raw_mask, os.path.basename(raw_image_filepath)
+                )
+
+                overlay_image = blend(raw_image_with_boundaries, decoded_prediction, 0.5)
+                overlay_output = self.output_folder / "overlays_output"
+                os.makedirs(overlay_output, exist_ok=True)
+                decoded_prediction = np.array(decoded_prediction)
+
+                alpha = 0.6
+                blended_img = addWeighted(raw_image_with_boundaries, alpha, decoded_prediction, 1 - alpha, 0)
+                imwrite(
+                    os.path.join(overlay_output, os.path.basename(raw_image_filepath)),
+                    blended_img
                 )
 
         if clear_cache:
@@ -235,7 +250,7 @@ class PredictionPipeline:
             self.output_folder, f".cache/full_raw_images_with_boundaries"
         )
 
-        os.makedirs(cached_marked_borders, exist_ok=False)
+        os.makedirs(cached_marked_borders, exist_ok=True)
         imwrite(
             os.path.join(
                 cached_marked_borders,
@@ -243,6 +258,7 @@ class PredictionPipeline:
             ),
             raw_image_with_boundaries,
         )
+        return decoded_prediction, raw_image_with_boundaries
 
     def __process_single_oriented_borders(
         self,
