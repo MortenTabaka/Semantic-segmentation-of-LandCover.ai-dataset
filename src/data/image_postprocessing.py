@@ -3,12 +3,12 @@ import os
 import os.path
 from enum import Enum
 from pathlib import Path
-from typing import List, Union
+from typing import Any, List, Union, Tuple
 
 import cv2
 import numpy as np
 import tensorflow as tf
-from skimage.segmentation import slic
+from skimage.segmentation import mark_boundaries, slic
 from tqdm import tqdm
 
 from src.data.image_preprocessing import ImagePreprocessor
@@ -150,9 +150,9 @@ class ImagePostprocessor:
                     ] = single_tile
                 elif self.data_mode == DataMode.NUMPY_TENSOR:
                     full_sized_tensor[
-                    :,
-                    v * tile_shape[1]: (v + 1) * tile_shape[1],
-                    h * tile_shape[2]: (h + 1) * tile_shape[2],
+                        :,
+                        v * tile_shape[1] : (v + 1) * tile_shape[1],
+                        h * tile_shape[2] : (h + 1) * tile_shape[2],
                     ] = single_tile
 
                 k += 1
@@ -243,7 +243,7 @@ class SuperpixelsProcessor:
         not_decoded_prediction: tf.Tensor,
         threshold: float,
         should_class_balance: bool = False,
-    ):
+    ) -> Tuple[tf.Tensor, Any]:
         """
         Update the prediction for each superpixel segment in a not-decoded predicted tile.
 
@@ -264,7 +264,7 @@ class SuperpixelsProcessor:
             contains integer values representing the updated predicted classes for each pixel
             in the tile, after considering the most frequent class within each superpixel segment.
         """
-        superpixel_segments = self.get_superpixel_segments()
+        superpixel_segments, raw_segments = self.get_superpixel_segments()
         num_of_segments = self.get_number_of_segments(superpixel_segments)
         class_balance = get_normalized_class_balance_of_the_landcover_dataset()
 
@@ -280,7 +280,7 @@ class SuperpixelsProcessor:
             if should_class_balance:
                 counts = tf.cast(counts, dtype=tf.float32)
                 num_classes = len(counts)
-                counts = counts / class_balance[num_classes - 1]
+                counts = [counts[i] / class_balance[i] for i in range(num_classes)]
 
             # Find the index of the most often repeated value
             most_frequent_value_index = tf.math.argmax(counts)
@@ -290,22 +290,25 @@ class SuperpixelsProcessor:
             most_frequent_count = counts[most_frequent_value_index].numpy()
             ratio = most_frequent_count / number_of_all_pixels_in_segment
 
-            road_class_pixel_count = counts[-1]
-
             if ratio >= threshold:
                 # Get the most often repeated value
                 most_frequent_class_in_tile_segment = most_frequent_value_index.numpy()
                 # Create a tensor of ones with the shape of indices
-                ones = tf.ones((tf.shape(indices)[0],), dtype=tf.uint8)
+                ones = tf.ones((tf.shape(indices)[0],), dtype=tf.int64)
                 # Multiply the ones tensor by max_value
                 updates = ones * most_frequent_class_in_tile_segment
                 # Update the not_decoded_prediction tensor
                 not_decoded_prediction = tf.tensor_scatter_nd_update(
                     not_decoded_prediction, indices, updates
                 )
-        return not_decoded_prediction
 
-    def get_superpixel_segments(self) -> tf.Tensor:
+        raw_image_with_marked_boundaries = mark_boundaries(
+            self.raw_image, raw_segments, color=(0, 1, 1)
+        )
+
+        return not_decoded_prediction, raw_image_with_marked_boundaries
+
+    def get_superpixel_segments(self) -> Tuple:
         """
         Generates superpixel segments for an input image using the Simple Linear
         Iterative Clustering (SLIC) algorithm.
@@ -316,16 +319,16 @@ class SuperpixelsProcessor:
             tensor contains integer values representing the segment labels (superpixel
             indices) assigned to each pixel in the image.
         """
-        segments = slic(
+        raw_segments = slic(
             self.raw_image,
             **self.params_of_superpixels_postprocessing,
         )
-        segments = tf.convert_to_tensor(segments)
+        segments = tf.convert_to_tensor(raw_segments)
         segments = tf.reshape(
             segments,
             (1, segments.shape[0], segments.shape[1]),
         )
-        return segments
+        return segments, raw_segments
 
     @staticmethod
     def get_number_of_segments(superpixel_segments: tf.Tensor) -> int:

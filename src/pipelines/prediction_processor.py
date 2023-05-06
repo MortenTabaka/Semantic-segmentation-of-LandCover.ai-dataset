@@ -5,7 +5,7 @@ from pathlib import Path
 from shutil import rmtree
 from typing import List, Union
 
-import PIL.Image
+from PIL import Image
 import numpy as np
 import tensorflow as tf
 from cv2 import imread, imwrite
@@ -58,6 +58,7 @@ class PredictionPipeline:
         number_of_superpixels: int = None,
         compactness: float = None,
         superpixel_threshold: float = None,
+        sp_class_balance: bool = False,
         border_sp: bool = True,
         border_sp_count: int = None,
         border_compactness: float = None,
@@ -86,6 +87,7 @@ class PredictionPipeline:
         self.number_of_superpixels = number_of_superpixels
         self.compactness = compactness
         self.superpixel_threshold = superpixel_threshold
+        self.sp_class_balance = sp_class_balance
 
         self.border_sp = border_sp
         self.border_compactness = border_compactness
@@ -161,10 +163,10 @@ class PredictionPipeline:
         self, tile: str, prediction: tf.Tensor
     ) -> tf.Tensor:
         image = imread(tile)
-        prediction = SuperpixelsProcessor(
+        prediction, raw_image_with_marked_superpixels = SuperpixelsProcessor(
             image, self.get_slic_parameters
         ).get_updated_prediction_with_postprocessor_superpixels(
-            prediction, self.superpixel_threshold
+            prediction, self.superpixel_threshold, self.sp_class_balance
         )
         return prediction
 
@@ -205,7 +207,7 @@ class PredictionPipeline:
         num_vertical_borders = int(width / self.tile_height) - 1
         num_horizontal_borders = int(height / self.tile_width) - 1
 
-        raw_mask = self.__process_single_oriented_borders(
+        raw_mask, raw_image_with_boundaries = self.__process_single_oriented_borders(
             raw_image,
             raw_mask,
             "vertical",
@@ -213,7 +215,7 @@ class PredictionPipeline:
             self.border_sp_pixel_range,
         )
 
-        raw_mask = self.__process_single_oriented_borders(
+        raw_mask, raw_image_with_boundaries = self.__process_single_oriented_borders(
             raw_image,
             raw_mask,
             "horizontal",
@@ -227,7 +229,20 @@ class PredictionPipeline:
 
         filename = self.__generate_filename_with_sp_params(base_name)
         filepath = os.path.join(self.output_folder, filename)
-        decoded_prediction.save(filepath)
+        decoded_prediction.save(filepath, quality=100)
+
+        cached_marked_borders = os.path.join(
+            self.output_folder, f".cache/full_raw_images_with_boundaries"
+        )
+
+        os.makedirs(cached_marked_borders, exist_ok=False)
+        imwrite(
+            os.path.join(
+                cached_marked_borders,
+                f"{base_name}.tiff",
+            ),
+            raw_image_with_boundaries,
+        )
 
     def __process_single_oriented_borders(
         self,
@@ -245,24 +260,38 @@ class PredictionPipeline:
             raw_border_area, raw_border_prediction = self.__get_border_area(
                 raw_image, raw_prediction, orientation, top_or_right, bottom_or_left
             )
-            post_processed_border = SuperpixelsProcessor(
+            (
+                post_processed_border,
+                raw_image_with_marked_superpixels,
+            ) = SuperpixelsProcessor(
                 raw_border_area, slic_params_for_border
             ).get_updated_prediction_with_postprocessor_superpixels(
                 raw_border_prediction,
                 threshold=self.border_sp_thresh,
                 should_class_balance=self.border_sp_class_balance,
             )
-            if orientation == "horizontal":
-                raw_prediction[
-                    :, bottom_or_left:top_or_right, :
-                ] = post_processed_border
-            elif orientation == "vertical":
+            if orientation == "vertical":
                 raw_prediction[
                     :, :, bottom_or_left:top_or_right
                 ] = post_processed_border
+
+                raw_image[:, bottom_or_left:top_or_right, :] = (
+                    raw_image_with_marked_superpixels * 255
+                )
+
+            elif orientation == "horizontal":
+                raw_prediction[
+                    :, bottom_or_left:top_or_right, :
+                ] = post_processed_border
+
+                raw_image[bottom_or_left:top_or_right, :, :] = (
+                    raw_image_with_marked_superpixels * 255
+                )
+
             else:
                 raise ValueError("Pick correct which border to process.")
-        return raw_prediction
+
+        return raw_prediction, raw_image
 
     def __clear_cache(self, paths=None):
         if paths is None:
@@ -277,22 +306,23 @@ class PredictionPipeline:
         filename = f"{base_name}".replace(".jpg", "")
         if self.tiles_superpixel_postprocessing:
             filename += (
-                f"__SpTiles_spCount{self.number_of_superpixels}_spThresh{self.superpixel_threshold}"
-                f"__spCompactness{self.compactness}"
+                f"--SpTiles_spCount{self.number_of_superpixels}-spThresh{self.superpixel_threshold}"
+                f"--spCompactness{self.compactness}--spCB{self.sp_class_balance}"
             )
         else:
-            filename = f"{filename}_NoTilesSuperPixelsProcessing"
+            filename = f"{filename}-NoTilesSuperPixelsProcessing"
 
         if self.border_sp:
             filename += (
-                f"__SpBorders_spBorderCount{self.border_sp_count}_spBorderThresh{self.border_sp_thresh}"
-                f"_spBorderCompactness{self.border_compactness}_spBorderCB{self.border_sp_class_balance}"
-                f"_spBorderRange{self.border_sp_pixel_range}"
+                f"--SpBorders_spBorderCount{self.border_sp_count}-spBorderThresh{self.border_sp_thresh}"
+                f"-spBorderCompactness{self.border_compactness}-spBorderCB{self.border_sp_class_balance}"
+                f"-spBorderRange{self.border_sp_pixel_range}"
             )
         else:
-            filename = f"{filename}__NoBordersSuperPixelsProcessing"
+            filename = f"{filename}--NoBordersSuperPixelsProcessing"
 
-        return f"{filename}.jpg"
+        filename = f"{filename}".replace(".", "_")
+        return f"{filename}.tiff"
 
     @property
     def get_slic_parameters(self):
