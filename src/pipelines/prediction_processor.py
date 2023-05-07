@@ -175,13 +175,21 @@ class PredictionPipeline:
             DataMode.NUMPY_TENSOR,
         ).concatenate_all_tiles()
 
+        all_input_images = self.__get_full_size_raw_images
+        all_numpy_tensors = sorted(
+            glob(path.join(self.output_folder_superpixels_prediction_masks, "*.npy"))
+        )
+        all_numpy_tensors = [
+            item
+            for item in all_numpy_tensors
+            if any(
+                f"{os.path.splitext(os.path.basename(filepath))[0]}.npy" in item
+                for filepath in all_input_images
+            )
+        ]
+
         for raw_image_filepath, raw_mask_filepath in zip(
-            self.__get_full_size_raw_images,
-            sorted(
-                glob(
-                    path.join(self.output_folder_superpixels_prediction_masks, "*.npy")
-                )
-            ),
+            all_input_images, all_numpy_tensors
         ):
             raw_image = imread(raw_image_filepath)
             raw_mask = np.load(raw_mask_filepath)
