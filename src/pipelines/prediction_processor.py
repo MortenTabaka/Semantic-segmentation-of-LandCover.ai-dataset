@@ -5,11 +5,11 @@ from pathlib import Path
 from shutil import rmtree
 from typing import List, Union
 
-from PIL import Image
 import numpy as np
 import tensorflow as tf
-from cv2 import imread, imwrite
+from cv2 import addWeighted, imread, imwrite
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
+from tensorflow_addons.image import blend
 from tqdm import tqdm
 
 from src.data.image_postprocessing import (
@@ -96,6 +96,28 @@ class PredictionPipeline:
         self.border_sp_class_balance = border_sp_class_balance
         self.border_sp_pixel_range = border_sp_pixel_range
 
+        self.output_folder_image_mask_overlays = (
+            self.output_folder / "prediction_image_mask_overlays"
+        )
+        self.output_folder_image_mask_overlays_with_marked_SP = (
+            self.output_folder
+            / "prediction_image_mask_overlays_with_marked_SuperPixels"
+        )
+        self.output_folder_prediction_masks = self.output_folder / "prediction_masks"
+        self.output_folder_superpixels_prediction_masks = (
+            self.output_folder / "prediction_masks_SuperPixels_postprocessing"
+        )
+        self.output_folder_raw_image_marked_borders = (
+            self.output_folder / "raw_images_marked_borders"
+        )
+        os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
+        os.makedirs(
+            self.output_folder_image_mask_overlays_with_marked_SP, exist_ok=True
+        )
+        os.makedirs(self.output_folder_prediction_masks, exist_ok=True)
+        os.makedirs(self.output_folder_superpixels_prediction_masks, exist_ok=True)
+        os.makedirs(self.output_folder_raw_image_marked_borders, exist_ok=True)
+
     def process(self, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
@@ -112,21 +134,7 @@ class PredictionPipeline:
         self.__concatenate_tiles(predicted_tiles)
 
         if self.border_sp:
-            ImagePostprocessor(
-                os.path.join(self.output_folder, ".cache/prediction_numpy_tensors"),
-                self.output_folder,
-                DataMode.NUMPY_TENSOR,
-            ).concatenate_all_tiles()
-
-            for raw_image_filepath, raw_mask_filepath in zip(
-                self.__get_full_size_raw_images,
-                sorted(glob(path.join(self.output_folder, "*.npy"))),
-            ):
-                raw_image = imread(raw_image_filepath)
-                raw_mask = np.load(raw_mask_filepath)
-                self.__postprocess_tiles_borders_in_concatenated_prediction(
-                    raw_image, raw_mask, os.path.basename(raw_image_filepath)
-                )
+            self.__postprocess_tiles_boundaries_in_concatenated_image()
 
         if clear_cache:
             self.__clear_cache()
@@ -159,6 +167,62 @@ class PredictionPipeline:
             )
             self.__save_prediction_as_decoded_image(decoded_prediction, file_name)
 
+    def __postprocess_tiles_boundaries_in_concatenated_image(self):
+        ImagePostprocessor(
+            os.path.join(self.output_folder, ".cache/prediction_numpy_tensors"),
+            self.output_folder_superpixels_prediction_masks,
+            DataMode.NUMPY_TENSOR,
+        ).concatenate_all_tiles()
+
+        for raw_image_filepath, raw_mask_filepath in zip(
+            self.__get_full_size_raw_images,
+            sorted(
+                glob(
+                    path.join(self.output_folder_superpixels_prediction_masks, "*.npy")
+                )
+            ),
+        ):
+            raw_image = imread(raw_image_filepath)
+            raw_mask = np.load(raw_mask_filepath)
+            base_name = os.path.basename(raw_image_filepath)
+            (
+                raw_processed_mask,
+                raw_image_with_boundaries,
+            ) = self.__postprocess_tiles_borders_in_concatenated_prediction(
+                raw_image, raw_mask, base_name
+            )
+
+            decoded_prediction = decode_segmentation_mask_to_rgb(
+                raw_processed_mask,
+                *self.__get_colormap_and_number_of_classes,
+                return_numpy=True,
+            )
+
+            filename = self.__generate_filename_with_sp_params(base_name)
+            imwrite(
+                os.path.join(self.output_folder_superpixels_prediction_masks, filename),
+                decoded_prediction,
+            )
+
+            imwrite(
+                os.path.join(
+                    self.output_folder_raw_image_marked_borders,
+                    f"{filename}.tiff",
+                ),
+                raw_image_with_boundaries,
+            )
+
+            blended_img_with_marked_borders = addWeighted(
+                raw_image_with_boundaries, 1, decoded_prediction, 0.5, 0
+            )
+            imwrite(
+                os.path.join(
+                    self.output_folder_image_mask_overlays_with_marked_SP,
+                    f"{filename}.tiff",
+                ),
+                blended_img_with_marked_borders,
+            )
+
     def __get_superpixel_post_processed_tile_prediction(
         self, tile: str, prediction: tf.Tensor
     ) -> tf.Tensor:
@@ -188,7 +252,7 @@ class PredictionPipeline:
     def __concatenate_tiles(self, input_folder):
         ImagePostprocessor(
             input_path=input_folder,
-            output_path=self.output_folder,
+            output_path=self.output_folder_prediction_masks,
             data_mode=DataMode.IMAGE,
         ).concatenate_all_tiles()
 
@@ -223,26 +287,7 @@ class PredictionPipeline:
             self.border_sp_pixel_range,
         )
 
-        decoded_prediction = decode_segmentation_mask_to_rgb(
-            raw_mask, *self.__get_colormap_and_number_of_classes
-        )
-
-        filename = self.__generate_filename_with_sp_params(base_name)
-        filepath = os.path.join(self.output_folder, filename)
-        decoded_prediction.save(filepath, quality=100)
-
-        cached_marked_borders = os.path.join(
-            self.output_folder, f".cache/full_raw_images_with_boundaries"
-        )
-
-        os.makedirs(cached_marked_borders, exist_ok=False)
-        imwrite(
-            os.path.join(
-                cached_marked_borders,
-                f"{base_name}.tiff",
-            ),
-            raw_image_with_boundaries,
-        )
+        return raw_mask, raw_image_with_boundaries
 
     def __process_single_oriented_borders(
         self,

@@ -137,7 +137,7 @@ def load_data_for_revision(model_key):
 
 
 def decode_segmentation_mask_to_rgb(
-    mask, custom_colormap: List[int], num_classes: int = 5
+    mask, custom_colormap: List[int], num_classes: int = 5, return_numpy: bool = False
 ) -> array:
     """
     Transforms Landcover dataset's masks to RGB image.
@@ -156,13 +156,22 @@ def decode_segmentation_mask_to_rgb(
     g = zeros_like(mask).astype(uint8)
     b = zeros_like(mask).astype(uint8)
 
+    if return_numpy:
+        first_channel, second_channel, third_channel = 2, 1, 0
+    else:
+        first_channel, second_channel, third_channel = 0, 1, 2
+
     for i in range(0, num_classes):
         idx = mask == i
-        r[idx] = custom_colormap[i][0]
-        g[idx] = custom_colormap[i][1]
-        b[idx] = custom_colormap[i][2]
+        r[idx] = custom_colormap[i][first_channel]
+        g[idx] = custom_colormap[i][second_channel]
+        b[idx] = custom_colormap[i][third_channel]
 
     rgb = stack([r, g, b], axis=2)
+
+    if return_numpy:
+        return rgb
+
     image = array_to_img(rgb)
     return image
 
