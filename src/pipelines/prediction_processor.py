@@ -8,6 +8,7 @@ from typing import List, Union
 import numpy as np
 import tensorflow as tf
 from cv2 import addWeighted, imread, imwrite
+from datetime import datetime
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 from tensorflow_addons.image import blend
 from tqdm import tqdm
@@ -96,19 +97,36 @@ class PredictionPipeline:
         self.border_sp_class_balance = border_sp_class_balance
         self.border_sp_pixel_range = border_sp_pixel_range
 
+        current_datetime = datetime.now().strftime("%Y-%m-%d--%H:%M:%S")
         self.output_folder_image_mask_overlays = (
-            self.output_folder / "prediction_image_mask_overlays"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "overlays_mask_image"
         )
         self.output_folder_image_mask_overlays_with_marked_SP = (
             self.output_folder
-            / "prediction_image_mask_overlays_with_marked_SuperPixels"
+            / model_revision
+            / current_datetime
+            / "overlays_mask_image_with_marked_SuperPixels"
         )
-        self.output_folder_prediction_masks = self.output_folder / "prediction_masks"
+        self.output_folder_prediction_masks = (
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "prediction_masks_no_borders_post_processed"
+        )
         self.output_folder_superpixels_prediction_masks = (
-            self.output_folder / "prediction_masks_SuperPixels_postprocessing"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "prediction_masks_borders_post_processed"
         )
         self.output_folder_raw_image_marked_borders = (
-            self.output_folder / "raw_images_marked_borders"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "images_marked_borders_SuperPixels"
         )
         os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
         os.makedirs(
@@ -174,17 +192,25 @@ class PredictionPipeline:
             DataMode.NUMPY_TENSOR,
         ).concatenate_all_tiles()
 
+        all_input_images = self.__get_full_size_raw_images
+        all_numpy_tensors = sorted(
+            glob(path.join(self.output_folder_superpixels_prediction_masks, "*.npy"))
+        )
+        all_numpy_tensors = [
+            item
+            for item in all_numpy_tensors
+            if any(
+                f"{os.path.splitext(os.path.basename(filepath))[0]}.npy" in item
+                for filepath in all_input_images
+            )
+        ]
+
         for raw_image_filepath, raw_mask_filepath in zip(
-            self.__get_full_size_raw_images,
-            sorted(
-                glob(
-                    path.join(self.output_folder_superpixels_prediction_masks, "*.npy")
-                )
-            ),
+            all_input_images, all_numpy_tensors
         ):
             raw_image = imread(raw_image_filepath)
             raw_mask = np.load(raw_mask_filepath)
-            base_name = os.path.basename(raw_image_filepath)
+            base_name = os.path.splitext(os.path.basename(raw_image_filepath))[0]
             (
                 raw_processed_mask,
                 raw_image_with_boundaries,
@@ -218,7 +244,7 @@ class PredictionPipeline:
             imwrite(
                 os.path.join(
                     self.output_folder_image_mask_overlays_with_marked_SP,
-                    f"{filename}.tiff",
+                    f"{filename}.jpg",
                 ),
                 blended_img_with_marked_borders,
             )
