@@ -96,6 +96,25 @@ class PredictionPipeline:
         self.border_sp_class_balance = border_sp_class_balance
         self.border_sp_pixel_range = border_sp_pixel_range
 
+        self.output_folder_image_mask_overlays = (
+            self.output_folder / "prediction_image_mask_overlays"
+        )
+        self.output_folder_image_mask_overlays_with_marked_SP = (
+            self.output_folder
+            / "prediction_image_mask_overlays_with_marked_SuperPixels"
+        )
+        self.output_folder_prediction_masks = self.output_folder / "prediction_masks"
+        self.output_folder_superpixels_prediction_masks = (
+            self.output_folder / "prediction_masks_SuperPixels_postprocessing"
+        )
+        self.output_folder_raw_image_marked_borders = (
+            self.output_folder / "raw_images_marked_borders"
+        )
+        os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
+        os.makedirs(self.output_folder_prediction_masks, exist_ok=True)
+        os.makedirs(self.output_folder_superpixels_prediction_masks, exist_ok=True)
+        os.makedirs(self.output_folder_raw_image_marked_borders, exist_ok=True)
+
     def process(self, clear_cache: bool = True):
         config = ConfigProto()
         config.gpu_options.allow_growth = True
@@ -114,13 +133,19 @@ class PredictionPipeline:
         if self.border_sp:
             ImagePostprocessor(
                 os.path.join(self.output_folder, ".cache/prediction_numpy_tensors"),
-                self.output_folder,
+                self.output_folder_superpixels_prediction_masks,
                 DataMode.NUMPY_TENSOR,
             ).concatenate_all_tiles()
 
             for raw_image_filepath, raw_mask_filepath in zip(
                 self.__get_full_size_raw_images,
-                sorted(glob(path.join(self.output_folder, "*.npy"))),
+                sorted(
+                    glob(
+                        path.join(
+                            self.output_folder_superpixels_prediction_masks, "*.npy"
+                        )
+                    )
+                ),
             ):
                 raw_image = imread(raw_image_filepath)
                 raw_mask = np.load(raw_mask_filepath)
@@ -131,16 +156,16 @@ class PredictionPipeline:
                     raw_image, raw_mask, os.path.basename(raw_image_filepath)
                 )
 
-                overlay_image = blend(raw_image_with_boundaries, decoded_prediction, 0.5)
-                overlay_output = self.output_folder / "overlays_output"
-                os.makedirs(overlay_output, exist_ok=True)
                 decoded_prediction = np.array(decoded_prediction)
-
-                alpha = 0.6
-                blended_img = addWeighted(raw_image_with_boundaries, alpha, decoded_prediction, 1 - alpha, 0)
+                blended_img_with_marked_borders = addWeighted(
+                    raw_image_with_boundaries, 1, decoded_prediction, 0.5, 0
+                )
                 imwrite(
-                    os.path.join(overlay_output, os.path.basename(raw_image_filepath)),
-                    blended_img
+                    os.path.join(
+                        self.output_folder_image_mask_overlays_with_marked_SP,
+                        os.path.basename(raw_image_filepath),
+                    ),
+                    blended_img_with_marked_borders,
                 )
 
         if clear_cache:
@@ -203,7 +228,7 @@ class PredictionPipeline:
     def __concatenate_tiles(self, input_folder):
         ImagePostprocessor(
             input_path=input_folder,
-            output_path=self.output_folder,
+            output_path=self.output_folder_prediction_masks,
             data_mode=DataMode.IMAGE,
         ).concatenate_all_tiles()
 
@@ -243,18 +268,15 @@ class PredictionPipeline:
         )
 
         filename = self.__generate_filename_with_sp_params(base_name)
-        filepath = os.path.join(self.output_folder, filename)
+        filepath = os.path.join(
+            self.output_folder_superpixels_prediction_masks, filename
+        )
         decoded_prediction.save(filepath, quality=100)
 
-        cached_marked_borders = os.path.join(
-            self.output_folder, f".cache/full_raw_images_with_boundaries"
-        )
-
-        os.makedirs(cached_marked_borders, exist_ok=True)
         imwrite(
             os.path.join(
-                cached_marked_borders,
-                f"{base_name}.tiff",
+                self.output_folder_raw_image_marked_borders,
+                f"{filename}.tiff",
             ),
             raw_image_with_boundaries,
         )
