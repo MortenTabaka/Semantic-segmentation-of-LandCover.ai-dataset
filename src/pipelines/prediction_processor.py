@@ -96,20 +96,36 @@ class PredictionPipeline:
         self.border_sp_class_balance = border_sp_class_balance
         self.border_sp_pixel_range = border_sp_pixel_range
 
+        current_datetime = datetime.now().strftime("%Y-%m-%d--%H:%M:%S")
         self.output_folder_image_mask_overlays = (
-            self.output_folder / "overlays_mask_image"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "overlays_mask_image"
         )
         self.output_folder_image_mask_overlays_with_marked_SP = (
-            self.output_folder / "overlays_mask_image_with_marked_SuperPixels"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "overlays_mask_image_with_marked_SuperPixels"
         )
         self.output_folder_prediction_masks = (
-            self.output_folder / "prediction_masks_no_borders_post_processed"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "prediction_masks_no_borders_post_processed"
         )
         self.output_folder_superpixels_prediction_masks = (
-            self.output_folder / "prediction_masks_borders_post_processed"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "prediction_masks_borders_post_processed"
         )
         self.output_folder_raw_image_marked_borders = (
-            self.output_folder / "images_marked_borders_SuperPixels"
+            self.output_folder
+            / model_revision
+            / current_datetime
+            / "images_marked_borders_SuperPixels"
         )
         os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
         os.makedirs(
@@ -193,7 +209,7 @@ class PredictionPipeline:
         ):
             raw_image = imread(raw_image_filepath)
             raw_mask = np.load(raw_mask_filepath)
-            base_name = os.path.basename(raw_image_filepath)
+            base_name = os.path.splitext(os.path.basename(raw_image_filepath))[0]
             (
                 raw_processed_mask,
                 raw_image_with_boundaries,
