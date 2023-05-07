@@ -8,6 +8,7 @@ from typing import List, Union
 import numpy as np
 import tensorflow as tf
 from cv2 import addWeighted, imread, imwrite
+from datetime import datetime
 from tensorflow.compat.v1 import ConfigProto, InteractiveSession
 from tensorflow_addons.image import blend
 from tqdm import tqdm
@@ -243,7 +244,7 @@ class PredictionPipeline:
             imwrite(
                 os.path.join(
                     self.output_folder_image_mask_overlays_with_marked_SP,
-                    f"{filename}.tiff",
+                    f"{filename}.jpg",
                 ),
                 blended_img_with_marked_borders,
             )
