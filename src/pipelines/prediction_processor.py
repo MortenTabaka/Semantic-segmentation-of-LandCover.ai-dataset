@@ -111,7 +111,9 @@ class PredictionPipeline:
             self.output_folder / "raw_images_marked_borders"
         )
         os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
-        os.makedirs(self.output_folder_image_mask_overlays_with_marked_SP, exist_ok=True)
+        os.makedirs(
+            self.output_folder_image_mask_overlays_with_marked_SP, exist_ok=True
+        )
         os.makedirs(self.output_folder_prediction_masks, exist_ok=True)
         os.makedirs(self.output_folder_superpixels_prediction_masks, exist_ok=True)
         os.makedirs(self.output_folder_raw_image_marked_borders, exist_ok=True)
@@ -173,14 +175,12 @@ class PredictionPipeline:
         ).concatenate_all_tiles()
 
         for raw_image_filepath, raw_mask_filepath in zip(
-                self.__get_full_size_raw_images,
-                sorted(
-                    glob(
-                        path.join(
-                            self.output_folder_superpixels_prediction_masks, "*.npy"
-                        )
-                    )
-                ),
+            self.__get_full_size_raw_images,
+            sorted(
+                glob(
+                    path.join(self.output_folder_superpixels_prediction_masks, "*.npy")
+                )
+            ),
         ):
             raw_image = imread(raw_image_filepath)
             raw_mask = np.load(raw_mask_filepath)
@@ -193,14 +193,16 @@ class PredictionPipeline:
             )
 
             decoded_prediction = decode_segmentation_mask_to_rgb(
-                raw_processed_mask, *self.__get_colormap_and_number_of_classes, return_numpy=True
+                raw_processed_mask,
+                *self.__get_colormap_and_number_of_classes,
+                return_numpy=True,
             )
 
             filename = self.__generate_filename_with_sp_params(base_name)
-            filepath = os.path.join(
-                self.output_folder_superpixels_prediction_masks, filename
+            imwrite(
+                os.path.join(self.output_folder_superpixels_prediction_masks, filename),
+                decoded_prediction,
             )
-            imwrite(filepath, decoded_prediction)
 
             imwrite(
                 os.path.join(
