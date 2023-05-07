@@ -97,18 +97,19 @@ class PredictionPipeline:
         self.border_sp_pixel_range = border_sp_pixel_range
 
         self.output_folder_image_mask_overlays = (
-            self.output_folder / "prediction_image_mask_overlays"
+            self.output_folder / "overlays_mask_image"
         )
         self.output_folder_image_mask_overlays_with_marked_SP = (
-            self.output_folder
-            / "prediction_image_mask_overlays_with_marked_SuperPixels"
+            self.output_folder / "overlays_mask_image_with_marked_SuperPixels"
         )
-        self.output_folder_prediction_masks = self.output_folder / "prediction_masks"
+        self.output_folder_prediction_masks = (
+            self.output_folder / "prediction_masks_no_borders_post_processed"
+        )
         self.output_folder_superpixels_prediction_masks = (
-            self.output_folder / "prediction_masks_SuperPixels_postprocessing"
+            self.output_folder / "prediction_masks_borders_post_processed"
         )
         self.output_folder_raw_image_marked_borders = (
-            self.output_folder / "raw_images_marked_borders"
+            self.output_folder / "images_marked_borders_SuperPixels"
         )
         os.makedirs(self.output_folder_image_mask_overlays, exist_ok=True)
         os.makedirs(
