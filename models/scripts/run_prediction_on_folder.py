@@ -41,7 +41,7 @@ def main(
         50, min=0, help="Will be multiplied by number of borders in single strip"
     ),
     border_compactness: float = typer.Option(10, min=0),
-    border_sp_thresh: float = typer.Option(0.3, min=0, max=1),
+    border_sp_thresh: float = typer.Option(0.5, min=0, max=1),
     border_sp_class_balance: bool = typer.Option(False),
     border_sp_pixel_range: int = typer.Option(
         50,
