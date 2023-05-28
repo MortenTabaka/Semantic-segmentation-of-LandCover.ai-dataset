@@ -227,15 +227,15 @@ class Model:
 
 
 def build_deeplabv3plus(model_architecture: str, model_build_parameters: List):
-    if model_architecture == "deeplabv3plus":
+    if model_architecture == "original":
         model = deeplabv3plus.Deeplabv3(*model_build_parameters)
-    elif model_architecture == "modified_v1_deeplabv3plus":
+    elif model_architecture == "v1":
         model = modified_v1_deeplabv3plus.Deeplabv3(*model_build_parameters)
-    elif model_architecture == "modified_v2_deeplabv3plus":
+    elif model_architecture == "v2":
         model = modified_v2_deeplabv3plus.Deeplabv3(*model_build_parameters)
-    elif model_architecture == "modified_v3_deeplabv3plus":
+    elif model_architecture == "v3":
         model = modified_v3_deeplabv3plus.Deeplabv3(*model_build_parameters)
-    elif model_architecture == "modified_v4_deeplabv3plus":
+    elif model_architecture == "v4":
         model = modified_v4_deeplabv3plus.Deeplabv3(*model_build_parameters)
     else:
         raise ValueError("Model architecture does not exists.")
