@@ -31,14 +31,6 @@ pip install -r requirements.txt
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/' > $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 ```
-### Install Tensorflow with only CPU support
-```
-conda install -c anaconda tensorflow
-```
-### Install Tensorflow with GPU support
-```
-conda install -c anaconda tensorflow-gpu
-```
 #### Check installation 
 CPU: 
 ```
@@ -57,20 +49,16 @@ Success of Tensorflow2's installation is highly depend on your OS and Nvidia dri
 I will be experimenting with customizing [Tensorflow's Docker image](https://www.tensorflow.org/install/docker?hl=en), to create a docker image designed for this project.
 
 ### Register created Anaconda environment for Jupyter.
+Alternatively modify IDE's default interpreter to use created Conda environment.
 ```
 python -m ipykernel install --user --name tensorflow --display-name "Python 3.8 (tensorflow)"
 ```
 Now you should be able to change kernel in Jupyter Notebook.
-#### Create dataset and install pip packages with one command
-```
-make dataset
-``` 
-*During the process, pip packages specified in requirements.txt, will be installed.*
 
-### [Notebook for checking installation](https://github.com/MortenTabaka/main/notebooks/testing/check_tensorflow_installation.ipynb)
-Filepath: `/notebooks/testing/check_tensorflow_installation.ipynb`
+### [Notebook for checking installation](https://github.com/MortenTabaka/Semantic-segmentation-of-LandCover.ai-dataset/blob/main/notebooks/verify_installation.ipynb)
+ `/notebooks/verify_installation.ipynb`
 
-# My environemnt 
+# My environment 
 ## OS
 * Debian 12
 
