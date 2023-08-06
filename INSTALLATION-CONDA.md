@@ -20,10 +20,11 @@ conda activate landcover_semantic_segmentation
 ```
 conda install -c conda-forge nb_conda
 ```
-### Install Cudatoolkit and Cudnn.
+### Install Cudatoolkit, Cudnn and required PIP packages.
 ```
 conda install -c conda-forge cudatoolkit=11.3.1
 conda install -c nvidia cudnn
+pip install -r requirements.txt
 ```
 ### Set up automation for system paths configuration.
 ```
