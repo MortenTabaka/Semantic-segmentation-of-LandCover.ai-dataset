@@ -20,12 +20,10 @@ conda activate landcover_semantic_segmentation
 ```
 conda install -c conda-forge nb_conda
 ```
-### Install Cudnn and Cudatoolkit.
+### Install Cudatoolkit and Cudnn.
 ```
+conda install -c conda-forge cudatoolkit=11.3.1
 conda install -c nvidia cudnn
-```
-```
-conda install -c anaconda cudatoolkit
 ```
 ### Set up automation for system paths configuration.
 ```
@@ -73,12 +71,12 @@ Filepath: `/notebooks/testing/check_tensorflow_installation.ipynb`
 
 # My environemnt 
 ## OS
-* Ubuntu 22.04.1
+* Debian 12
 
 ## Anaconda environment
 * Python 3.8
 * Tensorflow 2.5 (with GPU)
-* Cudnn 8.2.1 (` conda list cudnn`)
+* Cudnn 8.9.2.26 (` conda list cudnn`)
 * Cudatoolkit 11.3.1 (`conda list cudatoolkit`)
 
 ## Nvidia
