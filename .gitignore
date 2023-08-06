@@ -95,3 +95,4 @@ models/saved_weights
 /notebooks/templates/results/
 /notebooks/templates/best_miou_score_weights/
 /notebooks/exploratory/
+/notebooks_training/
