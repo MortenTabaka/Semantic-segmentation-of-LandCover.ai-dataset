@@ -2,6 +2,9 @@ import tensorflow as tf
 
 
 class CustomMeanIoU(tf.keras.metrics.MeanIoU):
+    """
+    Source: https://github.com/tensorflow/tensorflow/issues/32875#issuecomment-707316950
+    """
     def __init__(self, num_classes=None, name=None, dtype=None):
         super(CustomMeanIoU, self).__init__(
             num_classes=num_classes, name=name, dtype=dtype
