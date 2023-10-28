@@ -19,7 +19,6 @@ def move_data(raw_data_path, processed_data_path):
     dataSplit = ["train", "val", "test"]
 
     for whichSplit in dataSplit:
-
         tilesFolder = raw_data_path + "/tiles"
         moveToSubset = processed_data_path + "/" + whichSplit
 

@@ -1,7 +1,16 @@
 from enum import Enum
 from pathlib import Path
 
+import os
 import typer
+import sys
+
+
+project_root = os.path.abspath(os.curdir)
+while not os.path.isfile(os.path.join(project_root, "README.md")):
+    current_dir = os.path.abspath(os.path.join(project_root, os.pardir))
+sys.path.insert(0, project_root)
+
 
 from src.features.utils import get_absolute_path_to_project_location
 from src.pipelines.prediction_processor import PredictionPipeline

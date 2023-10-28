@@ -95,7 +95,7 @@ class SemanticSegmentationLoss(object):
 
     def focal_loss_with_logits(self, logits, targets, alpha, gamma, y_pred):
         weight_a = alpha * (1 - y_pred) ** gamma * targets
-        weight_b = (1 - alpha) * y_pred ** gamma * (1 - targets)
+        weight_b = (1 - alpha) * y_pred**gamma * (1 - targets)
 
         return (tf.math.log1p(tf.exp(-tf.abs(logits))) + tf.nn.relu(-logits)) * (
             weight_a + weight_b

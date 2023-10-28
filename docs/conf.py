@@ -41,7 +41,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset"
+project = "Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -184,8 +184,8 @@ latex_documents = [
     (
         "index",
         "roads_semantic_segmentation_in_LandCover.ai_dataset.tex",
-        u"Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
-        u"Marcin Tabaka",
+        "Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
+        "Marcin Tabaka",
         "manual",
     ),
 ]
@@ -219,8 +219,8 @@ man_pages = [
     (
         "index",
         "roads_semantic_segmentation_in_LandCover.ai_dataset",
-        u"Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
-        [u"Marcin Tabaka"],
+        "Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
+        ["Marcin Tabaka"],
         1,
     )
 ]
@@ -238,8 +238,8 @@ texinfo_documents = [
     (
         "index",
         "roads_semantic_segmentation_in_LandCover.ai_dataset",
-        u"Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
-        u"Marcin Tabaka",
+        "Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset Documentation",
+        "Marcin Tabaka",
         "Improving_IoU_for_roads_semantic_segmentation_in_LandCover.ai_dataset",
         "Project will focus on tryingsemantic segmentation algorithms which may improve IoU for roads specifically. Dataset authors obtaied IoU=68.74% for roads, which was lowest score among all classes. ",
         "Miscellaneous",
