@@ -111,7 +111,6 @@ class ImagePreprocessor:
         target_size: int,
         path_to_output_folder: Union[Path, str],
     ):
-
         img_paths = glob.glob(
             os.path.join(self.path_to_folder_with_input_images, "*.tiff")
         )

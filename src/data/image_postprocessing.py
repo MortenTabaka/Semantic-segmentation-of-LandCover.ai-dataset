@@ -195,7 +195,6 @@ class ImagePostprocessor:
     def __get_tiles_according_its_base_name(
         self, base_names: List[str], tiles: List[str]
     ) -> List[List[str]]:
-
         split_tiles_according_to_base_name = []
 
         for base_name in base_names:

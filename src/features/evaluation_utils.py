@@ -201,7 +201,6 @@ class ConfusionMatrix:
         )
 
         for single_batch in self.dataset:
-
             y_true, y_pred = self.get_predictions_and_labels(single_batch)
 
             matrix = tf.math.confusion_matrix(

@@ -288,7 +288,6 @@ class PredictionPipeline:
     def __postprocess_tiles_borders_in_concatenated_prediction(
         self, raw_image, raw_mask, base_name: str
     ):
-
         height = tf.shape(raw_mask)[1]
         width = tf.shape(raw_mask)[2]
 
