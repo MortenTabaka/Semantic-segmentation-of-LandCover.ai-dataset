@@ -14,11 +14,6 @@ All credits for the dataset go to the original author and contributors.**
 
 After installing the necessary dependencies, execute the following scripts.
 
-Add project root to the Python path:
-```commandline
-python3 models/scripts/add_project_root_to_the_python_path.py
-```
-
 Run prediction on images in `models/custom_data/input`:
 ```commandline
 python3 models/scripts/run_prediction_on_folder.py
