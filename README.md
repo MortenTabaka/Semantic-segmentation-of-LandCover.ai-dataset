@@ -10,10 +10,17 @@ also accessible on [PapersWithCode](https://paperswithcode.com/paper/landcover-a
 **Please note that I am not the author or owner of this dataset, and I am using it under the terms of the license specified by the original author. 
 All credits for the dataset go to the original author and contributors.**
 
-## Making Predictions on Custom Images
+## Make predictions on custom images
 
-After installing the necessary dependencies, execute the following command to run the prediction script:
+After installing the necessary dependencies, execute the following scripts.
+
+Add project root to the Python path:
+```commandline
+python3 models/scripts/add_project_root_to_the_python_path.py
 ```
+
+Run prediction on images in `models/custom_data/input`:
+```commandline
 python3 models/scripts/run_prediction_on_folder.py
 ```
 This script allows you to make predictions using the DeepLabv3+ model on a folder containing custom input images. You can use the following parameters to customize the prediction process:
